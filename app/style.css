@@ -1,0 +1,30 @@
+html, body {
+    margin: 0;
+    padding: 0;
+  }
+  canvas {
+    display: block;
+  }
+  h1{
+    color: white;
+    text-align: center;
+  }
+
+form {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+ul {
+    display: flex;
+    flex-flow: column;
+    justify-content: left;
+    list-style-type: none;
+}
+
+input,
+button {
+    border-radius: 10px;
+    padding: 10px;
+}
