@@ -43,11 +43,6 @@ io.on('connection', socket => {
     //send the message to all others
     socket.broadcast.emit('message', `User ${socket.id.substring(0, 5)} connected`)
 
-    //listen for message event
-    socket.on('message', data => {
-        io.emit('message', `${socket.id.substring(0, 5)}: ${data}`)
-    })
-
     //when user disconnects, notify all other users
     socket.on('disconnect', ()=>{
         socket.broadcast.emit('message', `User ${socket.id.substring(0, 5)} disconnected`)

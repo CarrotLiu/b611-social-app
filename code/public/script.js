@@ -11,12 +11,10 @@ function sendMessage(e) {
   msgInput.focus()
 }
 
-
-
-// Listen for messages 
-socket.on("message", (data) => {
-  activity.textContent = ""
-  
+// -------------------- CONNECTION ACTIVITY -------------------- //
+socket.on("message", (msg) => {
+  activity.textContent = `${msg}`; 
+  clearEventMsg();
 })
 
 // -------------------- TYPING ACTIVITY -------------------- //
@@ -26,13 +24,17 @@ msgInput.addEventListener('keypress', () => {
 
 let activityTimer;
 socket.on("activity", (name) => {
-    activity.textContent = `${name} is typing...`
+  activity.textContent = `${name} is typing...`; 
+  clearEventMsg();
+})
 
-    // Clear after 3 seconds 
-    clearTimeout(activityTimer)
+function clearEventMsg(){
+  clearTimeout(activityTimer)
     activityTimer = setTimeout(() => {
         activity.textContent = ""
     }, 3000)
-})
+}
+
+
 
 
