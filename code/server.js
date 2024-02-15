@@ -34,18 +34,18 @@ const io = new Server(expressServer, {
 
 // connect socket
 io.on('connection', socket => {
-    console.log(`User ${socket.id} connected`)
+    console.log(`${socket.id} connected`)
 
     //upon connection
     //send the message to only the user
-    socket.emit('message', "Welcome to B611!")
+    socket.emit('message', {texts: "Welcome to B611!", user: `${socket.id}`})
 
-    //send the message to all others
-    socket.broadcast.emit('message', `User ${socket.id.substring(0, 5)} connected`)
+    //send the message to the other user
+    socket.broadcast.emit('message', {texts:`${socket.id.substring(0, 5)} connected`, user: `${socket.id}`})
 
-    //when user disconnects, notify all other users
+    //when user disconnects, notify the other user
     socket.on('disconnect', ()=>{
-        socket.broadcast.emit('message', `User ${socket.id.substring(0, 5)} disconnected`)
+        socket.broadcast.emit('message', {texts: `${socket.id.substring(0, 5)} disconnected`, user: `${socket.id}`})
     })
 
     //listen for activity
