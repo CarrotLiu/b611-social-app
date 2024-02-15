@@ -1,0 +1,75 @@
+html, body {
+  margin: 0;
+  padding: 0;
+}
+canvas {
+  display: block;
+}
+h1{
+  color: white;
+  text-align: center;
+}
+
+.textAreaContainer {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  max-width: 800px;
+  height: 60%;
+  max-height: 70vh;
+  text-align: center;
+  font-size: 18px;
+  font-family: 'IM Fell DW Pica', serif;
+}
+
+.textInputArea {
+  width: calc(100% - 10%); 
+  height: calc(100% - 10%);
+  padding: 5%;
+  background: rgba(255, 255, 255, 0.23);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(9.4px);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  outline: none;
+  color: white;
+  font-size: inherit;
+  text-align: inherit;
+  font-family: inherit;
+  white-space: pre-wrap;
+}
+
+
+#writeArea{
+  
+}
+
+#readArea{
+  visibility: hidden;
+}
+
+#buttonContainer{
+  padding: 6px;
+  width: 100%;
+}
+
+.btn-basic{
+  font-family: 'IM Fell DW Pica', serif;
+  font-size: 20px;
+  width: 110px;
+  padding: 2%;
+  /* position: relative; */
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 50px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(11.3px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+
+.btn-basic:hover {
+  background:rgba(255, 255, 255, 0.3);
+  box-shadow: 0px 0px 35px 0 #fff, 15px 15px 30px 0 #1d0dca17;
+  color:#fff;
+}
