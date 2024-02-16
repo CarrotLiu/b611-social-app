@@ -11,13 +11,14 @@ function sendMessage(e) {
   msgInput.focus()
 }
 
-// -------------------- CONNECTION ACTIVITY -------------------- //
+// -------------------- HTML ACTIVITY -------------------- //
+//connection activity
 socket.on("message", (msg) => {
   activity.textContent = `${msg.texts}`; 
   clearEventMsg();
 })
 
-// -------------------- TYPING ACTIVITY -------------------- //
+//typing activity
 msgInput.addEventListener('keypress', () => {
   socket.emit('activity', socket.id.substring(0, 5))
 })
@@ -28,6 +29,7 @@ socket.on("activity", (name) => {
   clearEventMsg();
 })
 
+//time function for clearing messages
 function clearEventMsg(){
   clearTimeout(activityTimer)
     activityTimer = setTimeout(() => {
@@ -37,7 +39,7 @@ function clearEventMsg(){
 
 
 
-// -------------------- P5 SKETCH -------------------- //
+// -------------------- P5JS SKETCH -------------------- //
 
 let canvas;
 let cores = [];
@@ -73,13 +75,13 @@ function draw() {
 }
   
 
-// -------------------- CLASS -------------------- //
-
+// -------------------- P5 CLASS -------------------- //
 // Core Class
 class Core {
   constructor(x, y, user) {
       this.x = x;
       this.y = y;
+      this.color = color(255, 255, 255);
       this.user = user;
       this.dmouse = dist(this.x, this.y, mouseX, mouseY);
       this.radius = 50;
@@ -90,7 +92,11 @@ class Core {
 
   update(){
     this.dmouse = dist(this.x, this.y, mouseX, mouseY);
-
+    if(this.dmouse < 20 && !this.ifClicked){
+      this.color = color(255, 0, 0);
+    }else{
+      this.color = color(255, 255, 255);
+    }
   }
 
   display() {
@@ -101,8 +107,8 @@ class Core {
 
   writeText() {
     // Show input box
-    let writeArea = document.getElementsByClassName("writeAreaContainer")
-    let submitButton = document.getElementsByClassName("button-submit")
+    let writeArea = document.querySelector('#writeArea')
+    let submitButton = document.querySelector("#btn-finish")
     writeArea.style.visibility = "visible";
 
     submitButton.addEventListener(
@@ -112,8 +118,7 @@ class Core {
         this.ifCheckDataNum = true;
         this.isWriting = false;
         this.ifClicked = false;
-        let divToRemove = document.getElementById("writeAreaContainer");
-        writeArea.style.display = "none";
+        writeArea.style.visibility = "hidden";
       }.bind(this)
     );  
   }
