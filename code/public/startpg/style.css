@@ -25,6 +25,7 @@ h1{
 }
   
 .btn-basic{
+cursor: pointer;
 font-family: 'IM Fell DW Pica', serif;
 font-size: 20px;
 width: 110px;

@@ -5,6 +5,7 @@ html, body {
   font-size: 18px;
   font-family: 'IM Fell DW Pica', serif;
   color: white;
+  box-sizing: border-box;
 }
 canvas {
   display: block;
@@ -19,6 +20,7 @@ h1{
 }
 
 .textAreaContainer {
+  box-sizing: border-box;
   position: absolute;
   top: 40%;
   left: 50%;
@@ -30,8 +32,9 @@ h1{
 }
 
 .textInputArea {
-  width: calc(100% - 10%); 
-  height: calc(100% - 10%);
+  box-sizing: border-box;
+  width: 100%; 
+  height: 100%;
   padding: 5%;
   background: rgba(255, 255, 255, 0.23);
   border-radius: 16px;
@@ -61,6 +64,7 @@ h1{
 }
 
 .btn-basic{
+  box-sizing: border-box;
   font-family: 'IM Fell DW Pica', serif;
   font-size: 20px;
   width: 110px;
