@@ -13,29 +13,63 @@ const firebaseConfig = {
     databaseURL: "https://b611-185f3-default-rtdb.firebaseio.com/"
 };
 
-let userNum = 0;
-let userData = {};
-let data_loaded = false;
-let write_done = false;
-const loginBtn = document.querySelector("#login")
-const visitBtn = document.querySelector("#visit")
-// const fireApp = initializeApp(firebaseConfig)
+const loginBtn = document.querySelector("#login");
+const visitBtn = document.querySelector("#visit");
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 const dbRef = db.ref("userData");
-// const db = getDatabase(fireApp);
-// const auth = getAuth(fireApp);
-// const provider = new GoogleAuthProvider(fireApp);
-// const dbRef = ref(db, 'userData');
-console.log(dbRef);
-//Read Data
 
+let userNum = 0;
+let userList = [];
+let userData={};
+let data_loaded = false;
+let if_set = true;
+let write_done = false;
+function processData() {
+    if (userList.length == 0) {
+      return;
+    }
+    data_loaded = true;
+  }
+
+//Read Data
+function readUserData(username){
+    dbRef.on("child_added", (snapshot) => {
+        console.log("!DB ADDED");
+        console.log(snapshot.key);
+        console.log(snapshot.val());
+        
+        let Value = snapshot.val();
+        userList=Object.values(Value);
+        
+        for(let i = 0; i < userList.length; i++){
+            if (userList[i].displayName == username) {
+                if_set = false;
+            } 
+        }
+        // Value.sort(function(a, b) {
+        //   return a.value - b.value;
+        // });
+        // if (snapshot.key == "ActivityL") {
+        //   for (key in Value) {
+        //     ActivityL.push(Value[key]);
+        //     TextL.push(key);
+        //   }
+        // } else if (snapshot.key == "ActivityT") {
+        //   for (key in Value) {
+        //     ActivityT.push(Value[key]);
+        //     TextT.push(key);
+        //   }
+        // }
+        processData();
+      });
+}
 
 //Write Data
 function writeUserData(id, username, ai, rm, x, cdt, sdd) {
-    console.log("write");
     userData[username]={
         displayName: username,
         userId: id,
@@ -45,10 +79,8 @@ function writeUserData(id, username, ai, rm, x, cdt, sdd) {
         coreData: cdt,
         seedData: sdd
     }
-    console.log(userData);
-    // set(ref(db, 'userData/'), {userData});
-
-    dbRef.child("userData").push(userData);
+    dbRef.child("userData").set(userData);
+    console.log("set");
     // write_done = true;
   }
   
@@ -74,7 +106,12 @@ if(loginBtn){
         let user = result.user;
         let username = user.displayName;
         let userId = user.uid;
-        writeUserData(userId, username, false, null, null, null, null); 
+
+        readUserData(username);
+        if(if_set && data_loaded){
+            writeUserData(userId, username, false, null, null, null, null); 
+        }
+        
         if(write_done){
             window.location.href = "app/index.html";
         }
