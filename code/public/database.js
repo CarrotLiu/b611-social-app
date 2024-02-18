@@ -1,12 +1,7 @@
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
-import { getDatabase, ref, set, push, onValue, onChildAdded, onChildChanged, onChildRemoved} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-lite.js';
-import { getAuth, getRedirectResult, signOut, signInWithPopup, signInWithRedirect, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-let userNum = 0;
-let userData = [];
-let data_loaded = false;
-
+// import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+// import { getDatabase, ref, set, push, onValue, onChildAdded, onChildChanged, onChildRemoved} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+// import { getAuth, getRedirectResult, signOut, signInWithPopup, signInWithRedirect, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+// let firebase = require('https://www.gstatic.com/firebasejs/10.8.0/firebase.js');
 // Firebase initialization
 const firebaseConfig = {
     apiKey: "AIzaSyCxkgwdNTOPwhosEk6zNwzXPqasIqIuhCY",
@@ -18,32 +13,43 @@ const firebaseConfig = {
     databaseURL: "https://b611-185f3-default-rtdb.firebaseio.com/"
 };
 
-
-const fireApp = initializeApp(firebaseConfig)
-const db = getDatabase(fireApp);
-const auth = getAuth(fireApp);
-const provider = new GoogleAuthProvider(fireApp);
-const dbRef = ref(db, 'userData');
-
+let userNum = 0;
+let userData = {};
+let data_loaded = false;
+let write_done = false;
+const loginBtn = document.querySelector("#login")
+const visitBtn = document.querySelector("#visit")
+// const fireApp = initializeApp(firebaseConfig)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+const provider = new firebase.auth.GoogleAuthProvider();
+const dbRef = db.ref("userData");
+// const db = getDatabase(fireApp);
+// const auth = getAuth(fireApp);
+// const provider = new GoogleAuthProvider(fireApp);
+// const dbRef = ref(db, 'userData');
+console.log(dbRef);
 //Read Data
-onValue(dbRef, (data)=>{
-    console.log("!USER ADDED");
-    let username = data.key;
-    let dtArray = data.val();
-    userData.push(dtArray);
-    updateStarCount(postElement, data);
-}) 
+
 
 //Write Data
-function writeUserData(userId, username, ifAI, room, pos, coreData, seedData) {
-    set(ref(db, 'users/' + userId), {
-        username: username,
-        ifAI: ifAI,
-        room: room,
-        pos : pos,
-        coreData: coreData,
-        seedData: seedData
-    });
+function writeUserData(id, username, ai, rm, x, cdt, sdd) {
+    console.log("write");
+    userData[username]={
+        displayName: username,
+        userId: id,
+        ifAI: ai,
+        room: rm,
+        pos : x,
+        coreData: cdt,
+        seedData: sdd
+    }
+    console.log(userData);
+    // set(ref(db, 'userData/'), {userData});
+
+    dbRef.child("userData").push(userData);
+    // write_done = true;
   }
   
 
@@ -61,23 +67,30 @@ function clearDBReference(refName) {
 }
 
 // ---------------------- SIGNIN ---------------------- //
+if(loginBtn){
+    loginBtn.addEventListener('click', () => {
+        firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+        let user = result.user;
+        let username = user.displayName;
+        let userId = user.uid;
+        writeUserData(userId, username, false, null, null, null, null); 
+        if(write_done){
+            window.location.href = "app/index.html";
+        }
+    }).catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+    
+      console.log(errorMessage);
+    });
+    })
+    
+    visitBtn.addEventListener('click', () => {
+        window.location.href = "app/index.html";
+    })
 
-signInWithPopup(auth, provider)
-.then((result) => {
-  // This gives you a Google Access Token. You can use it to access the Google API.
-  const credential = GoogleAuthProvider.credentialFromResult(result);
-  const token = credential.accessToken;
-  // The signed-in user info.
-  const user = result.user;
-  // IdP data available using getAdditionalUserInfo(result)
-  console.log(user);
-}).catch((error) => {
-  // Handle Errors here.
-  const errorCode = error.code;
-  const errorMessage = error.message;
-  // The email of the user's account used.
-  const email = error.customData.email;
-  // The AuthCredential type that was used.
-  const credential = GoogleAuthProvider.credentialFromError(error);
-  console.log(errorMessage);
-});
+}
+
+

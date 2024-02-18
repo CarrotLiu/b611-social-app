@@ -1,7 +1,7 @@
 const socket = io('ws://localhost:3500')
 const activity = document.querySelector('.activity')
 const msgInput = document.querySelector('textarea')
-
+console.log("userData")
 function sendMessage(e) {
   e.preventDefault()
   if (msgInput.value) {
