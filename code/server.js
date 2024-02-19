@@ -41,7 +41,6 @@ const io = new Server(expressServer, {
 // connect socket
 io.on('connection', socket => {
     console.log(`${socket.id} connected`)
-
     //upon connection
     //send the message to only the user
     socket.emit('message', {texts: "Welcome to B611!", user: `${socket.id}`})

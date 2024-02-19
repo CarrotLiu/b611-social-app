@@ -1,7 +1,21 @@
-const socket = io('ws://localhost:3500')
+// let socketURL;
+// if (window.location.hostname.includes('localhost')) {
+//   socketURL = 'ws://localhost:3500'; 
+// } else {
+//   socketURL = 'wss://carrotliu.github.io'; 
+// }
+readUserData()
+    .then(exists => {
+        console.log(userList); 
+    })
+    .catch(error => {
+        console.error(error);
+    });
+
+// const socket = io(socketURL);
+socket = io('ws://localhost:3500')
 const activity = document.querySelector('.activity')
 const msgInput = document.querySelector('textarea')
-console.log("userData")
 function sendMessage(e) {
   e.preventDefault()
   if (msgInput.value) {
@@ -58,8 +72,7 @@ socket.on("message", (msg)=>{
 })
 
 function setup() {
-createCanvas(windowWidth, windowHeight);
-canvas = createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
   canvas.position(0, 0);
   canvas.style("z-index", "-1");
 }
