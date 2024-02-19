@@ -33,56 +33,55 @@ function processData() {
       return;
     }
     data_loaded = true;
+    console.log(data_loaded);
   }
 
 //Read Data
-function readUserData(username){
-    dbRef.on("child_added", (snapshot) => {
-        console.log("!DB ADDED");
-        console.log(snapshot.key);
-        console.log(snapshot.val());
-        
-        let Value = snapshot.val();
-        userList=Object.values(Value);
-        
-        for(let i = 0; i < userList.length; i++){
-            if (userList[i].displayName == username) {
-                if_set = false;
-            } 
-        }
-        // Value.sort(function(a, b) {
-        //   return a.value - b.value;
-        // });
-        // if (snapshot.key == "ActivityL") {
-        //   for (key in Value) {
-        //     ActivityL.push(Value[key]);
-        //     TextL.push(key);
-        //   }
-        // } else if (snapshot.key == "ActivityT") {
-        //   for (key in Value) {
-        //     ActivityT.push(Value[key]);
-        //     TextT.push(key);
-        //   }
-        // }
-        processData();
-      });
+async function readUserData(id) {
+    return new Promise((resolve, reject) => {
+        dbRef.on("child_added", (snapshot) => {
+            let Value = snapshot.val();
+            let userList = Object.values(Value);
+            let exists = false;
+            for (let i = 0; i < userList.length; i++) {
+                if (userList[i].userId === id) {
+                    exists = true;
+                    break;
+                }
+            }
+            resolve(exists);
+        });
+    });
 }
 
-//Write Data
 function writeUserData(id, username, ai, rm, x, cdt, sdd) {
-    userData[username]={
+    const newUserId = dbRef.child("userData").push().key;
+    dbRef.child("userData").child(newUserId).set({
         displayName: username,
         userId: id,
         ifAI: ai,
         room: rm,
-        pos : x,
+        pos: x,
         coreData: cdt,
         seedData: sdd
-    }
-    dbRef.child("userData").set(userData);
-    console.log("set");
-    // write_done = true;
-  }
+    });
+    write_done = true;
+}
+
+function signin() {
+    return new Promise((resolve, reject) => {
+        firebase.auth().signInWithPopup(provider)
+            .then((result) => {
+                let user = result.user;
+                let username = user.displayName;
+                let userId = user.uid;
+                resolve({ username, userId });
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+}
   
 
   
@@ -99,35 +98,24 @@ function clearDBReference(refName) {
 }
 
 // ---------------------- SIGNIN ---------------------- //
-if(loginBtn){
-    loginBtn.addEventListener('click', () => {
-        firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-        let user = result.user;
-        let username = user.displayName;
-        let userId = user.uid;
 
-        readUserData(username);
-        if(if_set && data_loaded){
-            writeUserData(userId, username, false, null, null, null, null); 
+
+loginBtn.addEventListener('click', async () => {
+    try {
+        const { username, userId } = await signin();
+        const userExists = await readUserData(userId);
+        if (!userExists) {
+            writeUserData(userId, username, false, null, null, null, null);
         }
-        
-        if(write_done){
+        if (write_done) {
             window.location.href = "app/index.html";
         }
-    }).catch((error) => {
-      // Handle Errors here.
-      const errorCode = error.code;
-      const errorMessage = error.message;
-    
-      console.log(errorMessage);
-    });
-    })
-    
-    visitBtn.addEventListener('click', () => {
-        window.location.href = "app/index.html";
-    })
-
-}
+    } catch (error) {
+        console.log(error.message);
+    }
+});
 
 
+visitBtn.addEventListener('click', () => {
+    window.location.href = "app/index.html";
+})
