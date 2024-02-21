@@ -42,7 +42,7 @@ async function readUserData(id) {
     });
 }
 
-function writeUserData(id, username, pic, ai, rm, x, cdt, sdd, std) {
+function writeNewUser(id, username, pic, ai, rm, x, cdt, sdd, std) {
     const newUserId = dbRef.child("userData").push().key;
     dbRef.child("userData").child(newUserId).set({
         displayName: username,
@@ -57,6 +57,43 @@ function writeUserData(id, username, pic, ai, rm, x, cdt, sdd, std) {
     });
     write_done = true;
 }
+
+function writeOldUser(userid, room, pos){
+    dbRef.child("userData").child(userid).child("room").update(room);
+    dbRef.child("userData").child(userid).child("pos").update(pos);
+    write_done = true;
+}
+
+function writeCore(){
+
+}
+
+function writeSeed(){
+
+}
+
+function writeStar(){
+
+}
+  
+function clearDBReference(refName) {
+    let ref = database.ref(refName);
+// clear out the previous data in the key
+    ref.remove()
+    .then(function() {
+        console.log("! DB Remove succeeded.");
+    })
+    .catch(function(error) {
+        console.log("! DB Remove failed: " + error.message);
+    });
+}
+
+
+
+// ---------------------- SIGN IN/OUT ---------------------- //
+const loginBtn = document.querySelector("#login");
+const visitBtn = document.querySelector("#visit");
+const signoutBtn = document.querySelector("#btn-signout");
 
 function signin() {
     return new Promise((resolve, reject) => {
@@ -84,23 +121,6 @@ function signout(){
           });
     })
 }
-  
-function clearDBReference(refName) {
-    let ref = database.ref(refName);
-// clear out the previous data in the key
-    ref.remove()
-    .then(function() {
-        console.log("! DB Remove succeeded.");
-    })
-    .catch(function(error) {
-        console.log("! DB Remove failed: " + error.message);
-    });
-}
-
-// ---------------------- SIGN IN/OUT ---------------------- //
-const loginBtn = document.querySelector("#login");
-const visitBtn = document.querySelector("#visit");
-const signoutBtn = document.querySelector("#btn-signout");
 
 if(loginBtn){
     loginBtn.addEventListener('click', async () => {
@@ -108,7 +128,13 @@ if(loginBtn){
             const { username, userId, photoURL } = await signin();
             const userExists = await readUserData(userId);
             if (!userExists) {
-                writeUserData(userId, username, photoURL, false, "", "", "", "", "");
+                
+                // //拿一下room 和 pos
+                // socket.on('login', (rst)=>{
+                //     
+                //     writeNewUser(userId, username, photoURL, false, rst.room, rst.pos, "", "", "")
+                // });
+                writeNewUser(userId, username, photoURL, false, "", "", "", "", "");
             }else{
                 window.location.href = "app/index.html";
             }
@@ -135,7 +161,8 @@ if(loginBtn){
 
 
 
-// -------------------- EXPORT FUNCTION -------------------- //
+// -------------------- GLOBALIZE FUNCTION -------------------- //
 window.readUserData = readUserData;
-window.writeUserData = writeUserData;
+window.writeNewUser = writeNewUser;
 window.signin = signin;
+window.writeOldUser=writeOldUser;

@@ -41,18 +41,23 @@ const io = new Server(expressServer, {
 // connect socket
 io.on('connection', socket => {
     console.log(`${socket.id} connected`)
-    //upon connection
-    //send the message to only the user
-    socket.emit('message', {texts: "Welcome to B611!", user: `${socket.id}`})
 
-    //send the message to the other user
-    socket.broadcast.emit('message', {texts:`${socket.id.substring(0, 5)} connected`, user: `${socket.id}`})
+
+
+    //read data from firebase
+    socket.on('dtload', (dt)=>{
+        console.log(dt);
+        //send the message to only the user
+        socket.emit('message', {texts: "Welcome to B611!", user: `${socket.id}`})
+        //send the message to the other user
+        socket.broadcast.emit('message', {texts:`${socket.id.substring(0, 5)} connected`, user: `${socket.id}`})
+
+    })
 
     //when user disconnects, notify the other user
     socket.on('disconnect', ()=>{
         socket.broadcast.emit('message', {texts: `${socket.id.substring(0, 5)} disconnected`, user: `${socket.id}`})
     })
-
 
     //listen for activity
     socket.on('activity', (name)=>{
