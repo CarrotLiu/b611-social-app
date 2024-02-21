@@ -1,5 +1,6 @@
 // ---------------------- INITIALIZATION ---------------------- //
 //init firebase 
+socket = io('ws://localhost:3500')
 const firebaseConfig = {
     apiKey: "AIzaSyCxkgwdNTOPwhosEk6zNwzXPqasIqIuhCY",
     authDomain: "b611-185f3.firebaseapp.com",
@@ -20,10 +21,8 @@ const auth = firebase.auth();
 const provider = new firebase.auth.GoogleAuthProvider();
 
 // ---------------------- READ & WRITE DATA ---------------------- //
-let userNum = 0;
-let userList = [];
-let userData={};
 let write_done = false;
+let userList=[];
 
 //Read Data
 async function readUserData(id) {
@@ -33,7 +32,7 @@ async function readUserData(id) {
             userList = Object.values(Value);
             let exists = false;
             for (let i = 0; i < userList.length; i++) {
-                if (userList[i].userId === id) {
+                if (userList[i].userId == id) {
                     exists = true;
                     break;
                 }
@@ -43,16 +42,18 @@ async function readUserData(id) {
     });
 }
 
-function writeUserData(id, username, ai, rm, x, cdt, sdd) {
+function writeUserData(id, username, pic, ai, rm, x, cdt, sdd, std) {
     const newUserId = dbRef.child("userData").push().key;
     dbRef.child("userData").child(newUserId).set({
         displayName: username,
         userId: id,
+        profilePic: pic,
         ifAI: ai,
         room: rm,
         pos: x,
         coreData: cdt,
-        seedData: sdd
+        seedData: sdd,
+        starData: std
     });
     write_done = true;
 }
@@ -64,13 +65,25 @@ function signin() {
                 let user = result.user;
                 let username = user.displayName;
                 let userId = user.uid;
-                resolve({ username, userId });
+                let photoURL = user.photoURL;
+                resolve({ username, userId, photoURL });
             })
             .catch((error) => {
                 reject(error);
             });
     });
 } 
+
+function signout(){
+    return new Promise((resolve, reject)=>{
+        firebase.auth().signOut(provider)
+        .then((result) => {
+            resolve(result); 
+          }).catch((error) => {
+            reject(error);
+          });
+    })
+}
   
 function clearDBReference(refName) {
     let ref = database.ref(refName);
@@ -84,17 +97,18 @@ function clearDBReference(refName) {
     });
 }
 
-// ---------------------- SIGNIN ---------------------- //
+// ---------------------- SIGN IN/OUT ---------------------- //
 const loginBtn = document.querySelector("#login");
 const visitBtn = document.querySelector("#visit");
+const signoutBtn = document.querySelector("#btn-signout");
+
 if(loginBtn){
     loginBtn.addEventListener('click', async () => {
         try {
-            const { username, userId } = await signin();
+            const { username, userId, photoURL } = await signin();
             const userExists = await readUserData(userId);
             if (!userExists) {
-                writeUserData(userId, username, false, null, null, null, null);
-                console.log("write_done")
+                writeUserData(userId, username, photoURL, false, "", "", "", "", "");
             }else{
                 window.location.href = "app/index.html";
             }
@@ -108,8 +122,20 @@ if(loginBtn){
     visitBtn.addEventListener('click', () => {
         window.location.href = "app/index.html";
     })
+} else{
+    signoutBtn.addEventListener('click', async ()=>{
+        try {
+            const result=await signout();
+            window.location.href = "../index.html";
+        } catch(error){
+            console.log(error.message);
+        }
+    })
 }
 
+
+
+// -------------------- EXPORT FUNCTION -------------------- //
 window.readUserData = readUserData;
 window.writeUserData = writeUserData;
-
+window.signin = signin;

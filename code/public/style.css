@@ -5,6 +5,7 @@ html, body {
   font-size: 18px;
   font-family: 'IM Fell DW Pica', serif;
   color: white;
+  overflow:hidden;
   box-sizing: border-box;
 }
 canvas {
@@ -16,7 +17,12 @@ h1{
 }
 
 .activity{
+  position: absolute;
+  top: 3%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   height: 5%;
+  text-align: center;
 }
 
 .textAreaContainer {
@@ -81,4 +87,23 @@ h1{
   background:rgba(255, 255, 255, 0.3);
   box-shadow: 0px 0px 35px 0 #fff, 15px 15px 30px 0 #1d0dca17;
   color:#fff;
+}
+
+#topBtnContainer{
+  display: flex;
+  width: 100%;
+  padding: 10px;
+}
+
+#btn-signout{
+  
+  background: none;
+  color: white;
+  border: none;
+  box-shadow: none;
+  backdrop-filter:none;
+  width: 150px;
+}
+#btn-signout:hover{
+  color: red;
 }
