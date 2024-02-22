@@ -45,7 +45,7 @@ io.on('connection', socket => {
 
 
     //read data from firebase
-    socket.on('dtload', (dt)=>{
+    socket.on('initialize', (dt)=>{
         console.log(dt);
         //send the message to only the user
         socket.emit('message', {texts: "Welcome to B611!", user: `${socket.id}`})

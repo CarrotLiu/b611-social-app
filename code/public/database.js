@@ -27,9 +27,12 @@ let userList=[];
 //Read Data
 async function readUserData(id) {
     return new Promise((resolve, reject) => {
-        dbRef.on("child_added", (snapshot) => {
-            let Value = snapshot.val();
-            userList = Object.values(Value);
+        dbRef.once("value", (snapshot) => { 
+            let userList = []; 
+            snapshot.forEach((childSnapshot) => {
+                let value = childSnapshot.val();
+                userList.push(value);
+            });
             let exists = false;
             for (let i = 0; i < userList.length; i++) {
                 if (userList[i].userId == id) {
@@ -38,13 +41,17 @@ async function readUserData(id) {
                 }
             }
             resolve(exists);
+        }, (error) => {
+            reject(error); 
         });
     });
 }
 
 function writeNewUser(id, username, pic, ai, rm, x, cdt, sdd, std) {
-    const newUserId = dbRef.child("userData").push().key;
-    dbRef.child("userData").child(newUserId).set({
+    console.log("")
+    let newu = {username:{}}
+    const newUserId = dbRef.push(newu).key;
+    dbRef.child(newUserId).set({
         displayName: username,
         userId: id,
         profilePic: pic,
@@ -104,6 +111,7 @@ function signin() {
                 let userId = user.uid;
                 let photoURL = user.photoURL;
                 resolve({ username, userId, photoURL });
+                
             })
             .catch((error) => {
                 reject(error);
@@ -126,20 +134,22 @@ if(loginBtn){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
-            const userExists = await readUserData(userId);
-            if (!userExists) {
+            
+            const exists = await readUserData(userId);
+            if (!exists) {
                 
                 // //拿一下room 和 pos
                 // socket.on('login', (rst)=>{
                 //     
                 //     writeNewUser(userId, username, photoURL, false, rst.room, rst.pos, "", "", "")
                 // });
+                
                 writeNewUser(userId, username, photoURL, false, "", "", "", "", "");
             }else{
                 window.location.href = "app/index.html";
             }
             if (write_done) {
-                window.location.href = "app/index.html";
+                // window.location.href = "app/index.html";
             }
         } catch (error) {
             console.log(error.message);

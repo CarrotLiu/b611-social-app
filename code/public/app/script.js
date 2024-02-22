@@ -12,7 +12,7 @@ let users, username, userid, profilePic, ifAI, room, pos, coreData, seedData, st
 let data_loaded = false;
 readUserData()
     .then(exists => {
-        users = userList[0];
+        users = userList;
         username = users.displayName;
         userid = users.userId;
         ifAI = users.ifAI;
@@ -21,12 +21,13 @@ readUserData()
         coreData = users.coreData;
         seedData = users.seedData;
         socket.emit('initialize', "getting room and pos");
-        socket.on('getrmpos', (room, pos)=>{
-          writeOldUser(userid, room, pos)
-          .then(exists => {
-            data_loaded = true;
-          })
-        })   
+        data_loaded = true;
+        // socket.on('getrmpos', (room, pos)=>{
+        //   writeOldUser(userid, room, pos)
+        //   .then(exists => {
+        //     data_loaded = true;
+        //   })
+        // })   
     })
     .catch(error => {
         console.error(error);
@@ -40,6 +41,7 @@ if(data_loaded){
 
 const activity = document.querySelector('.activity')
 const msgInput = document.querySelector('textarea')
+
 if(data_loaded){
   // -------------------- HTML ACTIVITY -------------------- //
   //connection activity
@@ -88,6 +90,7 @@ if(data_loaded){
     canvas = createCanvas(windowWidth, windowHeight);
     canvas.position(0, 0);
     canvas.style("z-index", "-1");
+    background(0);
   }
 
   // Main draw function
