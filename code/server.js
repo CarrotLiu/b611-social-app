@@ -17,17 +17,19 @@ const app = express()
 const publicDir = path.join(__dirname, "public")
 app.use(express.static(publicDir))
 
-
-
 //Binds and listens for connections on the specified host and port.
 const expressServer = app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
 })
 
 
-
-
 // ---------------------- SOCKET ---------------------- //
+let userNum = 0;
+let allUsers = [];
+let usersid = [];
+let curRoom;
+let rooms =[];
+let curPos;
 //Establish socket server API
 //if in production mode: route to github path. else, route to local path
 const io = new Server(expressServer, {
@@ -40,27 +42,51 @@ const io = new Server(expressServer, {
 
 // connect socket
 io.on('connection', socket => {
-    console.log(`${socket.id} connected`)
-
-
-
+    userNum += 1;
+    console.log(`${socket.id} connected`, userNum)
     //read data from firebase
-    socket.on('initialize', (dt)=>{
-        console.log(dt);
-        //send the message to only the user
-        socket.emit('message', {texts: "Welcome to B611!", user: `${socket.id}`})
-        //send the message to the other user
-        socket.broadcast.emit('message', {texts:`${socket.id.substring(0, 5)} connected`, user: `${socket.id}`})
+    socket.on('initialize', (nm)=>{
+        console.log(nm);
+        userNum+=1;
+        allUsers.push(`${socket.id}`)
+        let room = findOrCreateRoom();
+        
+        if(nm){
+            socket.emit('message', `Welcome to B611! ${nm}`)
+
+        }else{
+            socket.emit('message', `Welcome to B611! ${socket.id}`)
+        }
+        
+        //send room and pos
+        // socket.emit('getrmpos', {socketID:`${socket.id}`, room:curRoom, pos: curPos});
 
     })
-
-    //when user disconnects, notify the other user
+    socket.on('login', (user)=>{
+        socket.emit('message', `Welcome to B611! ${user}`)
+        socket.broadcast.emit('message', `${user} connected`)
+    })
+    
     socket.on('disconnect', ()=>{
-        socket.broadcast.emit('message', {texts: `${socket.id.substring(0, 5)} disconnected`, user: `${socket.id}`})
+        socket.emit('bye', "disconnected")
+        socket.broadcast.emit('bye', "disconnected")
+        // let userToDelete = ;
+        // allUsers = allUsers.filter(item => item !== userToDelete);
     })
 
-    //listen for activity
     socket.on('activity', (name)=>{
         socket.broadcast.emit('activity', name)
     })
 })
+
+function findOrCreateRoom() {
+    for (const room in rooms) {
+        if (rooms[room].length < 2) {
+            return room;
+        }
+    }
+    
+    const newRoom = `Room-${Object.keys(rooms).length + 1}`;
+    rooms[newRoom] = [];
+    return newRoom;
+}

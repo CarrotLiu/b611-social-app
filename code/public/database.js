@@ -28,7 +28,6 @@ let userList=[];
 async function readUserData(id) {
     return new Promise((resolve, reject) => {
         dbRef.once("value", (snapshot) => { 
-            let userList = []; 
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
                 userList.push(value);
@@ -47,8 +46,8 @@ async function readUserData(id) {
     });
 }
 
-function writeNewUser(id, username, pic, ai, rm, x, cdt, sdd, std) {
-    console.log("")
+function writeNewUser(id, username, pic, ai, rm, x, cdt, sdt, std) {
+    console.log("write new user");
     let newu = {username:{}}
     const newUserId = dbRef.push(newu).key;
     dbRef.child(newUserId).set({
@@ -59,28 +58,32 @@ function writeNewUser(id, username, pic, ai, rm, x, cdt, sdd, std) {
         room: rm,
         pos: x,
         coreData: cdt,
-        seedData: sdd,
+        seedData: sdt,
         starData: std
     });
     write_done = true;
 }
 
-function writeOldUser(userid, room, pos){
-    dbRef.child("userData").child(userid).child("room").update(room);
-    dbRef.child("userData").child(userid).child("pos").update(pos);
+function writeOldUser(userid, rm, pos){
+    console.log("update room & pos");
+    dbRef.child(userid).child("room").update(rm);
+    dbRef.child(userid).child("pos").update(pos);
     write_done = true;
 }
 
-function writeCore(){
-
+function writeCore(userid, cdt){
+    console.log("update core data");
+    dbRef.child(userid).child("coreData").update(cdt);
 }
 
-function writeSeed(){
-
+function writeSeed(userid, sdt){
+    console.log("update seed data");
+    dbRef.child(userid).child("seedData").update(sdt);
 }
 
-function writeStar(){
-
+function writeStar(userid, std){
+    console.log("update seed data");
+    dbRef.child(userid).child("seedData").update(std);
 }
   
 function clearDBReference(refName) {
@@ -134,23 +137,20 @@ if(loginBtn){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
-            
             const exists = await readUserData(userId);
-            if (!exists) {
-                
-                // //拿一下room 和 pos
-                // socket.on('login', (rst)=>{
-                //     
-                //     writeNewUser(userId, username, photoURL, false, rst.room, rst.pos, "", "", "")
-                // });
-                
-                writeNewUser(userId, username, photoURL, false, "", "", "", "", "");
-            }else{
-                window.location.href = "app/index.html";
-            }
-            if (write_done) {
-                // window.location.href = "app/index.html";
-            }
+            socket.emit('initialize', username);
+            socket.on('getrmpos', (rst)=>{
+                if (!exists) {
+                    console.log(rst.room, rst.pos);
+                    // writeNewUser(userId, username, photoURL, false, rst.room, rst.pos, "", "", "");
+                }else{
+                    console.log(rst.room, rst.pos, rst.socketID);
+                    // writeOldUser(userid, rm, pos);
+                }
+                if (write_done) {
+                    // window.location.href = "app/index.html";
+                }
+            })
         } catch (error) {
             console.log(error.message);
         }
@@ -161,7 +161,7 @@ if(loginBtn){
 } else{
     signoutBtn.addEventListener('click', async ()=>{
         try {
-            const result=await signout();
+            const result = await signout();
             window.location.href = "../index.html";
         } catch(error){
             console.log(error.message);

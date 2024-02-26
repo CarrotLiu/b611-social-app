@@ -10,8 +10,10 @@ socket = io('ws://localhost:3500')
 // ---------------------- INITIALIZE RM & POS ---------------------- //
 let users, username, userid, profilePic, ifAI, room, pos, coreData, seedData, starData;
 let data_loaded = false;
+//
+//
 readUserData()
-    .then(exists => {
+    .then(() => {
         users = userList;
         username = users.displayName;
         userid = users.userId;
@@ -20,7 +22,6 @@ readUserData()
         pos = users.pos;
         coreData = users.coreData;
         seedData = users.seedData;
-        socket.emit('initialize', "getting room and pos");
         data_loaded = true;
         // socket.on('getrmpos', (room, pos)=>{
         //   writeOldUser(userid, room, pos)
@@ -33,17 +34,20 @@ readUserData()
         console.error(error);
     });
 
-if(data_loaded){
-  console.log("data_loaded!");
-  
-}
-
-
 const activity = document.querySelector('.activity')
 const msgInput = document.querySelector('textarea')
 
+
+// -------------------- HTML ACTIVITY -------------------- //
+// function sendMessage(e) {
+//   e.preventDefault()
+//   if (msgInput.value) {
+//       socket.emit('message', msgInput.value)
+//       msgInput.value = ""
+//   }
+//   msgInput.focus()
+// }
 if(data_loaded){
-  // -------------------- HTML ACTIVITY -------------------- //
   //connection activity
   socket.on("message", (msg) => {
     activity.textContent = `${msg.texts}`; 
@@ -52,30 +56,37 @@ if(data_loaded){
 
   //typing activity
   msgInput.addEventListener('keypress', () => {
-    socket.emit('activity', socket.id.substring(0, 5))
+    socket.emit('activity', username)
   })
 
   let activityTimer;
   socket.on("activity", (name) => {
-    activity.textContent = `${name} is typing...`; 
+    activity.textContent = `${username} is typing...`; 
     clearEventMsg();
   })
 
-  //time function for clearing messages
-  function clearEventMsg(){
-    clearTimeout(activityTimer)
-      activityTimer = setTimeout(() => {
-          activity.textContent = ""
-      }, 3000)
-  }
+  socket.on('bye', (msg)=>{
+    socket.emit('activity', username);
+    
+  })
+  
+}
+//time function for clearing messages
+function clearEventMsg(){
+  clearTimeout(activityTimer)
+    activityTimer = setTimeout(() => {
+        activity.textContent = ""
+    }, 3000)
+}
 
-  // -------------------- P5JS SKETCH -------------------- //
-  let canvas;
-  let cores = [];
-  let xPos = [innerWidth / 2 - 200, innerWidth / 2 + 200];
-  let yPos = innerHeight / 2;
-  let takenPos = {user: null, pos: null};
+// -------------------- P5JS SKETCH -------------------- //
+let canvas;
+let cores = [];
+let xPos = [innerWidth / 2 - 200, innerWidth / 2 + 200];
+let yPos = innerHeight / 2;
+let takenPos = {user: null, pos: null};
 
+if(data_loaded){
   socket.on("message", (msg)=>{
     if(takenPos.pos == null){
       cores.push(new Core(xPos[0], yPos, msg.user));
@@ -85,37 +96,37 @@ if(data_loaded){
       takenPos.pos = 1;
     }
   })
-
-  function setup() {
-    canvas = createCanvas(windowWidth, windowHeight);
-    canvas.position(0, 0);
-    canvas.style("z-index", "-1");
-    background(0);
-  }
-
-  // Main draw function
-  function draw() {
-    background(0);
-    if(data_loaded){
-      // console.log(username);  
-    }
-    for(let i = 0; i < cores.length; i ++){
-      cores[i].display();
-    }
-  }
 }
 
+function setup() {
+  canvas = createCanvas(windowWidth, windowHeight);
+  canvas.position(0, 0);
+  canvas.style("z-index", "-1");
+  background(0);
+}
+
+// Main draw function
+function draw() {
+  background(0);
+  if(cores.length !=0){
+    // console.log(username); 
+    for(let i = 0; i < cores.length; i ++){
+      cores[i].display();
+    } 
+  }
   
+}
 
 // -------------------- P5 CLASS -------------------- //
 // Core Class
 class Core {
-  constructor(x, y, user, ai, cdt) {
+  constructor(x, y, user, ai, cdt, posx) {
       this.x = x;
       this.y = y;
       this.user = user;
       this.ifAI = ai;
       this.coreData = cdt;
+      this.pos = posx;
       this.dmouse = dist(this.x, this.y, mouseX, mouseY);
       this.radius = 50;
       this.data = [];
@@ -161,11 +172,3 @@ class Core {
 
 
 
-// function sendMessage(e) {
-//   e.preventDefault()
-//   if (msgInput.value) {
-//       socket.emit('message', msgInput.value)
-//       msgInput.value = ""
-//   }
-//   msgInput.focus()
-// }
