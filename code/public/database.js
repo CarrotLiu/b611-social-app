@@ -1,6 +1,7 @@
 // ---------------------- INITIALIZATION ---------------------- //
 //init firebase 
 socket = io('ws://localhost:3500')
+
 const firebaseConfig = {
     apiKey: "AIzaSyCxkgwdNTOPwhosEk6zNwzXPqasIqIuhCY",
     authDomain: "b611-185f3.firebaseapp.com",
@@ -71,13 +72,6 @@ function writeNewUser(id, username, pic, ai, cdt, sdt, std) {
     write_done = true;
 }
 
-// function writeOldUser(userid, rm, pos){
-//     console.log("update room & pos");
-//     dbRef.child(userid).child("room").update(rm);
-//     dbRef.child(userid).child("pos").update(pos);
-//     write_done = true;
-// }
-
 function writeCore(userid, cdt){
     console.log("update core data");
     dbRef.child(userid).child("coreData").update(cdt);
@@ -139,7 +133,7 @@ function signout(){
     })
 }
 
-if(window.location.href != "app/index.html"){
+if(loginBtn){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
@@ -147,13 +141,12 @@ if(window.location.href != "app/index.html"){
             if (!exists) {
                 console.log("new user!");
                 writeNewUser(userId, username, photoURL, false, "", "", "");
-                socket.emit('login', userList);
-            }else{
-                socket.emit('login', userList);
+            }else{  
                 write_done = true;
             }
             if (write_done) {
-                // window.location.href = "app/index.html";
+                socket.emit('login', [userList, username]);
+                window.location.href = "app/index.html";
             }
      
         } catch (error) {
@@ -182,4 +175,3 @@ if(window.location.href != "app/index.html"){
 window.readUserData = readUserData;
 window.writeNewUser = writeNewUser;
 window.signin = signin;
-window.writeOldUser=writeOldUser;

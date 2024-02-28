@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 3500
 //create an express app
 const app = express()
 
+
 //user: the middleware function is executed when the base of the requested path matches path.
 //static: load the static files in the "public" folder
 const publicDir = path.join(__dirname, "public")
@@ -36,15 +37,20 @@ const io = new Server(expressServer, {
 
 // connect socket
 io.on('connection', socket => {
-    userNum += 1;
-    console.log(`${socket.id} connected`, userNum)
+    console.log("socket connected");
     //user login
-    socket.on('login', (userList)=>{
-        let others = userList.filter(data => data.displayName != username);
-        let self = userList.filter(data => data.displayName == username)[0];
+    socket.on('login', (userData)=>{
+        userNum += 1;
+        let others = userData[0].filter(data => data.displayName != userData[1]);
+        let self = userData[0].filter(data => data.displayName == userData[1])[0];
         allUsers.push(self.displayName)
+        // socket.emit('checkUser', ()=>{
+        //     console.log(self);
+        //     return self
+        // })
         socket.emit('checkUser', self)
         socket.emit('checkOthers', others)
+        console.log(self, others)
         socket.emit('message', `Welcome to B611! ${self.displayName}`)
     })
     socket.on('visit', (visitor)=>{
@@ -80,7 +86,7 @@ io.on('connection', socket => {
     socket.on('delete', (username)=>{
         
     })
-
+    console.log(`${socket.id} connected`, userNum)
 
     // //display event message
     // socket.on('activity', (name)=>{

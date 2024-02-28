@@ -6,7 +6,6 @@
 // }
 // const socket = io(socketURL);
 socket = io('ws://localhost:3500')
-
 // ---------------------- INITIALIZE RM & POS ---------------------- //
 let username, profilePic, ifAI;
 let princes = [];
@@ -20,20 +19,21 @@ socket.on('checkUser', (rst)=>{//rst = {username: string, userid: string, profil
   profilePic = rst.profilePic;
   ifAI = rst.ifAI;
   cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, username, ifAI, rst.coreData));
-  
+  console.log(cores);
 });
 
-socket.on('checkVisitor', ()=>{
+socket.on('checkVisitor', ()=>{ 
   username = null;
   profilePic = visitorAvatar;
   ifAI = false;
   cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, username, ifAI, null));
-  
+  console.log(cores);
 })
 
 socket.on('checkOthers',(others)=>{
   for (user in others) {
     cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, null, uesr.ifAI, user.coreData))
+    console.log(cores);
   }
 })
 
@@ -72,6 +72,11 @@ const msgInput = document.querySelector('textarea')
 //   }
 //   msgInput.focus()
 // }
+socket.on("message", (msg) => {
+  console.log("emitted")
+  activity.textContent = `${msg.texts}`; 
+  clearEventMsg();
+})
 if(data_loaded){
   //connection activity
   socket.on("message", (msg) => {
