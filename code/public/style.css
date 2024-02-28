@@ -57,7 +57,7 @@ h1{
 
 
 #writeArea{
-  visibility: visible;
+  visibility: hidden;
 }
 
 #readArea{

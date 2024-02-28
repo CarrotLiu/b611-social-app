@@ -46,17 +46,24 @@ async function readUserData(id) {
     });
 }
 
-function writeNewUser(id, username, pic, ai, rm, x, cdt, sdt, std) {
+function writeNewUser(id, username, pic, ai, cdt, sdt, std) {
     console.log("write new user");
     let newu = {username:{}}
     const newUserId = dbRef.push(newu).key;
+    userList.push({
+        displayName: username,
+        userId: id,
+        profilePic: pic,
+        ifAI: ai,
+        coreData: cdt,
+        seedData: sdt,
+        starData: std
+    });
     dbRef.child(newUserId).set({
         displayName: username,
         userId: id,
         profilePic: pic,
         ifAI: ai,
-        room: rm,
-        pos: x,
         coreData: cdt,
         seedData: sdt,
         starData: std
@@ -64,12 +71,12 @@ function writeNewUser(id, username, pic, ai, rm, x, cdt, sdt, std) {
     write_done = true;
 }
 
-function writeOldUser(userid, rm, pos){
-    console.log("update room & pos");
-    dbRef.child(userid).child("room").update(rm);
-    dbRef.child(userid).child("pos").update(pos);
-    write_done = true;
-}
+// function writeOldUser(userid, rm, pos){
+//     console.log("update room & pos");
+//     dbRef.child(userid).child("room").update(rm);
+//     dbRef.child(userid).child("pos").update(pos);
+//     write_done = true;
+// }
 
 function writeCore(userid, cdt){
     console.log("update core data");
@@ -114,7 +121,6 @@ function signin() {
                 let userId = user.uid;
                 let photoURL = user.photoURL;
                 resolve({ username, userId, photoURL });
-                
             })
             .catch((error) => {
                 reject(error);
@@ -133,32 +139,33 @@ function signout(){
     })
 }
 
-if(loginBtn){
+if(window.location.href != "app/index.html"){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
             const exists = await readUserData(userId);
-            socket.emit('initialize', username);
-            socket.on('getrmpos', (rst)=>{
-                if (!exists) {
-                    console.log(rst.room, rst.pos);
-                    // writeNewUser(userId, username, photoURL, false, rst.room, rst.pos, "", "", "");
-                }else{
-                    console.log(rst.room, rst.pos, rst.socketID);
-                    // writeOldUser(userid, rm, pos);
-                }
-                if (write_done) {
-                    // window.location.href = "app/index.html";
-                }
-            })
+            if (!exists) {
+                console.log("new user!");
+                writeNewUser(userId, username, photoURL, false, "", "", "");
+                socket.emit('login', userList);
+            }else{
+                socket.emit('login', userList);
+                write_done = true;
+            }
+            if (write_done) {
+                // window.location.href = "app/index.html";
+            }
+     
         } catch (error) {
             console.log(error.message);
         }
     });
     visitBtn.addEventListener('click', () => {
+        socket.emit('visit', `visitor ${socket.id.substring(0, 5)}`);
         window.location.href = "app/index.html";
     })
 } else{
+    
     signoutBtn.addEventListener('click', async ()=>{
         try {
             const result = await signout();

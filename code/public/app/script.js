@@ -8,31 +8,56 @@
 socket = io('ws://localhost:3500')
 
 // ---------------------- INITIALIZE RM & POS ---------------------- //
-let users, username, userid, profilePic, ifAI, room, pos, coreData, seedData, starData;
+let username, profilePic, ifAI;
+let princes = [];
+let cores = [];
+let seeds = [];
+let visitorAvatar = "../assets/door-close.svg";
 let data_loaded = false;
-//
-//
-readUserData()
-    .then(() => {
-        users = userList;
-        username = users.displayName;
-        userid = users.userId;
-        ifAI = users.ifAI;
-        room = users.room;
-        pos = users.pos;
-        coreData = users.coreData;
-        seedData = users.seedData;
-        data_loaded = true;
-        // socket.on('getrmpos', (room, pos)=>{
-        //   writeOldUser(userid, room, pos)
-        //   .then(exists => {
-        //     data_loaded = true;
-        //   })
-        // })   
-    })
-    .catch(error => {
-        console.error(error);
-    });
+
+socket.on('checkUser', (rst)=>{//rst = {username: string, userid: string, profilePic: png, ifAI: bool, coreData: string, seedData: string, starData:string}
+  username = rst.displayName;
+  profilePic = rst.profilePic;
+  ifAI = rst.ifAI;
+  cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, username, ifAI, rst.coreData));
+  
+});
+
+socket.on('checkVisitor', ()=>{
+  username = null;
+  profilePic = visitorAvatar;
+  ifAI = false;
+  cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, username, ifAI, null));
+  
+})
+
+socket.on('checkOthers',(others)=>{
+  for (user in others) {
+    cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, null, uesr.ifAI, user.coreData))
+  }
+})
+
+socket.on('bye', (username)=>{
+  if(username.substring(0, 5) == "visitor"){
+      console.log("is visitor! delete prince and dande");
+  }else{
+      console.log("is user! delete prince");
+  }
+})
+// readUserData()
+      // .then(() => {
+      //     users = userList;
+      //     username = users.displayName;
+      //     userid = users.userId;
+      //     ifAI = users.ifAI;
+      //     coreData = users.coreData;
+      //     seedData = users.seedData;
+      //     starData = users.starData;
+      //     data_loaded = true; 
+      // })
+      // .catch(error => {
+      //     console.error(error);
+      // });
 
 const activity = document.querySelector('.activity')
 const msgInput = document.querySelector('textarea')
@@ -81,22 +106,8 @@ function clearEventMsg(){
 
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
-let cores = [];
 let xPos = [innerWidth / 2 - 200, innerWidth / 2 + 200];
 let yPos = innerHeight / 2;
-let takenPos = {user: null, pos: null};
-
-if(data_loaded){
-  socket.on("message", (msg)=>{
-    if(takenPos.pos == null){
-      cores.push(new Core(xPos[0], yPos, msg.user));
-      takenPos.pos = 0;
-    } else if (takenPos.pos == 0){
-      cores.push(new Core(xPos[1], yPos, msg.user));
-      takenPos.pos = 1;
-    }
-  })
-}
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
@@ -120,16 +131,14 @@ function draw() {
 // -------------------- P5 CLASS -------------------- //
 // Core Class
 class Core {
-  constructor(x, y, user, ai, cdt, posx) {
+  constructor(x, y, user, ai, cdt) {
       this.x = x;
       this.y = y;
       this.user = user;
       this.ifAI = ai;
       this.coreData = cdt;
-      this.pos = posx;
       this.dmouse = dist(this.x, this.y, mouseX, mouseY);
       this.radius = 50;
-      this.data = [];
       this.isWriting = false;
       this.ifClicked = false;
   }

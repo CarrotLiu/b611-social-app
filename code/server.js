@@ -11,7 +11,6 @@ const PORT = process.env.PORT || 3500
 //create an express app
 const app = express()
 
-
 //user: the middleware function is executed when the base of the requested path matches path.
 //static: load the static files in the "public" folder
 const publicDir = path.join(__dirname, "public")
@@ -22,14 +21,10 @@ const expressServer = app.listen(PORT, () => {
     console.log(`listening on port ${PORT}`)
 })
 
-
 // ---------------------- SOCKET ---------------------- //
 let userNum = 0;
 let allUsers = [];
-let usersid = [];
-let curRoom;
-let rooms =[];
-let curPos;
+
 //Establish socket server API
 //if in production mode: route to github path. else, route to local path
 const io = new Server(expressServer, {
@@ -39,54 +34,63 @@ const io = new Server(expressServer, {
     }
 })
 
-
 // connect socket
 io.on('connection', socket => {
     userNum += 1;
     console.log(`${socket.id} connected`, userNum)
-    //read data from firebase
-    socket.on('initialize', (nm)=>{
-        console.log(nm);
-        userNum+=1;
-        allUsers.push(`${socket.id}`)
-        let room = findOrCreateRoom();
-        
-        if(nm){
-            socket.emit('message', `Welcome to B611! ${nm}`)
-
-        }else{
-            socket.emit('message', `Welcome to B611! ${socket.id}`)
-        }
-        
-        //send room and pos
-        // socket.emit('getrmpos', {socketID:`${socket.id}`, room:curRoom, pos: curPos});
-
+    //user login
+    socket.on('login', (userList)=>{
+        let others = userList.filter(data => data.displayName != username);
+        let self = userList.filter(data => data.displayName == username)[0];
+        allUsers.push(self.displayName)
+        socket.emit('checkUser', self)
+        socket.emit('checkOthers', others)
+        socket.emit('message', `Welcome to B611! ${self.displayName}`)
     })
-    socket.on('login', (user)=>{
-        socket.emit('message', `Welcome to B611! ${user}`)
-        socket.broadcast.emit('message', `${user} connected`)
+    socket.on('visit', (visitor)=>{
+        allUsers.push(visitor)
+        socket.emit('message', `Welcome to B611!`)
+        socket.emit('checkVisitor', visitor)
+        
+    })
+
+    socket.broadcast.emit('message', `A Little Prince just arrived!`)
+
+    // Enlarge canvas for more users
+    socket.on('canvas', (cvwidth)=>{
+        cvwidth += 100;
+        socket.emit('canvas', cvwidth)
     })
     
-    socket.on('disconnect', ()=>{
-        socket.emit('bye', "disconnected")
-        socket.broadcast.emit('bye', "disconnected")
-        // let userToDelete = ;
-        // allUsers = allUsers.filter(item => item !== userToDelete);
+    //update position
+    socket.on('position', (pos)=>{
+        // console.log(pos);
+        io.emit('position', pos)
+    })
+    
+    //user disconnect => delete prince
+    socket.on('disconnect', (username)=>{
+        userNum --;
+        io.emit('bye', username) 
+        socket.broadcast.emit('message', "A Little Prince just left" )
+        allUsers = allUsers.filter(user => user != username);
     })
 
-    socket.on('activity', (name)=>{
-        socket.broadcast.emit('activity', name)
+    //delete account => delete both prince and dandelion
+    socket.on('delete', (username)=>{
+        
     })
+
+
+    // //display event message
+    // socket.on('activity', (name)=>{
+    //     socket.broadcast.emit('activity', name)
+    // })
+
+    // socket.on('login', (user)=>{
+    //     socket.emit('message', `Welcome to B611! ${user}`)
+    //     socket.broadcast.emit('message', `${user} connected`)
+    // })
 })
 
-function findOrCreateRoom() {
-    for (const room in rooms) {
-        if (rooms[room].length < 2) {
-            return room;
-        }
-    }
-    
-    const newRoom = `Room-${Object.keys(rooms).length + 1}`;
-    rooms[newRoom] = [];
-    return newRoom;
-}
+
