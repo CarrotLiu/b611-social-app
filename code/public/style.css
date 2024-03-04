@@ -9,7 +9,7 @@ html, body {
   box-sizing: border-box;
 }
 canvas {
-  display: block;
+  display: none;
 }
 h1{
   color: white;
@@ -57,11 +57,13 @@ h1{
 
 
 #writeArea{
-  visibility: hidden;
+  /* visibility: hidden; */
+  display: none;
 }
 
 #readArea{
-  visibility: hidden;
+  /* visibility: hidden; */
+  display: none;
 }
 
 #buttonContainer{
@@ -90,7 +92,7 @@ h1{
 }
 
 #topBtnContainer{
-  display: flex;
+  display: none;
   width: 100%;
   padding: 10px;
 }
@@ -107,3 +109,18 @@ h1{
 #btn-signout:hover{
   color: red;
 }
+
+#login-btns{
+  margin-top: 100px;
+
+}
+
+#writing-btns{
+
+}
+#reading-btns{
+
+}
+
+
+

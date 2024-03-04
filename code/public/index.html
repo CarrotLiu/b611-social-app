@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B611 Start Page</title>
+    <title>B611</title>
     <link rel="stylesheet" type="text/css" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js" integrity="sha512-skuhu6jj+sQnhLq1Txsack8VfnIrX8wL+MTFilYlFFT/NuLJm7eya7zOROs39Jy5cjASMEWqxLzijRVmKhsqWQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js" integrity="sha512-uaz5GpnQoE6t5echKlX8P52czvsIGgLPcvlzfvRubLZ1Hp8JemUDnbUiAahbVtPb+jUVrNETuXvAhDDF/N3M4w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -12,15 +12,38 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script defer src="database.js"></script>
+    <script defer src="script.js"></script>
 
     
 </head>
 <body>                            
-    <h1>B611</h1>
-    <div class="buttonContainer">
+    <div class="buttonContainer" id="login-btns">
         <button class="btn-basic" id="login">Login</button>
         <button class="btn-basic" id="visit">Start Without Login</button>
+    </div>
+    <p class = "activity"></p>
+    <div class="textAreaContainer" id="writeArea">
+        <textarea class="textInputArea" type = "text" placeholder="Please write about your day here. How do you feel? What do you think?"></textarea>
+        <div id="buttonContainer" id="writing-btns">
+            <button class="btn-basic" id="btn-finish">Finish</button>
+        </div>
+    </div>
+    <div class="textAreaContainer" id="readArea">
+        <div class="textInputArea"></div>
+        <div id="buttonContainer" id="reading-btns">
+            <button class="btn-basic" id="btn-back">Back</button>
+            <button class="btn-basic" id="btn-revise">Revise</button>
+            <button class="btn-basic" id="btn-delete">Delete</button>
+            <button class="btn-basic" id="btn-achieve">Achieve</button>
+        </div>
+    </div>
+    <div id="topBtnContainer">
+        <button class="btn-basic" id="btn-signout">Sign Out</button>
     </div>
     
 </body>
 </html>
+
+
+ 
+    

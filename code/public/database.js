@@ -133,7 +133,7 @@ function signout(){
     })
 }
 
-if(loginBtn){
+if(loginBtn.style.display != "none"){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
@@ -145,8 +145,7 @@ if(loginBtn){
                 write_done = true;
             }
             if (write_done) {
-                socket.emit('login', [userList, username]);
-                window.location.href = "app/index.html";
+                startApp(username);
             }
      
         } catch (error) {
@@ -155,20 +154,31 @@ if(loginBtn){
     });
     visitBtn.addEventListener('click', () => {
         socket.emit('visit', `visitor ${socket.id.substring(0, 5)}`);
-        window.location.href = "app/index.html";
+        // window.location.href = "index.html";
+        
     })
 } else{
     
     signoutBtn.addEventListener('click', async ()=>{
         try {
             const result = await signout();
-            window.location.href = "../index.html";
+            // window.location.href = "index.html";
+
         } catch(error){
             console.log(error.message);
         }
     })
 }
 
+function startApp(username){
+    loginBtn.style.display = "none";
+    visitBtn.style.display = "none";
+    
+    document.querySelector("#topBtnContainer").style.display = "flex";
+    document.querySelector("canvas").style.display = "block";
+
+    socket.emit('login', [userList, username]);
+}
 
 
 // -------------------- GLOBALIZE FUNCTION -------------------- //

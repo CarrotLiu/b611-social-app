@@ -11,7 +11,7 @@ let username, profilePic, ifAI;
 let princes = [];
 let cores = [];
 let seeds = [];
-let visitorAvatar = "../assets/door-close.svg";
+let visitorAvatar = "assets/door-close.svg";
 let data_loaded = false;
 
 socket.on('checkUser', (rst)=>{//rst = {username: string, userid: string, profilePic: png, ifAI: bool, coreData: string, seedData: string, starData:string}
@@ -72,15 +72,10 @@ const msgInput = document.querySelector('textarea')
 //   }
 //   msgInput.focus()
 // }
-socket.on("message", (msg) => {
-  console.log("emitted")
-  activity.textContent = `${msg.texts}`; 
-  clearEventMsg();
-})
-if(data_loaded){
   //connection activity
   socket.on("message", (msg) => {
-    activity.textContent = `${msg.texts}`; 
+    console.log(msg);
+    activity.textContent = msg; 
     clearEventMsg();
   })
 
@@ -100,7 +95,7 @@ if(data_loaded){
     
   })
   
-}
+
 //time function for clearing messages
 function clearEventMsg(){
   clearTimeout(activityTimer)
@@ -167,7 +162,7 @@ class Core {
     // Show input box
     let writeArea = document.querySelector('#writeArea')
     let submitButton = document.querySelector("#btn-finish")
-    writeArea.style.visibility = "visible";
+    writeArea.style.display = "block";
 
     submitButton.addEventListener(
       "click",
@@ -176,7 +171,7 @@ class Core {
         this.ifCheckDataNum = true;
         this.isWriting = false;
         this.ifClicked = false;
-        writeArea.style.visibility = "hidden";
+        writeArea.style.display = "none";
       }.bind(this)
     );  
   }

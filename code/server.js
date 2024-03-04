@@ -43,14 +43,14 @@ io.on('connection', socket => {
         userNum += 1;
         let others = userData[0].filter(data => data.displayName != userData[1]);
         let self = userData[0].filter(data => data.displayName == userData[1])[0];
-        allUsers.push(self.displayName)
+        console.log(userData[0], userData);
+        // allUsers.push(self.displayName)
         // socket.emit('checkUser', ()=>{
         //     console.log(self);
         //     return self
         // })
         socket.emit('checkUser', self)
         socket.emit('checkOthers', others)
-        console.log(self, others)
         socket.emit('message', `Welcome to B611! ${self.displayName}`)
     })
     socket.on('visit', (visitor)=>{
