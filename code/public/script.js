@@ -7,33 +7,48 @@
 // const socket = io(socketURL);
 socket = io('ws://localhost:3500')
 // ---------------------- INITIALIZE RM & POS ---------------------- //
-let username, profilePic, ifAI;
-let princes = [];
-let cores = [];
-let seeds = [];
+let username, profilePic, ifAI, layerNum, color, freq;
+
+let princes = [], cores = [], seeds = [];
+
+let colorStem = [
+  [56, 130, 60], // green
+  [250, 80, 80], //pink
+  [120, 150, 190], //blue
+];
+
+let colorRange = [
+  [
+    [91, 179, 24],
+    [244, 206, 10],
+  ],
+  [
+    [255, 234, 221],
+    [255, 102, 102],
+  ],
+  [
+    [130, 170, 227],
+    [234, 253, 252],
+  ],
+];
 let visitorAvatar = "assets/door-close.svg";
 let data_loaded = false;
 
-socket.on('checkUser', (rst)=>{//rst = {username: string, userid: string, profilePic: png, ifAI: bool, coreData: string, seedData: string, starData:string}
+socket.on('checkSelf', (rst)=>{
   username = rst.displayName;
   profilePic = rst.profilePic;
   ifAI = rst.ifAI;
-  cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, username, ifAI, rst.coreData));
+  layerNum = rst.layerNum;
+  color = rst.color;
+  freq = rst.freq;
+  cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, layerNum, color, freq, username, ifAI, rst.coreData));
   console.log(cores);
 });
 
-socket.on('checkVisitor', ()=>{ 
-  username = null;
-  profilePic = visitorAvatar;
-  ifAI = false;
-  cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, username, ifAI, null));
-  console.log(cores);
-})
-
 socket.on('checkOthers',(others)=>{
   for (user in others) {
-    cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, null, uesr.ifAI, user.coreData))
-    console.log(cores);
+    cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.displayName, user.ifAI, user.coreData))
+    console.log(others);
   }
 })
 
@@ -95,7 +110,6 @@ const msgInput = document.querySelector('textarea')
     
   })
   
-
 //time function for clearing messages
 function clearEventMsg(){
   clearTimeout(activityTimer)
@@ -106,8 +120,6 @@ function clearEventMsg(){
 
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
-let xPos = [innerWidth / 2 - 200, innerWidth / 2 + 200];
-let yPos = innerHeight / 2;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
@@ -128,56 +140,15 @@ function draw() {
   
 }
 
-// -------------------- P5 CLASS -------------------- //
-// Core Class
-class Core {
-  constructor(x, y, user, ai, cdt) {
-      this.x = x;
-      this.y = y;
-      this.user = user;
-      this.ifAI = ai;
-      this.coreData = cdt;
-      this.dmouse = dist(this.x, this.y, mouseX, mouseY);
-      this.radius = 50;
-      this.isWriting = false;
-      this.ifClicked = false;
-  }
 
-  update(){
-    this.dmouse = dist(this.x, this.y, mouseX, mouseY);
-    
-  }
-
-  display() {
-    if(this.dmouse < 20 && !this.ifClicked){
-      fill(255,0,0);
-    }else{
-      fill(255);
-    }
-    noStroke();
-    circle(this.x, this.y, this.radius);
-  }
-
-  writeText() {
-    // Show input box
-    let writeArea = document.querySelector('#writeArea')
-    let submitButton = document.querySelector("#btn-finish")
-    writeArea.style.display = "block";
-
-    submitButton.addEventListener(
-      "click",
-      function () {
-        this.data[0] = textArea.value;
-        this.ifCheckDataNum = true;
-        this.isWriting = false;
-        this.ifClicked = false;
-        writeArea.style.display = "none";
-      }.bind(this)
-    );  
-  }
-}
-
-
-
+// display() {
+//   if(this.dmouse < 20 && !this.ifClicked){
+//     fill(255,0,0);
+//   }else{
+//     fill(255);
+//   }
+//   noStroke();
+//   circle(this.x, this.y, this.radius);
+// }
 
 

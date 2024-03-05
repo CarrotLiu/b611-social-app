@@ -47,7 +47,8 @@ async function readUserData(id) {
     });
 }
 
-function writeNewUser(id, username, pic, ai, cdt, sdt, std) {
+
+function writeNewUser(id, username, pic, ai, cdt, sdt, std, l, c, f) {
     console.log("write new user");
     let newu = {username:{}}
     const newUserId = dbRef.push(newu).key;
@@ -58,7 +59,11 @@ function writeNewUser(id, username, pic, ai, cdt, sdt, std) {
         ifAI: ai,
         coreData: cdt,
         seedData: sdt,
-        starData: std
+        starData: std,
+        layerNum: l,
+        color: c,
+        freq: f
+
     });
     dbRef.child(newUserId).set({
         displayName: username,
@@ -67,7 +72,10 @@ function writeNewUser(id, username, pic, ai, cdt, sdt, std) {
         ifAI: ai,
         coreData: cdt,
         seedData: sdt,
-        starData: std
+        starData: std,
+        layerNum: l,
+        color: c,
+        freq: f
     });
     write_done = true;
 }
@@ -104,6 +112,8 @@ function clearDBReference(refName) {
 // ---------------------- SIGN IN/OUT ---------------------- //
 const loginBtn = document.querySelector("#login");
 const visitBtn = document.querySelector("#visit");
+const loginContainer = document.querySelector("#login-btns");
+const topContainer = document.querySelector("#topBtnContainer");
 const signoutBtn = document.querySelector("#btn-signout");
 
 function signin() {
@@ -133,19 +143,22 @@ function signout(){
     })
 }
 
-if(loginBtn.style.display != "none"){
+if(loginContainer.style.display != "none"){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
             const exists = await readUserData(userId);
             if (!exists) {
                 console.log("new user!");
-                writeNewUser(userId, username, photoURL, false, "", "", "");
+                let l = 1;
+                let c= Math.floor(Math.random() * 3);
+                let f = Math.random(Math.PI, 2 * Math.PI);
+                writeNewUser(userId, username, photoURL, false, [], [], [], l, c, f);
             }else{  
                 write_done = true;
             }
             if (write_done) {
-                startApp(username);
+                startApp(userId, "login");
             }
      
         } catch (error) {
@@ -153,31 +166,37 @@ if(loginBtn.style.display != "none"){
         }
     });
     visitBtn.addEventListener('click', () => {
-        socket.emit('visit', `visitor ${socket.id.substring(0, 5)}`);
-        // window.location.href = "index.html";
-        
+        let id =  `${socket.id}`;
+        userList.push({
+            displayName: null,
+            userId: id,
+            profilePic: "assets/door-close.svg",
+            ifAI: false,
+            coreData: [],
+            seedData: [],
+            starData: [],
+            layerNum: 1,
+            color: Math.floor(Math.random() * 3),
+            freq: Math.random(Math.PI, 2 * Math.PI)
+    
+        });
+        startApp(id, "visit");
     })
 } else{
-    
     signoutBtn.addEventListener('click', async ()=>{
         try {
             const result = await signout();
-            // window.location.href = "index.html";
-
         } catch(error){
             console.log(error.message);
         }
     })
 }
 
-function startApp(username){
-    loginBtn.style.display = "none";
-    visitBtn.style.display = "none";
-    
-    document.querySelector("#topBtnContainer").style.display = "flex";
+function startApp(userId, event){
+    loginContainer.style.display = "none";
+    topContainer.style.display = "flex";
     document.querySelector("canvas").style.display = "block";
-
-    socket.emit('login', [userList, username]);
+    socket.emit(event, [userList, userId]);
 }
 
 

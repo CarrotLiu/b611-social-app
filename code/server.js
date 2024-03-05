@@ -23,7 +23,6 @@ const expressServer = app.listen(PORT, () => {
 })
 
 // ---------------------- SOCKET ---------------------- //
-let userNum = 0;
 let allUsers = [];
 
 //Establish socket server API
@@ -40,18 +39,21 @@ io.on('connection', socket => {
     console.log("socket connected");
     //user login
     socket.on('login', (userData)=>{
-        userNum += 1;
-        let others = userData[0].filter(data => data.displayName != userData[1]);
-        let self = userData[0].filter(data => data.displayName == userData[1])[0];
-        console.log(userData[0], userData);
-        // allUsers.push(self.displayName)
-        // socket.emit('checkUser', ()=>{
-        //     console.log(self);
-        //     return self
-        // })
-        socket.emit('checkUser', self)
-        socket.emit('checkOthers', others)
-        socket.emit('message', `Welcome to B611! ${self.displayName}`)
+        let self = userData[0].filter(data => data.userId == userData[1])[0];
+        console.log(self)
+        let allUserIds = [];
+        for(let user in allUsers){
+            allUserIds.push(user.userId);
+        }
+        if(!allUserIds.includes(self.userId)){
+            allUsers.push(self)
+            console.log(allUsers)
+            socket.emit('checkUser', self)
+            let others = allUsers.filter(data => data.userId != self.userId);
+            socket.emit('checkOthers', others)
+            socket.broadcast.emit('message', `A Little Prince just arrived!`)
+            socket.emit('message', `Welcome to B611! ${self.displayName}`)
+        }   
     })
     socket.on('visit', (visitor)=>{
         allUsers.push(visitor)
@@ -59,9 +61,7 @@ io.on('connection', socket => {
         socket.emit('checkVisitor', visitor)
         
     })
-
-    socket.broadcast.emit('message', `A Little Prince just arrived!`)
-
+    
     // Enlarge canvas for more users
     socket.on('canvas', (cvwidth)=>{
         cvwidth += 100;
@@ -76,10 +76,9 @@ io.on('connection', socket => {
     
     //user disconnect => delete prince
     socket.on('disconnect', (username)=>{
-        userNum --;
         io.emit('bye', username) 
         socket.broadcast.emit('message', "A Little Prince just left" )
-        allUsers = allUsers.filter(user => user != username);
+        allUsers = allUsers.filter(user => user.displayName != username);
     })
 
     //delete account => delete both prince and dandelion
