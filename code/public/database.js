@@ -153,12 +153,12 @@ if(loginContainer.style.display != "none"){
                 let l = 1;
                 let c= Math.floor(Math.random() * 3);
                 let f = Math.random(Math.PI, 2 * Math.PI);
-                writeNewUser(userId, username, photoURL, false, [], [], [], l, c, f);
+                writeNewUser(userId, username, photoURL, false, [""], [""], [""], l, c, f);
             }else{  
                 write_done = true;
             }
             if (write_done) {
-                startApp(userId, "login");
+                startApp(userId, "user");
             }
      
         } catch (error) {
@@ -180,7 +180,7 @@ if(loginContainer.style.display != "none"){
             freq: Math.random(Math.PI, 2 * Math.PI)
     
         });
-        startApp(id, "visit");
+        startApp(id, "visitor");
     })
 } else{
     signoutBtn.addEventListener('click', async ()=>{
@@ -192,11 +192,11 @@ if(loginContainer.style.display != "none"){
     })
 }
 
-function startApp(userId, event){
+function startApp(userId, type){
     loginContainer.style.display = "none";
     topContainer.style.display = "flex";
     document.querySelector("canvas").style.display = "block";
-    socket.emit(event, [userList, userId]);
+    socket.emit("login", [userList, userId, type]);
 }
 
 

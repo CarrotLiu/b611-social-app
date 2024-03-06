@@ -24,6 +24,7 @@ const expressServer = app.listen(PORT, () => {
 
 // ---------------------- SOCKET ---------------------- //
 let allUsers = [];
+let userNum = allUsers.length;
 
 //Establish socket server API
 //if in production mode: route to github path. else, route to local path
@@ -39,27 +40,29 @@ io.on('connection', socket => {
     console.log("socket connected");
     //user login
     socket.on('login', (userData)=>{
+        let others = allUsers;
         let self = userData[0].filter(data => data.userId == userData[1])[0];
-        console.log(self)
-        let allUserIds = [];
-        for(let user in allUsers){
-            allUserIds.push(user.userId);
-        }
-        if(!allUserIds.includes(self.userId)){
+        if(userData[2] == "user"){
+            let allUserIds = [];
+            for(let user in allUsers){
+                allUserIds.push(user.userId);
+            }
+            if(!allUserIds.includes(self.userId)){
+                allUsers.push(self);
+                socket.emit("addRoom", userData[0].length);
+                socket.broadcast.emit('message', `A Little Prince just arrived!`)
+                socket.emit('message', `Welcome to B611! ${self.displayName}`)
+            }else{
+                others = allUsers.filter(data => data.userId != self.userId);
+            }
+        }else if(userData[2] == "visitor"){
             allUsers.push(self)
-            console.log(allUsers)
-            socket.emit('checkUser', self)
-            let others = allUsers.filter(data => data.userId != self.userId);
-            socket.emit('checkOthers', others)
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
-            socket.emit('message', `Welcome to B611! ${self.displayName}`)
-        }   
-    })
-    socket.on('visit', (visitor)=>{
-        allUsers.push(visitor)
-        socket.emit('message', `Welcome to B611!`)
-        socket.emit('checkVisitor', visitor)
-        
+            socket.emit('message', `Welcome to B611!`)
+        }
+        socket.emit('checkSelf', self)
+        socket.emit('checkOthers', others)
+        console.log(userNum);
     })
     
     // Enlarge canvas for more users
@@ -85,6 +88,7 @@ io.on('connection', socket => {
     socket.on('delete', (username)=>{
         
     })
+
     console.log(`${socket.id} connected`, userNum)
 
     // //display event message

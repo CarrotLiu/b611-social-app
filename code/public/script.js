@@ -7,9 +7,17 @@
 // const socket = io(socketURL);
 socket = io('ws://localhost:3500')
 // ---------------------- INITIALIZE RM & POS ---------------------- //
-let username, profilePic, ifAI, layerNum, color, freq;
+let iX, roomX = 700, marginX = 80; 
 
-let princes = [], cores = [], seeds = [];
+let myName, myAvatar, myAI, myLayer, myColor, myFreq, myCDT, mySDT, mySTD;
+let myCore, myPrince, mySeeds, myStars, myStem;
+let myX, myY;
+
+let ifRoomSet = false;
+
+let princes = [], cores = [], seeds = [], stems=[];
+
+let cnvX = 0;
 
 let colorStem = [
   [56, 130, 60], // green
@@ -34,20 +42,33 @@ let colorRange = [
 let visitorAvatar = "assets/door-close.svg";
 let data_loaded = false;
 
-socket.on('checkSelf', (rst)=>{
-  username = rst.displayName;
-  profilePic = rst.profilePic;
-  ifAI = rst.ifAI;
-  layerNum = rst.layerNum;
-  color = rst.color;
-  freq = rst.freq;
-  cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, layerNum, color, freq, username, ifAI, rst.coreData));
-  console.log(cores);
+socket.on("addRoom", (index)=>{
+  myX = Math.random(marginX , roomX * index - marginX);
+  myY = window.innerHeight / 2;
+  cnvX = -(myX - window.innerWidth / 2);
+  ifRoomSet = true;
 });
+
+socket.on('checkSelf', (rst)=>{
+  myName = rst.displayName;
+  myAvatar = rst.profilePic;
+  myAI = rst.ifAI;
+  myLayer = rst.layerNum;
+  myColor = rst.color;
+  myFreq = rst.freq;
+  myCDT = rst.coreData;
+  mySDT = rst.seedData;
+  mySTD = rst.starData;
+  
+  myCore = new Core(myX, myY, myLayer, myColor, myFreq, myName, myAI, myCDT, true);
+  myPrince = new Prince(myX + 250, myY + 100, myFreq);
+});
+
+
 
 socket.on('checkOthers',(others)=>{
   for (user in others) {
-    cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.displayName, user.ifAI, user.coreData))
+    cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.displayName, user.ifAI, user.coreData, false))
     console.log(others);
   }
 })
@@ -131,6 +152,11 @@ function setup() {
 // Main draw function
 function draw() {
   background(0);
+  translate(cnvX, 0);
+
+  //self
+  drawSelf();
+  //others
   if(cores.length !=0){
     // console.log(username); 
     for(let i = 0; i < cores.length; i ++){
@@ -138,6 +164,37 @@ function draw() {
     } 
   }
   
+}
+
+function drawSelf(){
+  push();
+  if(myCore){
+    drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),
+    map(cos(myFreq), -1, 1, -10, 0),
+    myX,myY,myColor);
+    myCore.update();
+    myCore.display();
+    
+  }
+  if(myPrince){
+    myPrince.update();
+    myPrince.display();
+  }
+  pop();
+}
+
+function drawStem(x, y, transX, transY, colorIndex) {
+  push();
+  translate(transX, transY);
+  strokeWeight(5);
+  stroke(
+    colorStem[colorIndex][0],
+    colorStem[colorIndex][1],
+    colorStem[colorIndex][2]
+  );
+  noFill();
+  bezier(x, y, 0, 150, 0, 500, 0, 500);
+  pop();
 }
 
 
