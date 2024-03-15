@@ -16,10 +16,11 @@
     <script defer src="Seed.js"></script>
     <script defer src="Prince.js"></script>
     <script defer src="script.js"></script>
-
     
 </head>
-<body>                            
+<body>  
+    <main>
+    <div id="p5-container"></div>                        
     <div class="buttonContainer" id="login-btns">
         <button class="btn-basic" id="login">Login</button>
         <button class="btn-basic" id="visit">Start Without Login</button>
@@ -31,6 +32,7 @@
             <button class="btn-basic" id="btn-finish">Finish</button>
         </div>
     </div>
+    
     <div class="textAreaContainer" id="readArea">
         <div class="textInputArea"></div>
         <div id="buttonContainer" id="reading-btns">
@@ -41,9 +43,23 @@
         </div>
     </div>
     <div id="topBtnContainer">
-        <button class="btn-basic" id="btn-signout">Sign Out</button>
+        <div id="top-left-btn-container">
+            <button class="btn-top" id="btn-signout">
+            </button>
+        </div>
+        
+        <div id="top-right-btn-container">
+            <button class="btn-top" id="btn-locate">
+            </button>
+            <button class="btn-top" id="btn-star">
+            </button>
+            <button class="btn-top" id="btn-bulb">
+            </button>
+        </div>
+
+        
     </div>
-    
+</main>  
 </body>
 </html>
 

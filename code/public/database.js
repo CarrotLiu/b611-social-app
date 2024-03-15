@@ -153,7 +153,7 @@ if(loginContainer.style.display != "none"){
                 let l = 1;
                 let c= Math.floor(Math.random() * 3);
                 let f = Math.random(Math.PI, 2 * Math.PI);
-                writeNewUser(userId, username, photoURL, false, [""], [""], [""], l, c, f);
+                writeNewUser(userId, username, photoURL, false, [" "], [" "], [" "], l, c, f);
             }else{  
                 write_done = true;
             }
@@ -195,8 +195,9 @@ if(loginContainer.style.display != "none"){
 function startApp(userId, type){
     loginContainer.style.display = "none";
     topContainer.style.display = "flex";
-    document.querySelector("canvas").style.display = "block";
+    document.querySelector("#p5-container").style.visibility = "visible";
     socket.emit("login", [userList, userId, type]);
+    
 }
 
 

@@ -31,7 +31,7 @@ let userNum = allUsers.length;
 const io = new Server(expressServer, {
     cors: {
         origin: process.env.NODE_ENV === "production" ? "https://carrotliu.github.io" : 
-        ["http://localhost:5500", "http://127.0.0.1:5500"]
+        ["http://localhost:5501", "http://127.0.0.1:5501"]
     }
 })
 
@@ -41,6 +41,7 @@ io.on('connection', socket => {
     //user login
     socket.on('login', (userData)=>{
         let others = allUsers;
+        console.log("hello");
         let self = userData[0].filter(data => data.userId == userData[1])[0];
         if(userData[2] == "user"){
             let allUserIds = [];

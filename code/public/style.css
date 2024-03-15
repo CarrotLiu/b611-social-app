@@ -2,6 +2,7 @@ html, body {
   margin: 0;
   padding: 0;
   text-align: center;
+  background-color:#001C30;
   font-size: 18px;
   font-family: 'IM Fell DW Pica', serif;
   color: white;
@@ -9,8 +10,14 @@ html, body {
   box-sizing: border-box;
 }
 canvas {
-  display: none;
+  
 }
+
+#p5-container{
+  visibility: hidden;
+  height: 100%;
+}
+
 h1{
   color: white;
   text-align: center;
@@ -26,6 +33,7 @@ h1{
 }
 
 .textAreaContainer {
+  background-color: transparent;
   box-sizing: border-box;
   position: absolute;
   top: 40%;
@@ -94,21 +102,77 @@ h1{
 #topBtnContainer{
   display: none;
   width: 100%;
-  padding: 10px;
+  margin-top:20px;
+  padding: 20px;
+  background-color: transparent;
+}
+
+#top-right-btn-container{
+  display: flex;
+  justify-content: right;
+  align-items: right;
+  right:0px;
+  width: 87%;
+  margin: 0px;
+  padding:0px;
+}
+#top-left-btn-container{
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  left:0px;
+  width: 12%;
+  margin: 0px;
+  padding:0px;
+}
+
+.btn-top{
+  background: none;
+  border: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 60px;
+  height: 60px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 #btn-signout{
-  
-  background: none;
-  color: white;
-  border: none;
-  box-shadow: none;
-  backdrop-filter:none;
-  width: 150px;
+  background-image: url('assets/door-close.svg');
 }
 #btn-signout:hover{
-  color: red;
+  background-image: url('assets/door-open.svg');
+  cursor:pointer;
 }
+
+#btn-locate{
+  background-image: url('assets/locate-off.svg');
+}
+
+#btn-locate:hover{
+  background-image: url('assets/locate-on.svg');
+  cursor:pointer;
+}
+
+#btn-star{
+  background-image: url('assets/star-off.svg');
+}
+
+#btn-star:hover{
+  background-image: url('assets/star-on.svg');
+  cursor:pointer;
+}
+
+#btn-bulb{
+  background-image: url('assets/bulb-off.svg');
+}
+
+#btn-bulb:hover{
+  background-image: url('assets/bulb-on.svg');
+  cursor:pointer;
+}
+
 
 #login-btns{
   margin-top: 100px;

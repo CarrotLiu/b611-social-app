@@ -45,9 +45,9 @@ let data_loaded = false;
 socket.on("addRoom", (index)=>{
   myX = Math.random(marginX , roomX * index - marginX);
   myY = window.innerHeight / 2;
-  cnvX = -(myX - window.innerWidth / 2);
   ifRoomSet = true;
 });
+
 
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
@@ -59,9 +59,11 @@ socket.on('checkSelf', (rst)=>{
   myCDT = rst.coreData;
   mySDT = rst.seedData;
   mySTD = rst.starData;
-  
-  myCore = new Core(myX, myY, myLayer, myColor, myFreq, myName, myAI, myCDT, true);
-  myPrince = new Prince(myX + 250, myY + 100, myFreq);
+  if(ifRoomSet){
+    cnvX = -(myX - window.innerWidth / 2);
+    myCore = new Core(myX, myY, myLayer, myColor, myFreq, myName, myAI, myCDT, true);
+    myPrince = new Prince(myX + 250, myY + 100, myFreq);
+  }
 });
 
 
@@ -144,14 +146,14 @@ let canvas;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
+  canvas.parent("p5-container")
   canvas.position(0, 0);
   canvas.style("z-index", "-1");
-  background(0);
 }
 
 // Main draw function
 function draw() {
-  background(0);
+  background("#001C30");
   translate(cnvX, 0);
 
   //self
