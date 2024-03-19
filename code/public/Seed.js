@@ -30,7 +30,7 @@ class Seed {
       mouseY
     );
     this.hideX = 0;
-    this.hideY = 0;
+    this.hideY = 0; 
 
     this.ifFriend = false;
     this.ifSelf = true;
@@ -92,10 +92,6 @@ class Seed {
         this.hideY;
     }
     this.checkClick(ifClicked);
-    // if(this.layerNum == 1){
-      // console.log(this.coreX, this.coreY);
-      // console.log(this.seedX + this.coreX, this.seedY + this.coreY);
-    // }
     if(this.isHovering){
       console.log("hhh");
     }
@@ -107,7 +103,6 @@ class Seed {
     this.drawSeedStem();
     this.drawSeed();
     pop();
-    // console.log(this.layerNum);
   }
 
   drawSeed() {
@@ -132,21 +127,6 @@ class Seed {
       push();
 
       if (this.data.length != 0) {
-        // push();
-        // fill(255, 60);
-        // circle(
-        //   0,
-        //   0,
-        //   5 +
-        //     map(
-        //       sin(this.seedPos + frameCount * 0.05),
-        //       -1,
-        //       1,
-        //       3,
-        //       6 + this.layerNum * 3.5
-        //     )
-        // );
-        // pop();
         push();
         this.assignColor(fluct1);
         noStroke();

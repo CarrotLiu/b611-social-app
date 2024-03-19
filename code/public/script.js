@@ -10,8 +10,10 @@ socket = io('ws://localhost:3500')
 let iX, roomX = 700, marginX = 80; 
 
 let myName, myAvatar, myAI, myLayer, myColor, myFreq, myCDT, mySDT, mySTD;
-let myCore, myPrince, mySeeds, myStars, myStem;
+let myCore, myPrince, mySeeds = [], myStars, myStem;
 let myX, myY;
+let currentLayer = 1;
+let maxLayerNum = 2;
 
 let ifRoomSet = false;
 
@@ -62,6 +64,22 @@ socket.on('checkSelf', (rst)=>{
   if(ifRoomSet){
     cnvX = -(myX - window.innerWidth / 2);
     myCore = new Core(myX, myY, myLayer, myColor, myFreq, myName, myAI, myCDT, true);
+    for (let r = currentLayer; r > 0; r--) {
+      for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+        mySeeds.push(
+          new Seed(
+            myX,
+            myY,
+            myLayer,
+            i,
+            random(0, 0.003),
+            random(0.001, 0.002),
+            myColor,
+            myFreq
+          )
+        );
+      }
+    }
     myPrince = new Prince(myX + 250, myY + 100, myFreq);
   }
 });
@@ -109,7 +127,7 @@ const msgInput = document.querySelector('textarea')
 //       msgInput.value = ""
 //   }
 //   msgInput.focus()
-// }
+// } 
   //connection activity
   socket.on("message", (msg) => {
     console.log(msg);
@@ -143,19 +161,29 @@ function clearEventMsg(){
 
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
+let stars = [];
+let stopHover = false;
+let ifClicked = false;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
   canvas.parent("p5-container")
   canvas.position(0, 0);
   canvas.style("z-index", "-1");
+  for (let i = 0; i < 150; i++) {
+    stars.push(new Star(random(0, width), random(0, height)));
+  }
 }
 
 // Main draw function
 function draw() {
   background("#001C30");
+  for (let i = 0; i < stars.length; i++) {
+    stars[i].update();
+    stars[i].display();
+  }
+  push()
   translate(cnvX, 0);
-
   //self
   drawSelf();
   //others
@@ -164,24 +192,42 @@ function draw() {
     for(let i = 0; i < cores.length; i ++){
       cores[i].display();
     } 
-  }
+  } 
+  circle(width + 10, height / 2, 50);
+  pop()
   
+  if(myCore){
+    push();
+    princeWalk()
+    if(myPrince){
+      myPrince.update();
+      myPrince.display();
+    }
+    pop();
+  }
 }
 
 function drawSelf(){
   push();
   if(myCore){
-    drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),
-    map(cos(myFreq), -1, 1, -10, 0),
-    myX,myY,myColor);
+    drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
+    for(let i = 0; i < mySeeds.length; i++){
+      mySeeds[i].update(stopHover, ifClicked);
+      mySeeds[i].display();
+      if (!mySeeds[i].ifFly) {
+        mySeeds[i].lastCoreX = mySeeds[i].coreX;
+        mySeeds[i].lastCoreY = mySeeds[i].coreY;
+        mySeeds[i].lastSeedX = mySeeds[i].seedX;
+        mySeeds[i].lastSeedY = mySeeds[i].seedY;
+      }      
+      if (mySeeds[i].flyDone) {
+        mySeeds.splice(i, 1);
+      }
+    }
     myCore.update();
     myCore.display();
-    
   }
-  if(myPrince){
-    myPrince.update();
-    myPrince.display();
-  }
+  
   pop();
 }
 
@@ -199,6 +245,30 @@ function drawStem(x, y, transX, transY, colorIndex) {
   pop();
 }
 
+function princeWalk(){
+  if (keyIsPressed && (keyCode == 39 || keyCode == 37)) {
+    //ArrowRight / ArrowLeft
+    console.log(myX)
+    myPrince.ifIdle = false;
+    myPrince.ifWalk = true; // => this.ifWalk
+    cnvX += myPrince.cnvX;
+    
+    if (myPrince.walkCount <= 60) {
+      myPrince.walkCount++;
+    }
+  } else {
+    myPrince.ifWalk = false;
+    myPrince.ifIdle = true;
+    myPrince.walkCount = 0;
+    myPrince.clothX = 0;
+    // if (sceneIndex == 2 || sceneIndex == 3 || sceneIndex == 4) {
+    //   prince2.ifWalk = false;
+    //   prince2.ifIdle = true;
+    //   prince2.walkCount = 0;
+    //   prince2.clothX = 0;
+    // }
+  }
+}
 
 // display() {
 //   if(this.dmouse < 20 && !this.ifClicked){

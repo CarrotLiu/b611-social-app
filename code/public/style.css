@@ -67,14 +67,17 @@ h1{
 #writeArea{
   /* visibility: hidden; */
   display: none;
+
 }
 
 #readArea{
   /* visibility: hidden; */
   display: none;
+
 }
 
 #buttonContainer{
+  background-color: transparent;
   padding: 6px;
   width: 100%;
 }
@@ -104,6 +107,7 @@ h1{
   width: 100%;
   margin-top:20px;
   padding: 20px;
+  background: none;
   background-color: transparent;
 }
 

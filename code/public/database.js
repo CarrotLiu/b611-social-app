@@ -196,6 +196,7 @@ function startApp(userId, type){
     loginContainer.style.display = "none";
     topContainer.style.display = "flex";
     document.querySelector("#p5-container").style.visibility = "visible";
+    document.querySelector("body").style.background = "none";
     socket.emit("login", [userList, userId, type]);
     
 }

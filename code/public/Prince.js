@@ -2,6 +2,7 @@ class Prince {
   constructor(x, y, freq) {
     this.x = x;
     this.y = y;
+    this.cnvX = 0;
     this.spdX = 1;
     this.spdY = 0;
     this.accX = 0;
@@ -136,7 +137,7 @@ class Prince {
     translate(-this.eyeVX, 0);
     line(this.eyeHX, this.eyeHY, -this.eyeHX, this.eyeHY);
     pop();
-    pop();
+    pop();              
   }
 
   blink() {
@@ -456,7 +457,13 @@ class Prince {
 
     this.hairX = hairx;
     this.hairY = hairy;
+    if((dist(this.x, 0, windowWidth, 0) < 50 && this.walkDir == 1)||(dist(this.x, 0, 0, 0) < 50 && this.walkDir == -1)){
+      this.cnvX = -this.walkDir;
+    }else{
+      this.x += this.walkDir * this.spdX;
+      this.cnvX = 0;
+    }
     this.y += yFloat * 0.1;
-    this.x += this.walkDir * this.spdX;
+    
   }
 }
