@@ -23,7 +23,7 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 // ---------------------- READ & WRITE DATA ---------------------- //
 let write_done = false;
-let userList=[];
+let userList=[]; 
 
 //Read Data
 async function readUserData(id) {
@@ -33,6 +33,7 @@ async function readUserData(id) {
                 let value = childSnapshot.val();
                 userList.push(value);
             });
+            
             let exists = false;
             for (let i = 0; i < userList.length; i++) {
                 if (userList[i].userId == id) {
@@ -55,27 +56,30 @@ function writeNewUser(id, username, pic, ai, cdt, sdt, std, l, c, f) {
     userList.push({
         displayName: username,
         userId: id,
-        profilePic: pic,
-        ifAI: ai,
         coreData: cdt,
         seedData: sdt,
         starData: std,
+        myX: pos,
         layerNum: l,
         color: c,
-        freq: f
+        freq: f,
+        size: s
 
     });
     dbRef.child(newUserId).set({
         displayName: username,
         userId: id,
-        profilePic: pic,
-        ifAI: ai,
+        //text data
         coreData: cdt,
         seedData: sdt,
-        starData: std,
+        //position data
+        starData: std, 
+        myX: pos,
+        //dande render
         layerNum: l,
         color: c,
-        freq: f
+        freq: f,
+        size: s
     });
     write_done = true;
 }
@@ -147,13 +151,18 @@ if(loginContainer.style.display != "none"){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
-            const exists = await readUserData(userId);
+            const exists = await readUserData(userId);  //userList现在是database里所有的user！！！如果是新用户/visitor，就还没存进去！！！
             if (!exists) {
                 console.log("new user!");
                 let l = 1;
                 let c= Math.floor(Math.random() * 3);
                 let f = Math.random(Math.PI, 2 * Math.PI);
-                writeNewUser(userId, username, photoURL, false, [" "], [" "], [" "], l, c, f);
+                let s = Math.random(0.8, 1.1);
+                let index = userList.length;
+                let marginX = s * 80;
+                let roomX = s * 700;
+                let myX = Math.random(marginX , roomX * index - marginX);
+                writeNewUser(userId, username, [" "], [" "], [" "], myX, l, c, f,s); //如果是新用户，存进去了！
             }else{  
                 write_done = true;
             }
@@ -170,16 +179,18 @@ if(loginContainer.style.display != "none"){
         userList.push({
             displayName: null,
             userId: id,
-            profilePic: "assets/door-close.svg",
-            ifAI: false,
             coreData: [],
             seedData: [],
             starData: [],
+            myX: 0,
             layerNum: 1,
             color: Math.floor(Math.random() * 3),
             freq: Math.random(Math.PI, 2 * Math.PI)
     
-        });
+        }); //visitor也存进userList了！
+        //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的data。
+        //所以userList里存了所有用户以及可能有一个visitor，但不包含其他在线的visitor。
+        //我胡汉三再忘记userList是啥就就改名卜萝胡。
         startApp(id, "visitor");
     })
 } else{

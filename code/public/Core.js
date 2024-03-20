@@ -1,12 +1,12 @@
 class Core {
-  constructor(x, y, layerNum, ci, freq, user, ai, cdt, self) {
-    this.user = user;
-    this.ifAI = ai;
+  constructor(x, y, layerNum, ci, freq, size, name, cdt, self) {
+    this.name = name;
     this.x = x;
     this.y = y;
     this.coreX = 0;
     this.coreY = 0;
     this.freq = freq;
+    this.size = size;
     this.layerNum = layerNum;
     this.coreData = cdt;
     this.colorIndex = ci;

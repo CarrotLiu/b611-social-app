@@ -9,15 +9,17 @@ socket = io('ws://localhost:3500')
 // ---------------------- INITIALIZE RM & POS ---------------------- //
 let iX, roomX = 700, marginX = 80; 
 
-let myName, myAvatar, myAI, myLayer, myColor, myFreq, myCDT, mySDT, mySTD;
+let myName, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize;
 let myCore, myPrince, mySeeds = [], myStars, myStem;
-let myX, myY;
+let myX, myY = window.innerHeight / 2;
 let currentLayer = 1;
 let maxLayerNum = 2;
 
 let ifRoomSet = false;
 
 let princes = [], cores = [], seeds = [], stems=[];
+let otherX={}, otherY={};
+let otherName = [], otherData = [];
 
 let cnvX = 0;
 
@@ -41,55 +43,69 @@ let colorRange = [
     [234, 253, 252],
   ],
 ];
-let visitorAvatar = "assets/door-close.svg";
 let data_loaded = false;
-
-socket.on("addRoom", (index)=>{
-  myX = Math.random(marginX , roomX * index - marginX);
-  myY = window.innerHeight / 2;
-  ifRoomSet = true;
-});
-
 
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
-  myAvatar = rst.profilePic;
-  myAI = rst.ifAI;
   myLayer = rst.layerNum;
   myColor = rst.color;
   myFreq = rst.freq;
+  myX = rst.myX;
   myCDT = rst.coreData;
   mySDT = rst.seedData;
   mySTD = rst.starData;
-  if(ifRoomSet){
-    cnvX = -(myX - window.innerWidth / 2);
-    myCore = new Core(myX, myY, myLayer, myColor, myFreq, myName, myAI, myCDT, true);
-    for (let r = currentLayer; r > 0; r--) {
-      for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
-        mySeeds.push(
-          new Seed(
-            myX,
-            myY,
-            myLayer,
-            i,
-            random(0, 0.003),
-            random(0.001, 0.002),
-            myColor,
-            myFreq
-          )
-        );
-      }
+  mySize = rst.size;
+  cnvX = -(myX - window.innerWidth / 2);
+  myPrince = new Prince(myX + 250, myY + 100, myFreq, myName);
+  myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
+  for (let r = currentLayer; r > 0; r--) {
+    for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+      mySeeds.push(
+        new Seed(
+          myX,                    
+          myY,
+          myLayer,
+          i,
+          random(0, 0.003),
+          random(0.001, 0.002),
+          myColor,
+          myFreq
+        )
+      );
     }
-    myPrince = new Prince(myX + 250, myY + 100, myFreq);
   }
+  
 });
 
 
 
 socket.on('checkOthers',(others)=>{
-  for (user in others) {
-    cores.push(new Core(random(80 , window.innerWidth - 80),  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.displayName, user.ifAI, user.coreData, false))
-    console.log(others);
+  otherData = others[0];
+  otherName = Object.key(others[1]);
+  otherX = others[1];
+  otherY = others[2];
+  for (user in otherData) {
+    cores.push(new Core(user.myX,  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+    for(key in otherName){
+      if(user.displayName == key){
+        princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
+      }
+    }
+  }
+})
+
+socket.emit('updatePos',[myName, myPrince.x, myPrince.y]);
+socket.on('getPos', (pos)=>{
+  otherName = Object.key(pos[0]);
+  otherX = pos[0];
+  otherY = pos[1];
+  for(prince in princes){
+    for(key in otherName){
+      if(prince.name == key){
+        prince.x = otherX[key];
+        prince.y = otherY[key];
+      }
+    }
   }
 })
 
@@ -105,7 +121,6 @@ socket.on('bye', (username)=>{
       //     users = userList;
       //     username = users.displayName;
       //     userid = users.userId;
-      //     ifAI = users.ifAI;
       //     coreData = users.coreData;
       //     seedData = users.seedData;
       //     starData = users.starData;
@@ -193,7 +208,6 @@ function draw() {
       cores[i].display();
     } 
   } 
-  circle(width + 10, height / 2, 50);
   pop()
   
   if(myCore){

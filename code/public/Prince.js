@@ -1,5 +1,6 @@
 class Prince {
-  constructor(x, y, freq) {
+  constructor(x, y, freq, name) {
+    this.name = name;
     this.x = x;
     this.y = y;
     this.cnvX = 0;

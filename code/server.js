@@ -24,6 +24,8 @@ const expressServer = app.listen(PORT, () => {
 
 // ---------------------- SOCKET ---------------------- //
 let allUsers = [];
+let userX = {};
+let userY = {};
 let userNum = allUsers.length;
 
 //Establish socket server API
@@ -41,8 +43,9 @@ io.on('connection', socket => {
     //user login
     socket.on('login', (userData)=>{
         let others = allUsers;
-        console.log("hello");
         let self = userData[0].filter(data => data.userId == userData[1])[0];
+        let otherX = userX;
+        let otherY = userY;
         if(userData[2] == "user"){
             let allUserIds = [];
             for(let user in allUsers){
@@ -50,7 +53,7 @@ io.on('connection', socket => {
             }
             if(!allUserIds.includes(self.userId)){
                 allUsers.push(self);
-                socket.emit("addRoom", userData[0].length);
+                // socket.emit("addRoom", userData[0].length);
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
             }else{
@@ -62,20 +65,14 @@ io.on('connection', socket => {
             socket.emit('message', `Welcome to B611!`)
         }
         socket.emit('checkSelf', self)
-        socket.emit('checkOthers', others)
+        socket.emit('checkOthers', [others, otherX, otherY])
         console.log(userNum);
     })
     
-    // Enlarge canvas for more users
-    socket.on('canvas', (cvwidth)=>{
-        cvwidth += 100;
-        socket.emit('canvas', cvwidth)
-    })
-    
     //update position
-    socket.on('position', (pos)=>{
-        // console.log(pos);
-        io.emit('position', pos)
+    socket.on('updatePos',(posDt)=>{
+        userX[posDt[0]] = posDt[1];
+        userY[posDt[0]] = posDt[2];
     })
     
     //user disconnect => delete prince
