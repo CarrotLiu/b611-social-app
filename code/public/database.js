@@ -188,7 +188,7 @@ if(loginContainer.style.display != "none"){
             freq: Math.random(Math.PI, 2 * Math.PI)
     
         }); //visitor也存进userList了！
-        //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的data。
+        //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的object data。
         //所以userList里存了所有用户以及可能有一个visitor，但不包含其他在线的visitor。
         //我胡汉三再忘记userList是啥就就改名卜萝胡。
         startApp(id, "visitor");

@@ -73,7 +73,11 @@ io.on('connection', socket => {
     socket.on('updatePos',(posDt)=>{
         userX[posDt[0]] = posDt[1];
         userY[posDt[0]] = posDt[2];
+        socket.broadcast.emit('getPos', [userX, userY]);
     })
+
+    
+
     
     //user disconnect => delete prince
     socket.on('disconnect', (username)=>{
