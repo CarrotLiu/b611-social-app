@@ -51,6 +51,7 @@ socket.on('checkSelf', (rst)=>{
   myColor = rst.color;
   myFreq = rst.freq;
   myX = rst.myX;
+  console.log(myX)
   myCDT = rst.coreData;
   console.log(rst);
   mySDT = rst.seedData;
@@ -148,7 +149,7 @@ const msgInput = document.querySelector('textarea')
   })
 
   socket.on('bye', (msg)=>{
-    socket.emit('activity', username);
+    socket.emit('activity', msg);
     
   })
   
@@ -250,7 +251,6 @@ function drawStem(x, y, transX, transY, colorIndex) {
 function princeWalk(){
   if (keyIsPressed && (keyCode == 39 || keyCode == 37)) {
     //ArrowRight / ArrowLeft
-    console.log(myX)
     myPrince.ifIdle = false;
     myPrince.ifWalk = true; // => this.ifWalk
     cnvX += myPrince.cnvX;
@@ -275,7 +275,7 @@ function princeWalk(){
 function positionUpdate(){
   socket.emit('updatePos',[myName, myPrince.x, myPrince.y]);
   socket.on('getPos', (pos)=>{
-    otherName = Object.key(pos[0]);
+    otherName = Object.keys(pos[0]);
     otherX = pos[0];
     otherY = pos[1];
     for(prince in princes){

@@ -156,12 +156,15 @@ if(loginContainer.style.display != "none"){
                 console.log("new user!");
                 let l = 1;
                 let c= Math.floor(Math.random() * 3);
-                let f = Math.random(Math.PI, 2 * Math.PI);
-                let s = Math.random(0.8, 1.1);
-                let index = userList.length;
+                let f = Math.random() * Math.PI + Math.PI;
+                let s = Math.random() * (1.1 - 0.8) + 0.8;
+                let index = userList.length + 1;
                 let marginX = s * 80;
                 let roomX = s * 700;
-                let myX = Math.random(marginX , roomX * index - marginX);
+                let min = marginX;
+                let max = roomX * index - marginX;
+                let myX = Math.random() * (max - min) + min;
+                console.log(marginX, index, roomX, myX);
                 writeNewUser(userId, username, [" "], [" "], [" "], myX, l, c, f,s); //如果是新用户，存进去了！
             }else{  
                 write_done = true;
