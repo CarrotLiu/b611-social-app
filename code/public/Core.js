@@ -12,8 +12,8 @@ class Core {
     this.colorIndex = ci;
 
     this.dmouse = dist(
-      this.x + this.seedX,
-      this.y + this.seedY,
+      this.x + this.coreX,
+      this.y + this.coreY,
       mouseX,
       mouseY
     );

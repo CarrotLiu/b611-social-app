@@ -52,6 +52,7 @@ socket.on('checkSelf', (rst)=>{
   myFreq = rst.freq;
   myX = rst.myX;
   myCDT = rst.coreData;
+  console.log(rst);
   mySDT = rst.seedData;
   mySTD = rst.starData;
   mySize = rst.size;
@@ -77,11 +78,9 @@ socket.on('checkSelf', (rst)=>{
   
 });
 
-
-
 socket.on('checkOthers',(others)=>{
   otherData = others[0];
-  otherName = Object.key(others[1]);
+  otherName = Object.keys(others[1]);
   otherX = others[1];
   otherY = others[2];
   for (user in otherData) {
@@ -94,20 +93,7 @@ socket.on('checkOthers',(others)=>{
   }
 })
 
-socket.emit('updatePos',[myName, myPrince.x, myPrince.y]);
-socket.on('getPos', (pos)=>{
-  otherName = Object.key(pos[0]);
-  otherX = pos[0];
-  otherY = pos[1];
-  for(prince in princes){
-    for(key in otherName){
-      if(prince.name == key){
-        prince.x = otherX[key];
-        prince.y = otherY[key];
-      }
-    }
-  }
-})
+
 
 socket.on('bye', (username)=>{
   if(username.substring(0, 5) == "visitor"){
@@ -216,9 +202,11 @@ function draw() {
     if(myPrince){
       myPrince.update();
       myPrince.display();
+      positionUpdate();
     }
     pop();
   }
+  
 }
 
 function drawSelf(){
@@ -282,6 +270,23 @@ function princeWalk(){
     //   prince2.clothX = 0;
     // }
   }
+}
+
+function positionUpdate(){
+  socket.emit('updatePos',[myName, myPrince.x, myPrince.y]);
+  socket.on('getPos', (pos)=>{
+    otherName = Object.key(pos[0]);
+    otherX = pos[0];
+    otherY = pos[1];
+    for(prince in princes){
+      for(key in otherName){
+        if(prince.name == key){
+          prince.x = otherX[key];
+          prince.y = otherY[key];
+        }
+      }
+    }
+  })
 }
 
 // display() {

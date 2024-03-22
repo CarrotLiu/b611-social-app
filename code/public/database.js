@@ -49,7 +49,7 @@ async function readUserData(id) {
 }
 
 
-function writeNewUser(id, username, pic, ai, cdt, sdt, std, l, c, f) {
+function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
     console.log("write new user");
     let newu = {username:{}}
     const newUserId = dbRef.push(newu).key;
@@ -176,16 +176,22 @@ if(loginContainer.style.display != "none"){
     });
     visitBtn.addEventListener('click', () => {
         let id =  `${socket.id}`;
+        let s = Math.random(0.8, 1.1);
+        let index = userList.length;
+        let marginX = s * 80;
+        let roomX = s * 700;
+        let xpos = Math.random(marginX , roomX * index - marginX);
         userList.push({
             displayName: null,
             userId: id,
             coreData: [],
             seedData: [],
             starData: [],
-            myX: 0,
+            myX: xpos,
             layerNum: 1,
             color: Math.floor(Math.random() * 3),
-            freq: Math.random(Math.PI, 2 * Math.PI)
+            freq: Math.random(Math.PI, 2 * Math.PI),
+            size: s
     
         }); //visitor也存进userList了！
         //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的object data。

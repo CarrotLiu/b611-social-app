@@ -46,7 +46,6 @@ class Seed {
 
     this.ifFly = false;
     this.flyDone = false;
-
     this.colorIndex = ci;
   }
 
