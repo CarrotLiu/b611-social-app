@@ -48,7 +48,6 @@ io.on('connection', socket => {
         let others = allUsers; //需要所有在线users但不包含当前user，但如果是同一个user打开两个tab就会包含当前user
         let self = userData[0].filter(data => data.userId == userData[1])[0];//当前的user
 
-
         if(userData[2] == "user"){
             let allUserIds = [];
             for(let user in allUsers){
@@ -57,19 +56,23 @@ io.on('connection', socket => {
             //如果当前user只登陆了一个tab：
             if(!allUserIds.includes(self.userId)){
                 allUsers.push(self);
-                // socket.emit("addRoom", userData[0].length);
+                
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
             }else{ //如果当前user打开了多个tab：
                 //把当前user从others里去掉
-                others = allUsers.filter(data => data.userId != self.userId);
+                // others = allUsers.filter(data => data.userId != self.userId);
             }
+            
         }else if(userData[2] == "visitor"){
             allUsers.push(self)
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
             socket.emit('message', `Welcome to B611!`)
+            
         }
+        others = allUsers.filter(data => data.userId != self.userId);
         socket.emit('checkSelf', self)
+        
         socket.emit('checkOthers', [others, userX, userY])
         console.log(userNum);
     })

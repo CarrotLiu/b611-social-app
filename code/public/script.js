@@ -16,6 +16,7 @@ let currentLayer = 1;
 let maxLayerNum = 2;
 
 let ifRoomSet = false;
+let ifOthersLoaded = false;
 
 let princes = [], cores = [], seeds = [], stems=[];
 let otherX={}, otherY={};
@@ -51,9 +52,7 @@ socket.on('checkSelf', (rst)=>{
   myColor = rst.color;
   myFreq = rst.freq;
   myX = rst.myX;
-  console.log(myX)
   myCDT = rst.coreData;
-  console.log(rst);
   mySDT = rst.seedData;
   mySTD = rst.starData;
   mySize = rst.size;
@@ -84,13 +83,17 @@ socket.on('checkOthers',(others)=>{
   otherName = Object.keys(others[1]);
   otherX = others[1];
   otherY = others[2];
-  for (user in otherData) {
-    cores.push(new Core(user.myX,  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
-    for(key in otherName){
-      if(user.displayName == key){
-        princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
+  if(otherData.length >0){
+    for (user in otherData) {
+      cores.push(new Core(user.myX,  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+      for(key in otherName){
+        if(user.displayName == key){
+          princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
+          
+        }
       }
     }
+    ifOthersLoaded = true;
   }
 })
 
@@ -189,9 +192,10 @@ function draw() {
   //self
   drawSelf();
   //others
-  if(cores.length !=0){
+  if(ifOthersLoaded){
     // console.log(username); 
     for(let i = 0; i < cores.length; i ++){
+      cores[i].update();
       cores[i].display();
     } 
   } 
@@ -227,6 +231,7 @@ function drawSelf(){
         mySeeds.splice(i, 1);
       }
     }
+
     myCore.update();
     myCore.display();
   }
