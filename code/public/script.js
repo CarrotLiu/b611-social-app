@@ -107,13 +107,13 @@ socket.on('checkOthers',(others)=>{
         }
       }
       seeds.push(userSeed);
-      for(key in otherName){
+      for(let i = 0; i < otherName.length; i++){
+        let key = otherName[i];
         if(user.displayName == key){
-          
           princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
-          
         }
       }
+      console.log(princes);
     }
     ifOthersLoaded = true;
   }
@@ -349,14 +349,6 @@ function positionUpdate(){
   })
 }
 
-// display() {
-//   if(this.dmouse < 20 && !this.ifClicked){
-//     fill(255,0,0);
-//   }else{
-//     fill(255);
-//   }
-//   noStroke();
-//   circle(this.x, this.y, this.radius);
-// }
+
 
 
