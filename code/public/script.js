@@ -81,13 +81,35 @@ socket.on('checkSelf', (rst)=>{
 socket.on('checkOthers',(others)=>{
   otherData = others[0];
   otherName = Object.keys(others[1]);
-  otherX = others[1];
+  
+  otherX = others[1]; 
   otherY = others[2];
+  
   if(otherData.length >0){
-    for (user in otherData) {
+    for (let i = 0; i < otherData.length; i ++) {
+      let user = otherData[i];
+      console.log(user);
       cores.push(new Core(user.myX,  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+      console.log(otherName);
+      let userSeed = [];
+      for (let r = currentLayer; r > 0; r--) {
+        for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+          userSeed.push(new Seed(
+            user.myX,                    
+            window.innerHeight / 2,
+            user.layerNum,
+            i,
+            random(0, 0.003),
+            random(0.001, 0.002),
+            user.color,
+            user.freq
+          ));
+        }
+      }
+      seeds.push(userSeed);
       for(key in otherName){
         if(user.displayName == key){
+          
           princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
           
         }
@@ -192,31 +214,35 @@ function draw() {
   //self
   drawSelf();
   //others
-  if(ifOthersLoaded){
-    // console.log(username); 
-    for(let i = 0; i < cores.length; i ++){
-      cores[i].update();
-      cores[i].display();
-    } 
-  } 
+  drawOthers();
   pop()
   
-  if(myCore){
+  if(myPrince){
     push();
     princeWalk()
-    if(myPrince){
-      myPrince.update();
-      myPrince.display();
-      positionUpdate();
-    }
+    myPrince.update();
+    myPrince.display();
+    positionUpdate();
     pop();
   }
+
+  if(ifOthersLoaded){
+    for(let i = 0; i < princes.length;i++){
+      push();
+      princes[i].update();
+      princes[i].display();
+      pop();
+    }
+  }
+    
+  
   
 }
 
 function drawSelf(){
   push();
   if(myCore){
+    // console.log(myCore);
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
       mySeeds[i].update(stopHover, ifClicked);
@@ -236,6 +262,37 @@ function drawSelf(){
     myCore.display();
   }
   
+  pop();
+}
+
+function drawOthers(){
+  push();
+  if(ifOthersLoaded){
+    // console.log(myCore);
+    for(let i = 0; i < cores.length; i ++){
+      drawStem(map(sin(frameCount * 0.01 + cores[i].freq), -1, 1, -60, 60),map(cos(cores[i].freq), -1, 1, -10, 0),cores[i].x,cores[i].y,cores[i].colorIndex);
+    }
+    for(let s = 0; s < seeds.length; s++){
+      let userSeeds = seeds[s];
+      for(let i = 0; i < userSeeds.length; i++){
+        userSeeds[i].update(stopHover, ifClicked);
+        userSeeds[i].display();
+        if (!userSeeds[i].ifFly) {
+          userSeeds[i].lastCoreX = userSeeds[i].coreX;
+          userSeeds[i].lastCoreY = userSeeds[i].coreY;
+          userSeeds[i].lastSeedX = userSeeds[i].seedX;
+          userSeeds[i].lastSeedY = userSeeds[i].seedY;
+        }      
+        if (userSeeds[i].flyDone) {
+          userSeeds.splice(i, 1);
+        }
+      }
+    }
+    for(let i = 0; i < cores.length; i ++){
+      cores[i].update();
+      cores[i].display();
+    } 
+  }
   pop();
 }
 
@@ -268,12 +325,7 @@ function princeWalk(){
     myPrince.ifIdle = true;
     myPrince.walkCount = 0;
     myPrince.clothX = 0;
-    // if (sceneIndex == 2 || sceneIndex == 3 || sceneIndex == 4) {
-    //   prince2.ifWalk = false;
-    //   prince2.ifIdle = true;
-    //   prince2.walkCount = 0;
-    //   prince2.clothX = 0;
-    // }
+
   }
 }
 
@@ -283,14 +335,17 @@ function positionUpdate(){
     otherName = Object.keys(pos[0]);
     otherX = pos[0];
     otherY = pos[1];
-    for(prince in princes){
-      for(key in otherName){
-        if(prince.name == key){
-          prince.x = otherX[key];
-          prince.y = otherY[key];
+    if(princes.length >0){
+      for(prince in princes){
+        for(key in otherName){
+          if(prince.name == key){
+            prince.x = otherX[key];
+            prince.y = otherY[key];
+          }
         }
       }
     }
+    
   })
 }
 
