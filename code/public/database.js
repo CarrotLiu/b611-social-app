@@ -24,7 +24,7 @@ const provider = new firebase.auth.GoogleAuthProvider();
 // ---------------------- READ & WRITE DATA ---------------------- //
 let write_done = false;
 let userList=[]; 
-
+let DBUserList=[];
 //Read Data
 async function readUserData(id) {
     return new Promise((resolve, reject) => {
@@ -32,6 +32,7 @@ async function readUserData(id) {
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
                 userList.push(value);
+                DBUserList.push(value);
             });
             
             let exists = false;
@@ -54,6 +55,19 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
     let newu = {username:{}}
     const newUserId = dbRef.push(newu).key;
     userList.push({
+        displayName: username,
+        userId: id,
+        coreData: cdt,
+        seedData: sdt,
+        starData: std,
+        myX: pos,
+        layerNum: l,
+        color: c,
+        freq: f,
+        size: s
+
+    });
+    DBUserList.push({
         displayName: username,
         userId: id,
         coreData: cdt,
@@ -217,7 +231,7 @@ function startApp(userId, type){
     topContainer.style.display = "flex";
     document.querySelector("#p5-container").style.visibility = "visible";
     document.querySelector("body").style.background = "none";
-    socket.emit("login", [userList, userId, type]);
+    socket.emit("login", [userList, userId, type, DBUserList]);
     
 }
 

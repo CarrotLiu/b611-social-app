@@ -16,7 +16,8 @@ let currentLayer = 1;
 let maxLayerNum = 2;
 
 let ifRoomSet = false;
-let ifOthersLoaded = false;
+let otherFlowersLoaded = false;
+let otherPrincesLoaded = false;
 
 let princes = [], cores = [], seeds = [], stems=[];
 let otherX={}, otherY={};
@@ -46,6 +47,33 @@ let colorRange = [
 ];
 let data_loaded = false;
 
+socket.on('newOthers', (newOther)=>{
+    cores.push(new Core(newOther.myX,  window.innerHeight / 2, newOther.layerNum, newOther.color, newOther.freq, newOther.size, newOther.displayName, newOther.coreData, false));
+    let userSeed = [];
+    for (let r = currentLayer; r > 0; r--) {
+      for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+        userSeed.push(new Seed(
+          newOther.myX,                    
+          window.innerHeight / 2,
+          newOther.layerNum,
+          i,
+          random(0, 0.003),
+          random(0.001, 0.002),
+          newOther.color,
+          newOther.freq
+        ));
+      }
+    }
+    seeds.push(userSeed);
+    // for(let i = 0; i < otherName.length; i++){
+    //   let key = otherName[i];
+    //   if(user.displayName == key){
+    //     princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
+    //   }
+    // }
+    console.log(princes);
+
+})
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
   myLayer = rst.layerNum;
@@ -78,19 +106,11 @@ socket.on('checkSelf', (rst)=>{
   
 });
 
-socket.on('checkOthers',(others)=>{
-  otherData = others[0];
-  otherName = Object.keys(others[1]);
-  
-  otherX = others[1]; 
-  otherY = others[2];
-  
-  if(otherData.length >0){
-    for (let i = 0; i < otherData.length; i ++) {
-      let user = otherData[i];
-      console.log(user);
+socket.on('otherFlower', (others)=>{
+  if(others.length >0){
+    for (let i = 0; i < others.length; i ++) {
+      let user = others[i];
       cores.push(new Core(user.myX,  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
-      console.log(otherName);
       let userSeed = [];
       for (let r = currentLayer; r > 0; r--) {
         for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -107,15 +127,32 @@ socket.on('checkOthers',(others)=>{
         }
       }
       seeds.push(userSeed);
+    }
+  }
+  otherFlowersLoaded = true;
+})
+
+socket.on('checkOthers',(others)=>{
+  otherData = others[0];
+  otherName = Object.keys(others[1]);
+  
+  otherX = others[1]; 
+  otherY = window.innerHeight / 2 + 100;
+  
+  if(otherData.length >0){
+    for (let i = 0; i < otherData.length; i ++) {
+      let user = otherData[i];
+      console.log("otherX:",otherX);
       for(let i = 0; i < otherName.length; i++){
         let key = otherName[i];
         if(user.displayName == key){
-          princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
+          princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName));
         }
       }
       console.log(princes);
     }
-    ifOthersLoaded = true;
+    otherPrincesLoaded = true;
+    
   }
 })
 
@@ -222,11 +259,10 @@ function draw() {
     princeWalk()
     myPrince.update();
     myPrince.display();
-    positionUpdate();
     pop();
   }
 
-  if(ifOthersLoaded){
+  if(otherPrincesLoaded){
     for(let i = 0; i < princes.length;i++){
       push();
       princes[i].update();
@@ -267,7 +303,7 @@ function drawSelf(){
 
 function drawOthers(){
   push();
-  if(ifOthersLoaded){
+  if(otherFlowersLoaded){
     // console.log(myCore);
     for(let i = 0; i < cores.length; i ++){
       drawStem(map(sin(frameCount * 0.01 + cores[i].freq), -1, 1, -60, 60),map(cos(cores[i].freq), -1, 1, -10, 0),cores[i].x,cores[i].y,cores[i].colorIndex);
@@ -316,6 +352,7 @@ function princeWalk(){
     myPrince.ifIdle = false;
     myPrince.ifWalk = true; // => this.ifWalk
     cnvX += myPrince.cnvX;
+    socket.emit('updatePos',[myName, myPrince.x]);
     
     if (myPrince.walkCount <= 60) {
       myPrince.walkCount++;
@@ -329,25 +366,25 @@ function princeWalk(){
   }
 }
 
-function positionUpdate(){
-  socket.emit('updatePos',[myName, myPrince.x, myPrince.y]);
+
   socket.on('getPos', (pos)=>{
-    otherName = Object.keys(pos[0]);
-    otherX = pos[0];
-    otherY = pos[1];
+    otherName = Object.keys(pos);
+    otherX = pos;
+    // console.log(otherX, otherY);
     if(princes.length >0){
-      for(prince in princes){
-        for(key in otherName){
+      for(let i = 0; i < princes.length; i++){
+        let prince = princes[i];
+        for(let z = 0; z < otherName; z++){
+          let key = otherName[z];
           if(prince.name == key){
             prince.x = otherX[key];
-            prince.y = otherY[key];
           }
         }
       }
     }
     
   })
-}
+
 
 
 

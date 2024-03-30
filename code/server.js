@@ -25,7 +25,6 @@ const expressServer = app.listen(PORT, () => {
 // ---------------------- SOCKET ---------------------- //
 let allUsers = []; // 所有在线的人的data（包含在在线的visitor和user）
 let userX = {}; // 所有在线的人的 x position
-let userY = {}; // 所有在线的人的 y position
 let userNum = allUsers.length;
 
 //Establish socket server API
@@ -47,7 +46,7 @@ io.on('connection', socket => {
         // userData[2] = "visitor" / "user";
         let others = allUsers; //需要所有在线users但不包含当前user，但如果是同一个user打开两个tab就会包含当前user
         let self = userData[0].filter(data => data.userId == userData[1])[0];//当前的user
-
+        let otherFlowers = userData[3].filter(data=>data.userId != userData[1]);//db里所有除self外的user
         if(userData[2] == "user"){
             let allUserIds = [];
             for(let user in allUsers){
@@ -56,32 +55,39 @@ io.on('connection', socket => {
             //如果当前user只登陆了一个tab：
             if(!allUserIds.includes(self.userId)){
                 allUsers.push(self);
-                
+                userX[self.displayName]=self.myX + 250;
+  
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
             }else{ //如果当前user打开了多个tab：
                 //把当前user从others里去掉
-                // others = allUsers.filter(data => data.userId != self.userId);
+                others = allUsers.filter(data => data.userId != self.userId);
             }
             
         }else if(userData[2] == "visitor"){
             allUsers.push(self)
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
+            
             socket.emit('message', `Welcome to B611!`)
             
         }
         others = allUsers.filter(data => data.userId != self.userId);
         socket.emit('checkSelf', self)
+        socket.emit('otherFlower', otherFlowers)
+        socket.emit('checkOthers', [others, userX])
+        if(allUsers.length > 1){
+            socket.broadcast.emit('newOthers', self)
+        }
         
-        socket.emit('checkOthers', [others, userX, userY])
-        console.log(userNum);
+        
+
     })
     
     //update position
     socket.on('updatePos',(posDt)=>{
         userX[posDt[0]] = posDt[1];
-        userY[posDt[0]] = posDt[2];
-        socket.broadcast.emit('getPos', [userX, userY]);
+        console.log(userX);
+        socket.broadcast.emit('getPos', userX);
     })
 
     
