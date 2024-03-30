@@ -41,10 +41,10 @@ class Core {
     pop();
   }
 
-  update(stopHover, achieveData, ifClicked) {
+  update(cnvX, stopHover, achieveData, ifClicked) {
     this.dmouse = dist(
-      this.x + this.coreX,
-      this.y + this.coreY,
+      this.x + this.coreX - cnvX,
+      this.y + this.coreY- cnvX,
       mouseX,
       mouseY
     );

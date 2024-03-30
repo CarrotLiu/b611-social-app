@@ -72,7 +72,6 @@ let colorPrince = [
 ]
 let data_loaded = false;
 socket.on('bye',(username)=>{
-  console.log(username);
   for(let i = 0; i < princes.length; i++){
     if(princes[i].name == username){
       princes.splice(i, 1);
@@ -82,10 +81,7 @@ socket.on('bye',(username)=>{
   
 })
 
-socket.on('newOthers', (newOther)=>{
-    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
-    console.log(princes);
-})
+
 
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
@@ -118,6 +114,8 @@ socket.on('checkSelf', (rst)=>{
   }
   
 });
+
+
 
 socket.on('otherFlower', (others)=>{
   if(others.length >0){
@@ -155,11 +153,15 @@ socket.on('checkOthers',(others)=>{
   if(otherData.length >0){
     for (let i = 0; i < otherData.length; i ++) {
       let user = otherData[i];
-      console.log("otherX:",otherX);
+      
       for(let i = 0; i < otherName.length; i++){
         let key = otherName[i];
         if(user.displayName == key){
-          princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
+          if(myName != key){
+            console.log("otherX:",otherX);
+            princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
+          }
+          
         }
       }
       console.log(princes);
@@ -168,6 +170,16 @@ socket.on('checkOthers',(others)=>{
     
   }
 })
+
+
+  socket.on('newOthers', (newOther)=>{
+      console.log(newOther.displayName);
+      console.log(myName);
+      if(newOther.displayName != myName){
+      princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
+      console.log(princes);
+    }
+  })
 
 
 
@@ -265,6 +277,14 @@ function draw() {
   drawSelf();
   //others
   drawOthers();
+  if(otherPrincesLoaded){
+    for(let i = 0; i < princes.length;i++){
+      push();
+      princes[i].update();
+      princes[i].display();
+      pop();
+    }
+  }
   pop()
   
   if(myPrince){
@@ -275,14 +295,7 @@ function draw() {
     pop();
   }
 
-  if(otherPrincesLoaded){
-    for(let i = 0; i < princes.length;i++){
-      push();
-      princes[i].update();
-      princes[i].display();
-      pop();
-    }
-  }
+  
     
   
   
@@ -294,7 +307,7 @@ function drawSelf(){
     // console.log(myCore);
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
-      mySeeds[i].update(stopHover, ifClicked);
+      mySeeds[i].update(cnvX, stopHover, ifClicked);
       mySeeds[i].display();
       if (!mySeeds[i].ifFly) {
         mySeeds[i].lastCoreX = mySeeds[i].coreX;
@@ -307,7 +320,8 @@ function drawSelf(){
       }
     }
 
-    myCore.update();
+    myCore.update(cnvX);
+    console.log(myCore.dmouse);
     myCore.display();
   }
   
@@ -324,7 +338,7 @@ function drawOthers(){
     for(let s = 0; s < seeds.length; s++){
       let userSeeds = seeds[s];
       for(let i = 0; i < userSeeds.length; i++){
-        userSeeds[i].update(stopHover, ifClicked);
+        userSeeds[i].update(cnvX, stopHover, ifClicked);
         userSeeds[i].display();
         if (!userSeeds[i].ifFly) {
           userSeeds[i].lastCoreX = userSeeds[i].coreX;
@@ -338,7 +352,7 @@ function drawOthers(){
       }
     }
     for(let i = 0; i < cores.length; i ++){
-      cores[i].update();
+      cores[i].update(cnvX);
       cores[i].display();
     } 
   }

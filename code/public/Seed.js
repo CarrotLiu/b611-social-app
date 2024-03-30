@@ -49,15 +49,16 @@ class Seed {
     this.colorIndex = ci;
   }
 
-  update(stopHover,ifClicked) {
+  update(cnvX, stopHover,ifClicked) {
     //get mouse pos
     this.dmouse = dist(
-      this.x + this.seedX + this.coreX,
-      this.y + this.seedY + this.coreY,
+      this.x + this.seedX + this.coreX - cnvX,
+      this.y + this.seedY + this.coreY - cnvX,
       mouseX,
       mouseY
     );
 
+    console.log(this.dmouse);
     //fly
     this.checkFly();
     if (this.ifFly) {

@@ -48,6 +48,7 @@ io.on('connection', socket => {
         let self = userData[0].filter(data => data.userId == userData[1])[0];//当前的user
         let otherFlowers = userData[3].filter(data=>data.userId != userData[1]);//db里所有除self外的user
         socket.id = self.displayName;
+        
         if(userData[2] == "user"){
             let allUserIds = [];
             for(let user in allUsers){
@@ -56,33 +57,32 @@ io.on('connection', socket => {
             //如果当前user只登陆了一个tab：
             if(!allUserIds.includes(self.userId)){
                 allUsers.push(self);
-                userX[self.displayName]=self.myX + 200;
-  
+                userX[self.displayName]=self.myX + 200;  
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
+
             }else{ //如果当前user打开了多个tab：
                 //把当前user从others里去掉
                 others = allUsers.filter(data => data.userId != self.userId);
             }
             
+            
         }else if(userData[2] == "visitor"){
             allUsers.push(self)
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
-            
             socket.emit('message', `Welcome to B611!`)
             
         }
+        userNum = allUsers.length;
         others = allUsers.filter(data => data.userId != self.userId);
         socket.emit('checkSelf', self)
         socket.emit('otherFlower', otherFlowers)
         socket.emit('checkOthers', [others, userX])
-        // if(allUsers.length > 1){
-        //     socket.broadcast.emit('newOthers', self)
-        // }
+        console.log(`${socket.id} connected`, userNum)
+        socket.broadcast.emit('newOthers', self)
         
-        
-
     })
+    
     
     //update position
     socket.on('updatePos',(posDt)=>{
@@ -96,19 +96,14 @@ io.on('connection', socket => {
     
     //user disconnect => delete prince
     socket.on('disconnect', ()=>{
-        
         io.emit('bye', socket.id) 
         console.log(socket.id)
         socket.broadcast.emit('message', "A Little Prince just left" )
         allUsers = allUsers.filter(user => user.displayName != socket.id);
     })
 
-    //delete account => delete both prince and dandelion
-    socket.on('delete', (username)=>{
-        
-    })
 
-    console.log(`${socket.id} connected`, userNum)
+    
 
     // //display event message
     // socket.on('activity', (name)=>{
