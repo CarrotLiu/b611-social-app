@@ -45,35 +45,48 @@ let colorRange = [
     [234, 253, 252],
   ],
 ];
+
+let colorPrince = [
+  [
+    [244, 206, 20], // scarf and hair
+    [216, 180, 3], // scarf darker
+    [91, 179, 24], //cloth
+    [43, 122, 11], //cloth darker
+    [56, 130, 60]//stem
+  ],
+  [
+    [255, 234, 221],
+    [230, 209, 200],
+    [250, 80, 80],
+    [200, 30, 30],
+    [250, 80, 80]
+  ],
+  [
+    [234, 253, 252],
+    [205, 220, 225],
+    [130, 170, 227],
+    [86, 115, 180],
+    [120, 150, 190]
+
+  ]
+]
 let data_loaded = false;
+socket.on('bye',(username)=>{
+  console.log(username);
+  for(let i = 0; i < princes.length; i++){
+    if(princes[i].name == username){
+      princes.splice(i, 1);
+      i--;
+    }
+  }
+  
+})
 
 socket.on('newOthers', (newOther)=>{
-    cores.push(new Core(newOther.myX,  window.innerHeight / 2, newOther.layerNum, newOther.color, newOther.freq, newOther.size, newOther.displayName, newOther.coreData, false));
-    let userSeed = [];
-    for (let r = currentLayer; r > 0; r--) {
-      for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
-        userSeed.push(new Seed(
-          newOther.myX,                    
-          window.innerHeight / 2,
-          newOther.layerNum,
-          i,
-          random(0, 0.003),
-          random(0.001, 0.002),
-          newOther.color,
-          newOther.freq
-        ));
-      }
-    }
-    seeds.push(userSeed);
-    // for(let i = 0; i < otherName.length; i++){
-    //   let key = otherName[i];
-    //   if(user.displayName == key){
-    //     princes.push(new Prince(otherX[key], otherY[key], user.freq, user.displayName));
-    //   }
-    // }
+    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
     console.log(princes);
-
 })
+
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
   myLayer = rst.layerNum;
@@ -85,7 +98,7 @@ socket.on('checkSelf', (rst)=>{
   mySTD = rst.starData;
   mySize = rst.size;
   cnvX = -(myX - window.innerWidth / 2);
-  myPrince = new Prince(myX + 250, myY + 100, myFreq, myName);
+  myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor]);
   myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
   for (let r = currentLayer; r > 0; r--) {
     for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -146,7 +159,7 @@ socket.on('checkOthers',(others)=>{
       for(let i = 0; i < otherName.length; i++){
         let key = otherName[i];
         if(user.displayName == key){
-          princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName));
+          princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
         }
       }
       console.log(princes);

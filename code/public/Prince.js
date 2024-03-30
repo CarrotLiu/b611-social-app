@@ -1,5 +1,5 @@
 class Prince {
-  constructor(x, y, freq, name) {
+  constructor(x, y, freq, name, color) {
     this.name = name;
     this.x = x;
     this.y = y;
@@ -32,6 +32,11 @@ class Prince {
     this.dataMax = 30;
     this.coreData = 0;
     this.maskAlpha = 255;
+    this.colorScarf = color[0];
+    this.colorScarfD = color[1];
+    this.colorCloth = color[2];
+    this.colorShadow = color[3];
+    this.colorStem = color[4];
   }
 
   display(dataNum) {
@@ -82,7 +87,7 @@ class Prince {
   drawHead() {
     push();
     strokeWeight(2);
-    stroke(125, 206, 19);
+    stroke(this.colorStem[0], this.colorStem[1], this.colorStem[2]);
     noFill();
     this.maskAlpha = map(this.coreData, 0, this.dataMax, 255, 0);
     bezier(this.hairX, this.hairY, 0, -70, 0, -30, 0, -30);
@@ -99,11 +104,11 @@ class Prince {
       i++
     ) {
       noStroke();
-      fill(244, 206, 20, 10 - floor(map(i, 0, 99, 5, 0)));
+      fill(this.colorScarf[0], this.colorScarf[1], this.colorScarf[2] + 10, 10 - floor(map(i, 0, 99, 5, 0)));
       circle(this.hairX, this.hairY, i * 0.35);
     }
 
-    fill(244, 206, 10);
+    fill(this.colorScarf[0], this.colorScarf[1], this.colorScarf[2]);
     circle(this.hairX, this.hairY, 15);
 
     push();
@@ -163,7 +168,7 @@ class Prince {
     push();
     scale(this.scarfDir, 1);
     noStroke();
-    fill(216, 180, 3);
+    fill(this.colorScarfD[0], this.colorScarfD[1], this.colorScarfD[2]);
     beginShape();
     vertex(53, 28);
     bezierVertex(
@@ -217,7 +222,7 @@ class Prince {
   scarfNeck() {
     push();
     noStroke();
-    fill(244, 206, 10);
+    fill(this.colorScarf[0], this.colorScarf[1], this.colorScarf[2]);
     beginShape();
     vertex(-54, 28);
     bezierVertex(-15, 40, 15, 40, 54, 28);
@@ -282,7 +287,7 @@ class Prince {
     //upper cloth
     push();
     noStroke();
-    fill(91, 179, 24);
+    fill(this.colorCloth[0], this.colorCloth[1], this.colorCloth[2]);
     beginShape();
     vertex(controlULX, controlULY);
     bezierVertex(
@@ -306,7 +311,7 @@ class Prince {
 
     //lower edge
     noStroke();
-    fill(91, 179, 24);
+    fill(this.colorCloth[0], this.colorCloth[1], this.colorCloth[2]);
     beginShape();
     vertex(controlDLX, controlDLY);
     bezierVertex(
@@ -322,7 +327,7 @@ class Prince {
     endShape();
 
     //lower edge darker
-    fill(43, 122, 11);
+    fill(this.colorShadow[0], this.colorShadow[1], this.colorShadow[2]);
     beginShape();
     vertex(controlDLX, controlDLY);
     bezierVertex(

@@ -47,6 +47,7 @@ io.on('connection', socket => {
         let others = allUsers; //需要所有在线users但不包含当前user，但如果是同一个user打开两个tab就会包含当前user
         let self = userData[0].filter(data => data.userId == userData[1])[0];//当前的user
         let otherFlowers = userData[3].filter(data=>data.userId != userData[1]);//db里所有除self外的user
+        socket.id = self.displayName;
         if(userData[2] == "user"){
             let allUserIds = [];
             for(let user in allUsers){
@@ -55,7 +56,7 @@ io.on('connection', socket => {
             //如果当前user只登陆了一个tab：
             if(!allUserIds.includes(self.userId)){
                 allUsers.push(self);
-                userX[self.displayName]=self.myX + 250;
+                userX[self.displayName]=self.myX + 200;
   
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
@@ -75,9 +76,9 @@ io.on('connection', socket => {
         socket.emit('checkSelf', self)
         socket.emit('otherFlower', otherFlowers)
         socket.emit('checkOthers', [others, userX])
-        if(allUsers.length > 1){
-            socket.broadcast.emit('newOthers', self)
-        }
+        // if(allUsers.length > 1){
+        //     socket.broadcast.emit('newOthers', self)
+        // }
         
         
 
@@ -94,10 +95,12 @@ io.on('connection', socket => {
 
     
     //user disconnect => delete prince
-    socket.on('disconnect', (username)=>{
-        io.emit('bye', username) 
+    socket.on('disconnect', ()=>{
+        
+        io.emit('bye', socket.id) 
+        console.log(socket.id)
         socket.broadcast.emit('message', "A Little Prince just left" )
-        allUsers = allUsers.filter(user => user.displayName != username);
+        allUsers = allUsers.filter(user => user.displayName != socket.id);
     })
 
     //delete account => delete both prince and dandelion
