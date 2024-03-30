@@ -43,9 +43,9 @@ class Core {
 
   update(cnvX, stopHover, achieveData, ifClicked) {
     this.dmouse = dist(
-      this.x + this.coreX - cnvX,
-      this.y + this.coreY- cnvX,
-      mouseX,
+      this.x + this.coreX,
+      this.y + this.coreY,
+      mouseX - cnvX,
       mouseY
     );
 

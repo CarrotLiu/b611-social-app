@@ -52,9 +52,9 @@ class Seed {
   update(cnvX, stopHover,ifClicked) {
     //get mouse pos
     this.dmouse = dist(
-      this.x + this.seedX + this.coreX - cnvX,
-      this.y + this.seedY + this.coreY - cnvX,
-      mouseX,
+      this.x + this.seedX + this.coreX ,
+      this.y + this.seedY + this.coreY,
+      mouseX - cnvX,
       mouseY
     );
 
