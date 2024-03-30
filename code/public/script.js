@@ -271,11 +271,12 @@ function draw() {
     stars[i].update();
     stars[i].display();
   }
+  //translate 所有其他东西
   push()
   translate(cnvX, 0);
-  //self
+  //self dandelion
   drawSelf();
-  //others
+  //others dandelion
   drawOthers();
   if(otherPrincesLoaded){
     for(let i = 0; i < princes.length;i++){
@@ -286,7 +287,7 @@ function draw() {
     }
   }
   pop()
-  
+  // user自己的小王子，不被translate
   if(myPrince){
     push();
     princeWalk()

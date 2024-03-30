@@ -58,7 +58,7 @@ class Seed {
       mouseY
     );
 
-    console.log(this.dmouse);
+    
     //fly
     this.checkFly();
     if (this.ifFly) {
