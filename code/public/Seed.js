@@ -92,9 +92,6 @@ class Seed {
         this.hideY;
     }
     this.checkClick(ifClicked);
-    if(this.isHovering){
-      console.log("hhh");
-    }
   }
 
   display() {

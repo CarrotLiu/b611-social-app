@@ -71,6 +71,7 @@ let colorPrince = [
   ]
 ]
 let data_loaded = false;
+
 socket.on('bye',(username)=>{
   for(let i = 0; i < princes.length; i++){
     if(princes[i].name == username){
@@ -78,10 +79,13 @@ socket.on('bye',(username)=>{
       i--;
     }
   }
+  // if(username.substring(0, 5) == "visitor"){
+  //   console.log("is visitor! delete prince and dande");
+  // }else{
+  //     console.log("is user! delete prince");
+  // }
   
 })
-
-
 
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
@@ -114,8 +118,6 @@ socket.on('checkSelf', (rst)=>{
   }
   
 });
-
-
 
 socket.on('otherFlower', (others)=>{
   if(others.length >0){
@@ -153,56 +155,28 @@ socket.on('checkOthers',(others)=>{
   if(otherData.length >0){
     for (let i = 0; i < otherData.length; i ++) {
       let user = otherData[i];
-      
-      for(let i = 0; i < otherName.length; i++){
-        let key = otherName[i];
+      for(let j = 0; j < otherName.length; j++){
+        let key = otherName[j];
         if(user.displayName == key){
           if(myName != key){
-            console.log("otherX:",otherX);
+            console.log("otherX:", otherX);
             princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
           }
-          
         }
       }
       console.log(princes);
     }
     otherPrincesLoaded = true;
-    
   }
 })
 
-
-  socket.on('newOthers', (newOther)=>{
-      console.log(newOther.displayName);
-      console.log(myName);
-      if(newOther.displayName != myName){
-      princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
-      console.log(princes);
-    }
-  })
-
-
-
-socket.on('bye', (username)=>{
-  if(username.substring(0, 5) == "visitor"){
-      console.log("is visitor! delete prince and dande");
-  }else{
-      console.log("is user! delete prince");
-  }
+socket.on('newOthers', (newOther)=>{
+  console.log(`${newOther.displayName} just arrived`);
+  princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
+  console.log(princes);
+  
 })
-// readUserData()
-      // .then(() => {
-      //     users = userList;
-      //     username = users.displayName;
-      //     userid = users.userId;
-      //     coreData = users.coreData;
-      //     seedData = users.seedData;
-      //     starData = users.starData;
-      //     data_loaded = true; 
-      // })
-      // .catch(error => {
-      //     console.error(error);
-      // });
+
 
 const activity = document.querySelector('.activity')
 const msgInput = document.querySelector('textarea')
@@ -275,19 +249,14 @@ function draw() {
   push()
   translate(cnvX, 0);
   //self dandelion
-  drawSelf();
+  drawMyDande();
   //others dandelion
-  drawOthers();
-  if(otherPrincesLoaded){
-    for(let i = 0; i < princes.length;i++){
-      push();
-      princes[i].update();
-      princes[i].display();
-      pop();
-    }
-  }
+  drawOtherDande();
+  drawOtherPrince();
   pop()
-  // user自己的小王子，不被translate
+  drawMyPrince();
+}
+function drawMyPrince(){
   if(myPrince){
     push();
     princeWalk()
@@ -295,14 +264,18 @@ function draw() {
     myPrince.display();
     pop();
   }
-
-  
-    
-  
-  
 }
-
-function drawSelf(){
+function drawOtherPrince(){
+  if(princes.length > 0){
+    for(let i = 0; i < princes.length;i++){
+      push();
+      princes[i].update();
+      princes[i].display();
+      pop();
+    }
+  }
+}
+function drawMyDande(){
   push();
   if(myCore){
     // console.log(myCore);
@@ -322,14 +295,14 @@ function drawSelf(){
     }
 
     myCore.update(cnvX);
-    console.log(myCore.dmouse);
+    // console.log(myCore.dmouse);
     myCore.display();
   }
   
   pop();
 }
 
-function drawOthers(){
+function drawOtherDande(){
   push();
   if(otherFlowersLoaded){
     // console.log(myCore);

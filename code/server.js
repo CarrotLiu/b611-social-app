@@ -38,7 +38,6 @@ const io = new Server(expressServer, {
 
 // connect socket
 io.on('connection', socket => {
-    console.log("socket connected");
     //user login
     socket.on('login', (userData)=>{
         // userData[0] = userList; 已经写入了新user
@@ -47,7 +46,7 @@ io.on('connection', socket => {
         let others = allUsers; //需要所有在线users但不包含当前user，但如果是同一个user打开两个tab就会包含当前user
         let self = userData[0].filter(data => data.userId == userData[1])[0];//当前的user
         let otherFlowers = userData[3].filter(data=>data.userId != userData[1]);//db里所有除self外的user
-        socket.id = self.displayName;
+        socket.username = self.displayName;
         
         if(userData[2] == "user"){
             let allUserIds = [];
@@ -78,7 +77,7 @@ io.on('connection', socket => {
         socket.emit('checkSelf', self)
         socket.emit('otherFlower', otherFlowers)
         socket.emit('checkOthers', [others, userX])
-        console.log(`${socket.id} connected`, userNum)
+        console.log(`${socket.username} connected`, userNum)
         socket.broadcast.emit('newOthers', self)
         
     })
@@ -87,33 +86,17 @@ io.on('connection', socket => {
     //update position
     socket.on('updatePos',(posDt)=>{
         userX[posDt[0]] = posDt[1];
-        console.log(userX);
+        // console.log(userX);
         socket.broadcast.emit('getPos', userX);
     })
 
-    
-
-    
     //user disconnect => delete prince
     socket.on('disconnect', ()=>{
-        io.emit('bye', socket.id) 
-        console.log(socket.id)
+        io.emit('bye', socket.username) 
+        console.log(`${socket.username} just left`)
         socket.broadcast.emit('message', "A Little Prince just left" )
-        allUsers = allUsers.filter(user => user.displayName != socket.id);
+        allUsers = allUsers.filter(user => user.displayName != socket.username);
     })
-
-
-    
-
-    // //display event message
-    // socket.on('activity', (name)=>{
-    //     socket.broadcast.emit('activity', name)
-    // })
-
-    // socket.on('login', (user)=>{
-    //     socket.emit('message', `Welcome to B611! ${user}`)
-    //     socket.broadcast.emit('message', `${user} connected`)
-    // })
 })
 
 
