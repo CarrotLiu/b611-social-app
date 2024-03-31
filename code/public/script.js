@@ -145,36 +145,42 @@ socket.on('otherFlower', (others)=>{
   otherFlowersLoaded = true;
 })
 
-socket.on('checkOthers',(others)=>{
-  otherData = others[0];
-  otherName = Object.keys(others[1]);
+// socket.on('checkOthers',(others)=>{
+//   otherData = others[0];
+//   otherName = Object.keys(others[1]);
   
-  otherX = others[1]; 
-  otherY = window.innerHeight / 2 + 100;
+//   otherX = others[1]; 
+//   otherY = window.innerHeight / 2 + 100;
+
+//   for (let i = 0; i < otherData.length; i ++) {
+//     let user = otherData[i];
+//     for(let j = 0; j < otherName.length; j++){
+//       let key = otherName[j];
+//       if(user.displayName == key){
+//         if(myName != key){
+//           console.log("otherX:", otherX);
+//           princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
+//         }
+//       }
+//     }
+    
+//   }
+//   otherPrincesLoaded = true;
   
-  if(otherData.length >0){
-    for (let i = 0; i < otherData.length; i ++) {
-      let user = otherData[i];
-      for(let j = 0; j < otherName.length; j++){
-        let key = otherName[j];
-        if(user.displayName == key){
-          if(myName != key){
-            console.log("otherX:", otherX);
-            princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
-          }
-        }
-      }
-      console.log(princes);
-    }
-    otherPrincesLoaded = true;
-  }
-})
+// })
 
 socket.on('newOthers', (newOther)=>{
   console.log(`${newOther.displayName} just arrived`);
-  princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
-  console.log(princes);
-  
+  let ifExist = false;
+  for(let i = 0; i < princes.length; i++){
+    if(princes[i].name == newOther.name){
+      ifExist = true;
+    }
+  }
+  if(!ifExist){
+    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
+    console.log(princes);
+  }
 })
 
 
