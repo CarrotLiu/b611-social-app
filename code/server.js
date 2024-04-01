@@ -49,6 +49,7 @@ io.on('connection', socket => {
         socket.username = self.displayName;
         
         if(userData[2] == "user"){
+            console.log(otherFlowers)
             let allUserIds = [];
             for(let user in allUsers){
                 allUserIds.push(user.userId);
@@ -66,20 +67,26 @@ io.on('connection', socket => {
                 //把当前user从others里去掉
                 others = allUsers.filter(data => data.userId != self.userId);
             }
-            
-            
         }else if(userData[2] == "visitor"){
-            allUsers.push(self)
+            self.userId = socket.id;
+            allUsers.push(self);
+            let xData = {};
+            xData[self.userId] = self.myX;
+            userX.push(xData);
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
             socket.emit('message', `Welcome to B611!`)
-            
         }
         userNum = allUsers.length;
         others = allUsers.filter(data => data.userId != self.userId);
         socket.emit('checkSelf', self)
         socket.emit('otherFlower', otherFlowers)
         socket.emit('checkOthers', [others, userX])
-        console.log(`${socket.username} connected`, userNum)
+        if(socket.username){
+            console.log(`${socket.username} connected`, userNum)
+        }else{
+            console.log(`${socket.id} connected`, userNum)
+        }
+        
         socket.broadcast.emit('newOthers', self)
         
     })
@@ -98,11 +105,22 @@ io.on('connection', socket => {
 
     //user disconnect => delete prince
     socket.on('disconnect', ()=>{
-        io.emit('bye', socket.username) 
-        console.log(`${socket.username} just left`)
+        if(socket.username){
+            io.emit('bye', socket.username); 
+            console.log(`${socket.username} just left`)
+        }else{
+            io.emit('bye', socket.id); 
+            console.log(`${socket.id} just left`)
+        }
         socket.broadcast.emit('message', "A Little Prince just left" )
-        allUsers = allUsers.filter(user => user.displayName != socket.username);
-        userX = userX.filter(user => Object.keys(user)[0] != socket.username);
+        if(socket.username){
+            allUsers = allUsers.filter(user => user.displayName != socket.username);
+            userX = userX.filter(user => Object.keys(user)[0] != socket.username);
+        }else{
+            allUsers = allUsers.filter(user => user.userId != socket.id);
+            userX = userX.filter(user => Object.keys(user)[0] != socket.id);
+        }
+        
     })
 })
 

@@ -31,18 +31,25 @@ async function readUserData(id) {
         dbRef.once("value", (snapshot) => { 
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
-                userList.push(value);
                 DBUserList.push(value);
+                if(id){
+                    userList.push(value);
+                    let exists = false;
+                    for (let i = 0; i < userList.length; i++) {
+                        if (userList[i].userId == id) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    resolve(exists);
+                }else{
+                    resolve(false);
+                }
+                
+                
             });
             
-            let exists = false;
-            for (let i = 0; i < userList.length; i++) {
-                if (userList[i].userId == id) {
-                    exists = true;
-                    break;
-                }
-            }
-            resolve(exists);
+            
         }, (error) => {
             reject(error); 
         });
@@ -191,30 +198,35 @@ if(loginContainer.style.display != "none"){
             console.log(error.message);
         }
     });
-    visitBtn.addEventListener('click', () => {
-        let id =  `${socket.id}`;
-        let s = Math.random(0.8, 1.1);
-        let index = userList.length;
-        let marginX = s * 80;
-        let roomX = s * 700;
-        let xpos = Math.random(marginX , roomX * index - marginX);
-        userList.push({
-            displayName: null,
-            userId: id,
-            coreData: [],
-            seedData: [],
-            starData: [],
-            myX: xpos,
-            layerNum: 1,
-            color: Math.floor(Math.random() * 3),
-            freq: Math.random(Math.PI, 2 * Math.PI),
-            size: s
-    
-        }); //visitor也存进userList了！
-        //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的object data。
-        //所以userList里存了所有用户以及可能有一个visitor，但不包含其他在线的visitor。
-        //我胡汉三再忘记userList是啥就就改名卜萝胡。
-        startApp(id, "visitor");
+    visitBtn.addEventListener('click', async () => {
+        try {
+            let id =  `${socket.id}`;
+            let s = Math.random(0.8, 1.1);
+            let index = userList.length;
+            let marginX = s * 80;
+            let roomX = s * 700;
+            let xpos = width / 2;
+            userList.push({
+                displayName: null,
+                userId: id,
+                coreData: [],
+                seedData: [],
+                starData: [],
+                myX: xpos,
+                layerNum: 1,
+                color: Math.floor(Math.random() * 3),
+                freq: Math.random(Math.PI, 2 * Math.PI),
+                size: s
+        
+            }); //visitor也存进userList了！
+            //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的object data。
+            //所以userList里存了所有用户以及可能有一个visitor，但不包含其他在线的visitor。
+            //我胡汉三再忘记userList是啥就就改名卜萝胡。
+            let exist = await readUserData(null);
+            startApp(id, "visitor");
+        } catch (error) {
+            console.log(error.message);
+        }
     })
 } else{
     signoutBtn.addEventListener('click', async ()=>{

@@ -9,7 +9,7 @@ socket = io('ws://localhost:3500')
 // ---------------------- INITIALIZE RM & POS ---------------------- //
 let iX, roomX = 700, marginX = 80; 
 
-let myName, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize;
+let myName, myId, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize;
 let myCore, myPrince, mySeeds = [], myStars, myStem;
 let myX, myY = window.innerHeight / 2;
 let currentLayer = 1;
@@ -83,6 +83,7 @@ socket.on('bye',(username)=>{
 socket.on('checkSelf', (rst)=>{
   myName = rst.displayName;
   myLayer = rst.layerNum;
+  myId = rst.userId;
   myColor = rst.color;
   myFreq = rst.freq;
   myX = rst.myX;
@@ -91,63 +92,77 @@ socket.on('checkSelf', (rst)=>{
   mySTD = rst.starData;
   mySize = rst.size;
   cnvX = 0;
-  myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true);
-  myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
-  for (let r = currentLayer; r > 0; r--) {
-    for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
-      mySeeds.push(
-        new Seed(
-          myX,                    
-          myY,
-          myLayer,
-          i,
-          random(0, 0.003),
-          random(0.001, 0.002),
-          myColor,
-          myFreq
-        )
-      );
+  if(myName){
+    myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true);
+    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
+    for (let r = currentLayer; r > 0; r--) {
+      for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+        mySeeds.push(
+          new Seed(
+            myX,                    
+            myY,
+            myLayer,
+            i,
+            random(0, 0.003),
+            random(0.001, 0.002),
+            myColor,
+            myFreq
+          )
+        );
+      }
     }
+  }else{
+    myPrince = new Prince(myX - 200, myY + 100, myFreq, myId, colorPrince[myColor], true);
   }
 });
 
 socket.on('otherFlower', (others)=>{
+  console.log("loading other flowers!!!!!")
+  console.log(others)
   if(others.length >0){
     for (let i = 0; i < others.length; i ++) {
       let user = others[i];
-      cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
-      let userSeed = [];
-      for (let r = currentLayer; r > 0; r--) {
-        for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
-          userSeed.push(new Seed(
-            user.myX,                    
-            window.innerHeight / 2,
-            user.layerNum,
-            i,
-            random(0, 0.003),
-            random(0.001, 0.002),
-            user.color,
-            user.freq
-          ));
+      if(user.displayName){
+        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+        let userSeed = [];
+        for (let r = currentLayer; r > 0; r--) {
+          for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+            userSeed.push(new Seed(
+              user.myX,                    
+              window.innerHeight / 2,
+              user.layerNum,
+              i,
+              random(0, 0.003),
+              random(0.001, 0.002),
+              user.color,
+              user.freq
+            ));
+          }
         }
+        seeds.push(userSeed);
       }
-      seeds.push(userSeed);
     }
   }
   otherFlowersLoaded = true;
 })
 
 socket.on('newOthers', (newOther)=>{
-  console.log(`${newOther.displayName} just arrived`);
+  let newOtherName;
+  if(newOther.displayName){
+    newOtherName = newOther.displayName;
+  }else{
+    newOtherName = newOther.userId;
+  }
+  console.log(`${newOtherName} just arrived`);
   let ifExist = false;
   for(let i = 0; i < princes.length; i++){
-    if(princes[i].name == newOther.name){
+    if(princes[i].name == newOtherName){
       ifExist = true;
     }
   }
   if(!ifExist){
-    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color], false));
-    console.log(princes);
+    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOtherName, colorPrince[newOther.color], false));
+    // console.log(princes);
   }
 })
 
@@ -285,7 +300,7 @@ function drawMyDande(){
 function drawOtherDande(){
   push();
   if(otherFlowersLoaded){
-    // console.log(myCore);
+    // console.log(cores);
     for(let i = 0; i < cores.length; i ++){
       drawStem(map(sin(frameCount * 0.01 + cores[i].freq), -1, 1, -60, 60),map(cos(cores[i].freq), -1, 1, -10, 0),cores[i].x,cores[i].y,cores[i].colorIndex);
     }
@@ -341,8 +356,12 @@ function princeWalk(){
     if (myPrince.walkCount <= 60) { 
       myPrince.walkCount++;
     }
-    console.log("xout:",myPrince.xOut);
-    socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
+    // console.log("xout:",myPrince.xOut);
+    if(myName){
+      socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.xOut]);
+    }else{
+      socket.emit('updatePos',[myId, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
+    }
   } else {
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
@@ -357,9 +376,14 @@ function keyReleased(){
     myPrince.ifIdle = true;
     myPrince.walkCount = 0;
     myPrince.clothX = 0;
-    console.log("x", myPrince.x);
-    console.log("xOut",myPrince.xOut);
-    socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.xOut]);
+    // console.log("x", myPrince.x);
+    // console.log("xOut",myPrince.xOut);
+    if(myName){
+      socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.xOut]);
+    }else{
+      socket.emit('updatePos',[myId, myPrince.walkDir, false, myPrince.xOut]);
+    }
+    
   }
 }
 
