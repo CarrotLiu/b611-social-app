@@ -24,7 +24,7 @@ const expressServer = app.listen(PORT, () => {
 
 // ---------------------- SOCKET ---------------------- //
 let allUsers = []; // 所有在线的人的data（包含在在线的visitor和user）
-let userX = {}; // 所有在线的人的 x position
+let userX = []; // 所有在线的人的 x position
 let userNum = allUsers.length;
 
 //Establish socket server API
@@ -56,7 +56,9 @@ io.on('connection', socket => {
             //如果当前user只登陆了一个tab：
             if(!allUserIds.includes(self.userId)){
                 allUsers.push(self);
-                userX[self.displayName]=self.myX + 200;  
+                let xData = {};
+                xData[self.displayName] = self.myX + 200;
+                userX.push(xData);
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
 
@@ -85,9 +87,13 @@ io.on('connection', socket => {
     
     //update position
     socket.on('updatePos',(posDt)=>{
-        userX[posDt[0]] = posDt[1];
+        if(!posDt[2]){
+            let user = userX.filter(user => Object.keys(user)[0] == posDt[0])[0];
+            user[posDt[0]] = posDt[3];
+            socket.broadcast.emit('getPos', user);
+        }
         // console.log(userX);
-        socket.broadcast.emit('getPos', userX);
+        socket.broadcast.emit('getMove', posDt);
     })
 
     //user disconnect => delete prince
@@ -96,6 +102,7 @@ io.on('connection', socket => {
         console.log(`${socket.username} just left`)
         socket.broadcast.emit('message', "A Little Prince just left" )
         allUsers = allUsers.filter(user => user.displayName != socket.username);
+        userX = userX.filter(user => Object.keys(user)[0] != socket.username);
     })
 })
 

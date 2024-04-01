@@ -20,8 +20,6 @@ let otherFlowersLoaded = false;
 let otherPrincesLoaded = false;
 
 let princes = [], cores = [], seeds = [], stems=[];
-let otherX={}, otherY={};
-let otherName = [], otherData = [];
 
 let cnvX = 0;
 
@@ -178,6 +176,7 @@ socket.on('newOthers', (newOther)=>{
     }
   }
   if(!ifExist){
+    
     princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
     console.log(princes);
   }
@@ -359,39 +358,61 @@ function princeWalk(){
     myPrince.ifIdle = false;
     myPrince.ifWalk = true; // => this.ifWalk
     cnvX += myPrince.cnvX;
-    socket.emit('updatePos',[myName, myPrince.x]);
-    
-    if (myPrince.walkCount <= 60) {
+    if (myPrince.walkCount <= 60) { 
       myPrince.walkCount++;
     }
+    socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk]);
   } else {
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
     myPrince.walkCount = 0;
     myPrince.clothX = 0;
+  }
+  
+}
 
+function keyReleased(){
+  if(keyCode == 39 || keyCode == 37){
+    socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.x]);
   }
 }
 
-
-  socket.on('getPos', (pos)=>{
-    otherName = Object.keys(pos);
-    otherX = pos;
-    // console.log(otherX, otherY);
-    if(princes.length >0){
-      for(let i = 0; i < princes.length; i++){
-        let prince = princes[i];
-        for(let z = 0; z < otherName; z++){
-          let key = otherName[z];
-          if(prince.name == key){
-            prince.x = otherX[key];
+socket.on('getMove', (posDt)=>{
+  let otherName = posDt[0];
+  // otherName = Object.keys(pos);
+  // console.log(otherX, otherY);
+  if(princes.length >0){
+    for(let i = 0; i < princes.length; i++){
+      let prince = princes[i];
+      if(prince.name == otherName){
+        prince.walkDir = posDt[1];
+        prince.ifWalk = posDt[2];
+        prince.ifIdle = !posDt[2];
+        if(prince.ifWalk){
+          if (prince.walkCount <= 60) { 
+            myPrince.walkCount++;
           }
+        }else{
+          prince.walkCount = 0;
+          prince.clothX = 0;
+          prince.x = pos[3];
         }
       }
     }
-    
-  })
+  }
+})
 
+socket.on('getPos', (userX)=>{
+  let otherName = Object.keys(userX)[0];
+  if(princes.length >0){
+    for(let i = 0; i < princes.length; i++){
+      let prince = princes[i];
+      if(prince.name == otherName){
+        prince.x = userX[otherName];
+      }
+    }
+  }
+})
 
 
 

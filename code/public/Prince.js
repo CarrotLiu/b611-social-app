@@ -4,7 +4,7 @@ class Prince {
     this.x = x;
     this.y = y;
     this.cnvX = 0;
-    this.spdX = 1;
+    this.spdX = 2;
     this.spdY = 0;
     this.accX = 0;
     this.accY = 0;
@@ -463,7 +463,7 @@ class Prince {
 
     this.hairX = hairx;
     this.hairY = hairy;
-    if((dist(this.x, 0, windowWidth, 0) < 50 && this.walkDir == 1)||(dist(this.x, 0, 0, 0) < 50 && this.walkDir == -1)){
+    if((dist(this.x, 0, windowWidth, 0) < 100 && this.walkDir == 1)||(dist(this.x, 0, 0, 0) < 100 && this.walkDir == -1)){
       this.cnvX = -this.walkDir;
     }else{
       this.x += this.walkDir * this.spdX;
