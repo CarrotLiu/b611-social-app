@@ -469,7 +469,7 @@ class Prince {
     this.hairX = hairx;
     this.hairY = hairy;
     if((dist(this.x, 0, windowWidth, 0) < 100 && this.walkDir == 1)||(dist(this.x, 0, 0, 0) < 100 && this.walkDir == -1)){
-      this.cnvX = -this.walkDir;
+      this.cnvX = -this.walkDir * this.spdX;;
     }else{
       this.x += this.walkDir * this.spdX;
       this.cnvX = 0;

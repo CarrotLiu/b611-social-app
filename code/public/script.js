@@ -16,6 +16,7 @@ let currentLayer = 1;
 let maxLayerNum = 2;
 
 let ifRoomSet = false;
+let located = false;
 let otherFlowersLoaded = false;
 let otherPrincesLoaded = false;
 
@@ -89,7 +90,7 @@ socket.on('checkSelf', (rst)=>{
   mySDT = rst.seedData;
   mySTD = rst.starData;
   mySize = rst.size;
-  cnvX = -(myX - window.innerWidth / 2);
+  cnvX = 0;
   myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true);
   myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
   for (let r = currentLayer; r > 0; r--) {
@@ -209,6 +210,8 @@ function setup() {
   for (let i = 0; i < 150; i++) {
     stars.push(new Star(random(0, width), random(0, height)));
   }
+  
+  
 }
 
 // Main draw function
@@ -217,6 +220,10 @@ function draw() {
   for (let i = 0; i < stars.length; i++) {
     stars[i].update();
     stars[i].display();
+  }
+  if(myPrince && !located){
+    locateSelf();
+    located = true;
   }
   //translate 所有其他东西
   push()
@@ -393,6 +400,10 @@ socket.on('getPos', (userX)=>{
   }
 })
 
+function locateSelf(){
+    cnvX = -(myX - width / 2);
+    myPrince.x = myX + cnvX + 200;
+}
 
 
 
