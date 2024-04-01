@@ -444,13 +444,11 @@ class Prince {
   }
 
   walk(hairx, hairy, yFloat) {
-    if (keyCode == 39 || key == "d") {
+    if (this.walkDir == 1) {
       //ArrowRight
-      this.walkDir = 1;
       this.scarfDir = -1;
-    } else if (keyCode == 37 || key == "a") {
-      // ArrowLeft
-      this.walkDir = -1;
+    } else if (this.walkDir == -1) {
+      // ArrowLeft     
       this.scarfDir = 1;
     }
     if (this.walkDir == 1) {

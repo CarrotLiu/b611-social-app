@@ -143,30 +143,6 @@ socket.on('otherFlower', (others)=>{
   otherFlowersLoaded = true;
 })
 
-// socket.on('checkOthers',(others)=>{
-//   otherData = others[0];
-//   otherName = Object.keys(others[1]);
-  
-//   otherX = others[1]; 
-//   otherY = window.innerHeight / 2 + 100;
-
-//   for (let i = 0; i < otherData.length; i ++) {
-//     let user = otherData[i];
-//     for(let j = 0; j < otherName.length; j++){
-//       let key = otherName[j];
-//       if(user.displayName == key){
-//         if(myName != key){
-//           console.log("otherX:", otherX);
-//           princes.push(new Prince(otherX[key], otherY, user.freq, user.displayName, colorPrince[user.color]));
-//         }
-//       }
-//     }
-    
-//   }
-//   otherPrincesLoaded = true;
-  
-// })
-
 socket.on('newOthers', (newOther)=>{
   console.log(`${newOther.displayName} just arrived`);
   let ifExist = false;
@@ -354,6 +330,11 @@ function drawStem(x, y, transX, transY, colorIndex) {
 
 function princeWalk(){
   if (keyIsPressed && (keyCode == 39 || keyCode == 37)) {
+    if(keyCode == 39){
+      myPrince.walkDir = 1;
+    }else if(keyCode == 37){
+      myPrince.walkDir = -1;
+    }
     //ArrowRight / ArrowLeft
     myPrince.ifIdle = false;
     myPrince.ifWalk = true; // => this.ifWalk
@@ -361,7 +342,9 @@ function princeWalk(){
     if (myPrince.walkCount <= 60) { 
       myPrince.walkCount++;
     }
-    socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk]);
+    
+    console.log("user's walk dir:", myPrince.walkDir);
+    socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk, myPrince.x + myPrince.cnvX]);
   } else {
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
@@ -373,7 +356,12 @@ function princeWalk(){
 
 function keyReleased(){
   if(keyCode == 39 || keyCode == 37){
-    socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.x]);
+    
+    myPrince.ifWalk = false;
+    myPrince.ifIdle = true;
+    myPrince.walkCount = 0;
+    myPrince.clothX = 0;
+    socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.x, myPrince.x + myPrince.cnvX]);
   }
 }
 
@@ -385,17 +373,18 @@ socket.on('getMove', (posDt)=>{
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
       if(prince.name == otherName){
+        console.log("others' walk dir:", posDt[1]);
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
         prince.ifIdle = !posDt[2];
         if(prince.ifWalk){
           if (prince.walkCount <= 60) { 
-            myPrince.walkCount++;
+            prince.walkCount++;
           }
         }else{
           prince.walkCount = 0;
           prince.clothX = 0;
-          prince.x = pos[3];
+          prince.x = posDt[3];
         }
       }
     }
