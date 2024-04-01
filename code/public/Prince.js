@@ -1,8 +1,10 @@
 class Prince {
-  constructor(x, y, freq, name, color) {
+  constructor(x, y, freq, name, color, ifSelf) {
     this.name = name;
     this.x = x;
     this.y = y;
+    this.ifSelf = ifSelf;
+    this.xOut = x;
     this.cnvX = 0;
     this.spdX = 2;
     this.spdY = 0;
@@ -41,7 +43,12 @@ class Prince {
 
   display(dataNum) {
     push();
-    translate(this.x, this.y);
+    if(this.ifSelf){
+      translate(this.x, this.y);
+    }else{
+      translate(this.xOut, this.y);
+    }
+   
     this.drawHead();
     this.drawEye();
     this.drawCloth(dataNum);
@@ -467,6 +474,7 @@ class Prince {
       this.x += this.walkDir * this.spdX;
       this.cnvX = 0;
     }
+    this.xOut += this.walkDir * this.spdX;
     this.y += yFloat * 0.1;
     
   }

@@ -77,12 +77,6 @@ socket.on('bye',(username)=>{
       i--;
     }
   }
-  // if(username.substring(0, 5) == "visitor"){
-  //   console.log("is visitor! delete prince and dande");
-  // }else{
-  //     console.log("is user! delete prince");
-  // }
-  
 })
 
 socket.on('checkSelf', (rst)=>{
@@ -96,7 +90,7 @@ socket.on('checkSelf', (rst)=>{
   mySTD = rst.starData;
   mySize = rst.size;
   cnvX = -(myX - window.innerWidth / 2);
-  myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor]);
+  myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true);
   myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
   for (let r = currentLayer; r > 0; r--) {
     for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -114,14 +108,13 @@ socket.on('checkSelf', (rst)=>{
       );
     }
   }
-  
 });
 
 socket.on('otherFlower', (others)=>{
   if(others.length >0){
     for (let i = 0; i < others.length; i ++) {
       let user = others[i];
-      cores.push(new Core(user.myX,  window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+      cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
       let userSeed = [];
       for (let r = currentLayer; r > 0; r--) {
         for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -152,8 +145,7 @@ socket.on('newOthers', (newOther)=>{
     }
   }
   if(!ifExist){
-    
-    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color]));
+    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOther.displayName, colorPrince[newOther.color], false));
     console.log(princes);
   }
 })
@@ -342,26 +334,25 @@ function princeWalk(){
     if (myPrince.walkCount <= 60) { 
       myPrince.walkCount++;
     }
-    
-    console.log("user's walk dir:", myPrince.walkDir);
-    socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk, myPrince.x + myPrince.cnvX]);
+    console.log("xout:",myPrince.xOut);
+    socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
   } else {
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
     myPrince.walkCount = 0;
     myPrince.clothX = 0;
   }
-  
 }
 
 function keyReleased(){
   if(keyCode == 39 || keyCode == 37){
-    
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
     myPrince.walkCount = 0;
     myPrince.clothX = 0;
-    socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.x, myPrince.x + myPrince.cnvX]);
+    console.log("x", myPrince.x);
+    console.log("xOut",myPrince.xOut);
+    socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.xOut]);
   }
 }
 
@@ -373,7 +364,6 @@ socket.on('getMove', (posDt)=>{
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
       if(prince.name == otherName){
-        console.log("others' walk dir:", posDt[1]);
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
         prince.ifIdle = !posDt[2];
