@@ -29,27 +29,22 @@ let DBUserList=[];
 async function readUserData(id) {
     return new Promise((resolve, reject) => {
         dbRef.once("value", (snapshot) => { 
+            let exists = false;
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
                 DBUserList.push(value);
-                if(id){
-                    userList.push(value);
-                    let exists = false;
-                    for (let i = 0; i < userList.length; i++) {
-                        if (userList[i].userId == id) {
-                            exists = true;
-                            break;
-                        }
+                userList.push(value);
+                
+                for (let i = 0; i < userList.length; i++) {
+                    if (userList[i].userId == id) {
+                        exists = true;
+                        console.log("inside for loop exists is:",exists)
+                        break;
                     }
-                    resolve(exists);
-                }else{
-                    resolve(false);
                 }
-                
-                
             });
-            
-            
+            console.log("outside for loop exists is:",exists)
+            resolve(exists);
         }, (error) => {
             reject(error); 
         });
@@ -173,6 +168,7 @@ if(loginContainer.style.display != "none"){
         try {
             const { username, userId, photoURL } = await signin();
             const exists = await readUserData(userId);  //userList现在是database里所有的user！！！如果是新用户/visitor，就还没存进去！！！
+            console.log("now exists is:", exists)
             if (!exists) {
                 console.log("new user!");
                 let l = 1;
@@ -180,12 +176,13 @@ if(loginContainer.style.display != "none"){
                 let f = Math.random() * Math.PI + Math.PI;
                 let s = Math.random() * (1.1 - 0.8) + 0.8;
                 let index = userList.length + 1;
+                // console.log(index);
                 let marginX = s * 80;
                 let roomX = s * 700;
                 let min = marginX;
                 let max = roomX * index - marginX;
                 let myX = Math.random() * (max - min) + min;
-                console.log(marginX, index, roomX, myX);
+                // console.log(marginX, index, roomX, myX);
                 writeNewUser(userId, username, [" "], [" "], [" "], myX, l, c, f,s); //如果是新用户，存进去了！
             }else{  
                 write_done = true;

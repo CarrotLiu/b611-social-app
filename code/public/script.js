@@ -219,8 +219,6 @@ function setup() {
   for (let i = 0; i < 150; i++) {
     stars.push(new Star(random(0, width), random(0, height)));
   }
-  
-  
 }
 
 // Main draw function
@@ -267,7 +265,6 @@ function drawOtherPrince(){
 function drawMyDande(){
   push();
   if(myCore){
-    // console.log(myCore);
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
       mySeeds[i].update(cnvX, stopHover, ifClicked);
@@ -284,7 +281,6 @@ function drawMyDande(){
     }
 
     myCore.update(cnvX);
-    // console.log(myCore.dmouse);
     myCore.display();
   }
   
@@ -419,11 +415,16 @@ socket.on('getPos', (userX)=>{
 })
 
 function locateSelf(){
-  console.log("locate!!!")
   if(myPrince){
     cnvX = -(myX - window.innerWidth / 2);
     myPrince.x = myX + cnvX + 200;
-    
+  } 
+}
+
+function locateOther(flowerX){
+  if(myPrince){
+    cnvX = -(flowerX - window.innerWidth / 2);
+    myPrince.x = flowerX + cnvX - 200;
   } 
 }
 
