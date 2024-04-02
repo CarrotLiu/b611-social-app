@@ -166,51 +166,45 @@ socket.on('newOthers', (newOther)=>{
   }
 })
 
-
-const activity = document.querySelector('.activity')
-const msgInput = document.querySelector('textarea')
-
-
 // -------------------- HTML ACTIVITY -------------------- //
-// function sendMessage(e) {
-//   e.preventDefault()
-//   if (msgInput.value) {
-//       socket.emit('message', msgInput.value)
-//       msgInput.value = ""
-//   }
-//   msgInput.focus()
-// } 
-  //connection activity
-  socket.on("message", (msg) => {
-    console.log(msg);
-    activity.textContent = msg; 
-    clearEventMsg();
-  })
+const activity = document.querySelector('.activity');
+const msgInput = document.querySelector('textarea');
+const locateBtn = document.querySelector("#btn-locate");
+const starBtn = document.querySelector("#btn-star");
+const helpBtn = document.querySelector("#btn-bulb");
+const logBtn = document.querySelector("#btn-signout");
 
-  //typing activity
-  msgInput.addEventListener('keypress', () => {
-    socket.emit('activity', username)
-  })
+//connection activity
+socket.on("message", (msg) => {
+  console.log(msg);
+  activity.textContent = msg; 
+  clearEventMsg();
+})
 
-  let activityTimer;
-  socket.on("activity", (name) => {
-    activity.textContent = `${username} is typing...`; 
-    clearEventMsg();
-  })
+//typing activity
+msgInput.addEventListener('keypress', () => {
+  socket.emit('activity', username)
+})
 
-  socket.on('bye', (msg)=>{
-    socket.emit('activity', msg);
-    
-  })
+let activityTimer;
+socket.on("activity", (name) => {
+  activity.textContent = `${username} is typing...`; 
+  clearEventMsg();
+})
+
+socket.on('bye', (msg)=>{
+  socket.emit('activity', msg);
+})
   
 //time function for clearing messages
 function clearEventMsg(){
   clearTimeout(activityTimer)
     activityTimer = setTimeout(() => {
         activity.textContent = ""
-    }, 3000)
+    }, 5000)
 }
 
+locateBtn.addEventListener('click', ()=>{locateSelf();});
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
 let stars = [];
@@ -236,7 +230,7 @@ function draw() {
     stars[i].update();
     stars[i].display();
   }
-  if(myPrince && !located){
+  if(!located){
     locateSelf();
     located = true;
   }
@@ -425,8 +419,12 @@ socket.on('getPos', (userX)=>{
 })
 
 function locateSelf(){
-    cnvX = -(myX - width / 2);
+  console.log("locate!!!")
+  if(myPrince){
+    cnvX = -(myX - window.innerWidth / 2);
     myPrince.x = myX + cnvX + 200;
+    
+  } 
 }
 
 
