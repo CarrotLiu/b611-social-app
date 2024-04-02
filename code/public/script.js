@@ -351,7 +351,7 @@ function princeWalk(){
     }
     // console.log("xout:",myPrince.xOut);
     if(myName){
-      socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.xOut]);
+      socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
     }else{
       socket.emit('updatePos',[myId, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
     }
@@ -382,8 +382,6 @@ function keyReleased(){
 
 socket.on('getMove', (posDt)=>{
   let otherName = posDt[0];
-  // otherName = Object.keys(pos);
-  // console.log(otherX, otherY);
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];

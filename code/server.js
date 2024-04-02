@@ -73,6 +73,7 @@ io.on('connection', socket => {
             let xData = {};
             xData[self.userId] = self.myX;
             userX.push(xData);
+            // console.log("logging in visitor:", self.userId);
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
             socket.emit('message', `Welcome to B611!`)
         }
@@ -117,6 +118,7 @@ io.on('connection', socket => {
             allUsers = allUsers.filter(user => user.displayName != socket.username);
             userX = userX.filter(user => Object.keys(user)[0] != socket.username);
         }else{
+            // console.log("leaving visitor:",allUsers)
             allUsers = allUsers.filter(user => user.userId != socket.id);
             userX = userX.filter(user => Object.keys(user)[0] != socket.id);
         }
