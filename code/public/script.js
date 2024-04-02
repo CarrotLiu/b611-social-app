@@ -71,9 +71,9 @@ let colorPrince = [
 ]
 let data_loaded = false;
 
-socket.on('bye',(username)=>{
+socket.on('bye',(userId)=>{
   for(let i = 0; i < princes.length; i++){
-    if(princes[i].name == username){
+    if(princes[i].id == userId){
       princes.splice(i, 1);
       i--;
     }
@@ -93,7 +93,7 @@ socket.on('checkSelf', (rst)=>{
   mySize = rst.size;
   cnvX = 0;
   if(myName){
-    myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true);
+    myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
     myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
     for (let r = currentLayer; r > 0; r--) {
       for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -112,13 +112,12 @@ socket.on('checkSelf', (rst)=>{
       }
     }
   }else{
-    myPrince = new Prince(myX - 200, myY + 100, myFreq, myId, colorPrince[myColor], true);
+    myPrince = new Prince(myX - 200, myY + 100, myFreq, myId, colorPrince[myColor], true, myId);
   }
 });
 
 socket.on('otherFlower', (others)=>{
-  console.log("loading other flowers!!!!!")
-  console.log(others)
+  // console.log("loading other flowers!!!!!")
   if(others.length >0){
     for (let i = 0; i < others.length; i ++) {
       let user = others[i];
@@ -146,23 +145,56 @@ socket.on('otherFlower', (others)=>{
   otherFlowersLoaded = true;
 })
 
-socket.on('newOthers', (newOther)=>{
-  let newOtherName;
-  if(newOther.displayName){
-    newOtherName = newOther.displayName;
-  }else{
-    newOtherName = newOther.userId;
+socket.on('checkOthers', (otherData)=>{
+  console.log("userData",otherData[0]);
+  console.log("userX",otherData[1]);
+  for(let i = 0; i < otherData[0].length; i++){
+    let newOtherDT = otherData[0][i];
+    let newOtherName = newOtherDT.displayName;
+    let newOtherId = newOtherDT.userId;
+    
+    let newOtherX = otherData[1].filter(user => Object.keys(user)[0] == newOtherId)[0];
+    console.log(newOtherX[newOtherId])
+    console.log(princes);
+    let ifExists = false;
+    for (let j = 0; j < princes.length; j++) {
+      if (princes[j].id == newOtherId) {
+        ifExists = true;
+        break; // Exit loop once prince is found
+      }
+    }
+    if (!princeExists) {
+      princes.push(new Prince(newOtherX[0][newOtherId], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false, newOtherId));
+    }
+
+    // if(princes.length > 0){
+    //   for(let j = 0; j < princes.length; j++){
+    //     if(princes[j].name != newOtherName){
+    //       console.log(newOtherX)
+    //       princes.push(new Prince(newOtherX[newOtherName], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false));
+    //       console.log(princes);
+    //     }
+    //   }
+    // }else{
+    //   princes.push(new Prince(newOtherX[newOtherName], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false));
+    // }
   }
+})
+
+socket.on('newOthers', (newOther)=>{
+  let newOtherName = newOther.displayName;
+  let newOtherId = newOther.userId;
   console.log(`${newOtherName} just arrived`);
   let ifExist = false;
   for(let i = 0; i < princes.length; i++){
-    if(princes[i].name == newOtherName){
+    if(princes[i].id == newOtherId){
       ifExist = true;
+      break;
     }
   }
   if(!ifExist){
-    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOtherName, colorPrince[newOther.color], false));
-    // console.log(princes);
+    princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOtherName, colorPrince[newOther.color], false, newOtherId));
+    console.log(princes);
   }
 })
 
@@ -176,7 +208,7 @@ const logBtn = document.querySelector("#btn-signout");
 
 //connection activity
 socket.on("message", (msg) => {
-  console.log(msg);
+  // console.log(msg);
   activity.textContent = msg; 
   clearEventMsg();
 })
@@ -230,9 +262,8 @@ function draw() {
   }
   
   if(myPrince && !located){
-    locateSelf();
-    console.log(located)
-    console.log(myX)
+    cnvX = -(myX - window.innerWidth / 2);
+    myPrince.x = myX + cnvX + 200;
     located = true;
   }
   //translate 所有其他东西
@@ -258,6 +289,12 @@ function drawMyPrince(){
 function drawOtherPrince(){
   if(princes.length > 0){
     for(let i = 0; i < princes.length;i++){
+      if(princes[i].id == myId){
+        princes.splice(i, 1)
+        i--;
+      }
+    }
+    for(let i = 0; i < princes.length;i++){
       push();
       princes[i].update();
       princes[i].display();
@@ -282,11 +319,9 @@ function drawMyDande(){
         mySeeds.splice(i, 1);
       }
     }
-
     myCore.update(cnvX);
     myCore.display();
   }
-  
   pop();
 }
 
@@ -350,11 +385,8 @@ function princeWalk(){
       myPrince.walkCount++;
     }
     // console.log("xout:",myPrince.xOut);
-    if(myName){
-      socket.emit('updatePos',[myName, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
-    }else{
       socket.emit('updatePos',[myId, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
-    }
+    
   } else {
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
@@ -371,11 +403,7 @@ function keyReleased(){
     myPrince.clothX = 0;
     // console.log("x", myPrince.x);
     // console.log("xOut",myPrince.xOut);
-    if(myName){
-      socket.emit('updatePos',[myName, myPrince.walkDir, false, myPrince.xOut]);
-    }else{
-      socket.emit('updatePos',[myId, myPrince.walkDir, false, myPrince.xOut]);
-    }
+    socket.emit('updatePos',[myId, myPrince.walkDir, false, myPrince.xOut]);
     
   }
 }
@@ -385,11 +413,11 @@ socket.on('getMove', (posDt)=>{
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
-      if(prince.name == otherName){
+      if(prince.id == otherName){
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
         prince.ifIdle = !posDt[2];
-        if(prince.ifWalk){
+        if(prince.ifWalk){ 
           if (prince.walkCount <= 60) { 
             prince.walkCount++;
           }
@@ -408,7 +436,7 @@ socket.on('getPos', (userX)=>{
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
-      if(prince.name == otherName){
+      if(prince.id == otherName){
         prince.x = userX[otherName];
       }
     }
@@ -419,6 +447,7 @@ function locateSelf(){
   if(myPrince){
     cnvX = -(myX - window.innerWidth / 2);
     myPrince.x = myX + cnvX + 200;
+    socket.emit('updatePos',[myId, myPrince.walkDir, false, myPrince.xOut]);
   } 
 }
 

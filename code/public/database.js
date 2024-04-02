@@ -38,12 +38,12 @@ async function readUserData(id) {
                 for (let i = 0; i < userList.length; i++) {
                     if (userList[i].userId == id) {
                         exists = true;
-                        console.log("inside for loop exists is:",exists)
+                        // console.log("inside for loop exists is:",exists)
                         break;
                     }
                 }
             });
-            console.log("outside for loop exists is:",exists)
+            // console.log("outside for loop exists is:",exists)
             resolve(exists);
         }, (error) => {
             reject(error); 
@@ -168,7 +168,7 @@ if(loginContainer.style.display != "none"){
         try {
             const { username, userId, photoURL } = await signin();
             const exists = await readUserData(userId);  //userList现在是database里所有的user！！！如果是新用户/visitor，就还没存进去！！！
-            console.log("now exists is:", exists)
+            // console.log("now exists is:", exists)
             if (!exists) {
                 console.log("new user!");
                 let l = 1;

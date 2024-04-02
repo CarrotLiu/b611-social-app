@@ -1,6 +1,7 @@
 class Prince {
-  constructor(x, y, freq, name, color, ifSelf) {
+  constructor(x, y, freq, name, color, ifSelf, id) {
     this.name = name;
+    this.id = id;
     this.x = x;
     this.y = y;
     this.ifSelf = ifSelf;
