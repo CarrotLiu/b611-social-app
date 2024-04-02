@@ -163,8 +163,8 @@ socket.on('checkOthers', (otherData)=>{
         break; // Exit loop once prince is found
       }
     }
-    if (!princeExists) {
-      princes.push(new Prince(newOtherX[0][newOtherId], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false, newOtherId));
+    if (!ifExists) {
+      princes.push(new Prince(newOtherX[newOtherId], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false, newOtherId));
     }
 
     // if(princes.length > 0){

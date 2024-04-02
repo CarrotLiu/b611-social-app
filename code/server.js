@@ -60,7 +60,20 @@ io.on('connection', socket => {
                 allUsers.push(self);
                 let xData = {};
                 xData[self.userId] = self.myX + 200;
-                userX.push(xData);
+                let userIndex;
+                let ifExists = false;
+                for(let i = 0; i < userX.length; i++){
+                    userIndex = i;
+                    if(Object.keys(userX[i])[0] == self.userId){
+                        ifExists = true;
+                        break;
+                    }
+                }
+                if(!ifExists){
+                    userX.push(xData);
+                }else{
+                    userX[userIndex][self.userId] = self.myX + 200;
+                }
                 socket.broadcast.emit('message', `A Little Prince just arrived!`)
                 socket.emit('message', `Welcome to B611! ${self.displayName}`)
 
@@ -74,7 +87,18 @@ io.on('connection', socket => {
             allUsers.push(self);
             let xData = {};
             xData[self.userId] = self.myX;
-            userX.push(xData);
+            let ifExists = false;
+            for(let i = 0; i < userX.length; i++){
+                if(Object.keys(userX[i])[0] == self.userId){
+                    ifExists = true;
+                    break;
+                }
+            }
+            if(!ifExists){
+                userX.push(xData);
+            }else{
+                userX[userIdex][self.userId] = self.myX;
+            }
             // console.log("logging in visitor:", self.userId);
             socket.broadcast.emit('message', `A Little Prince just arrived!`)
             socket.emit('message', `Welcome to B611!`)
