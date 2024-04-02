@@ -228,8 +228,11 @@ function draw() {
     stars[i].update();
     stars[i].display();
   }
-  if(!located){
+  
+  if(myPrince && !located){
     locateSelf();
+    console.log(located)
+    console.log(myX)
     located = true;
   }
   //translate 所有其他东西
