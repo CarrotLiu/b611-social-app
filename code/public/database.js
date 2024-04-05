@@ -31,16 +31,15 @@ let DBUserList=[];
 //Read Data
 async function readUserData(id) {
     return new Promise((resolve, reject) => {
-        dbRef.once("value", (snapshot) => { 
+        dbRef.once("value", (snapshot) => {
             let exists = false;
+            let userFound = false; // Flag to indicate if user is found
+
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
                 DBUserList.push(value);
                 userList.push(value);
                 dbKeys.push(childSnapshot.key);
-                
-                // Flag to indicate if user is found
-                let userFound = false;
 
                 for (let i = 0; i < userList.length; i++) {
                     if (userList[i].userId == id) {
@@ -54,16 +53,18 @@ async function readUserData(id) {
                 }
 
                 if (userFound) {
-                    return false; // Break out of the outer loop if user is found
+                    // Break out of the outer loop if user is found
+                    return true; // Use 'true' instead of 'false'
                 }
             });
 
             resolve(exists);
         }, (error) => {
-            reject(error); 
+            reject(error);
         });
     });
 }
+
 
 
 
