@@ -280,7 +280,7 @@ function draw() {
 function drawMyPrince(){
   if(myPrince){
     push();
-    princeWalk()
+    princeWalk();
     myPrince.update();
     myPrince.display();
     pop();
@@ -408,8 +408,9 @@ function keyReleased(){
   }
 }
 
-socket.on('getMove', (posDt)=>{
+socket.on('getMove', function (posDt){
   let otherName = posDt[0];
+  // console.log(posDt);
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
@@ -421,9 +422,9 @@ socket.on('getMove', (posDt)=>{
         if(prince.ifWalk){ 
           if (prince.walkCount <= 60) { 
             prince.walkCount++;
-            console.log(prince.id);
           }
-          
+          console.log(prince.ifWalk);
+          console.log(prince)
           
         }else{
           prince.walkCount = 0;
@@ -434,9 +435,9 @@ socket.on('getMove', (posDt)=>{
       }
     }
   }
-})
+}.bind(this))
 
-socket.on('getPos', (userX)=>{
+socket.on('getPos', function (userX) {
   let otherName = Object.keys(userX)[0];
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
@@ -448,7 +449,7 @@ socket.on('getPos', (userX)=>{
       }
     }
   }
-})
+}.bind(this))
 
 function locateSelf(){
   if(myPrince){

@@ -71,6 +71,7 @@ class Prince {
 
     push();
     if (this.ifIdle) {
+      // console.log(this);
       this.idle(eyeOffsetX, eyeOffsetY, hairx, hairy, yFloat);
     } else if (this.ifWalk) {
       this.walk(hairx, hairy, yFloat);
