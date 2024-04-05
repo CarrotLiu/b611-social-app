@@ -142,6 +142,7 @@ class Core {
     this.submitHandler = function () {
       if (this.coreData[0] === " ") {
         this.coreData[0] = textArea.value;
+        
       } else {
         this.coreData.push(textArea.value);
       }

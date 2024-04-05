@@ -119,12 +119,12 @@ function writeCore(userid, cdt){
 
 function writeSeed(userid, sdt){
     console.log("update seed data");
-    dbRef.child(userid).child("seedData").update(sdt);
+    dbRef.child(userid).child("seedData").set(sdt);
 }
 
 function writeStar(userid, std){
-    console.log("update seed data");
-    dbRef.child(userid).child("seedData").update(std);
+    console.log("update star data");
+    dbRef.child(userid).child("starData").set(std);
 }
   
 function clearDBReference(refName) {
@@ -262,4 +262,6 @@ function startApp(userId, type){
 window.readUserData = readUserData;
 window.writeNewUser = writeNewUser;
 window.writeCore = writeCore;
+window.writeSeed = writeSeed;
+window.writeStar = writeStar;
 window.signin = signin;
