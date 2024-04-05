@@ -46,6 +46,10 @@ io.on('connection', socket => {
         let others = allUsers; //需要所有在线users但不包含当前user，但如果是同一个user打开两个tab就会包含当前user
         let self = userData[0].filter(data => data.userId == userData[1])[0];//当前的user
         let otherFlowers = userData[3].filter(data=>data.userId != userData[1]);//db里所有除self外的user
+        let dbKeys = userData[4];
+        let myKey = userData[5];
+        let ifNew = userData[6];
+        let otherKeys = dbKeys.filter(key => key != myKey);
         socket.username = self.displayName;
         socket.userId = self.userId;
         
@@ -105,14 +109,17 @@ io.on('connection', socket => {
         }
         userNum = allUsers.length;
         others = allUsers.filter(data => data.userId != self.userId);
-        socket.emit('checkSelf', self)
-        socket.emit('otherFlower', otherFlowers)
-        socket.emit('checkOthers', [others, userX])
-        socket.broadcast.emit('newOthers', self)
+        socket.emit('checkSelf', [self, myKey]);
+        socket.emit('otherFlower', [otherFlowers, otherKeys]);
+        socket.emit('checkOthers', [others, userX]);
+        if(ifNew){
+            socket.broadcast.emit('newKey', myKey);
+        }
+        socket.broadcast.emit('newOthers', self);
         if(socket.username){
-            console.log(`${socket.username} connected`, userNum)
+            console.log(`${socket.username} connected`, userNum);
         }else{
-            console.log(`${socket.userId} connected`, userNum)
+            console.log(`${socket.userId} connected`, userNum);
         } 
     })
     

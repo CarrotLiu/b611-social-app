@@ -23,6 +23,9 @@ const provider = new firebase.auth.GoogleAuthProvider();
 
 // ---------------------- READ & WRITE DATA ---------------------- //
 let write_done = false;
+let ifNewUser = false;
+let myKey;
+let dbKeys = [];
 let userList=[]; 
 let DBUserList=[];
 //Read Data
@@ -34,10 +37,12 @@ async function readUserData(id) {
                 let value = childSnapshot.val();
                 DBUserList.push(value);
                 userList.push(value);
+                dbKeys.push(childSnapshot.key);
                 
                 for (let i = 0; i < userList.length; i++) {
                     if (userList[i].userId == id) {
                         exists = true;
+                        myKey = childSnapshot.key;
                         // console.log("inside for loop exists is:",exists)
                         break;
                     }
@@ -55,7 +60,12 @@ async function readUserData(id) {
 function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
     console.log("write new user");
     let newu = {username:{}}
+    
     const newUserId = dbRef.push(newu).key;
+    dbKeys.push(newUserId);
+    myKey = newUserId;
+    ifNewUser = true;
+
     userList.push({
         displayName: username,
         userId: id,
@@ -69,6 +79,7 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         size: s
 
     });
+    
     DBUserList.push({
         displayName: username,
         userId: id,
@@ -102,7 +113,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
 
 function writeCore(userid, cdt){
     console.log("update core data");
-    dbRef.child(userid).child("coreData").update(cdt);
+    console.log(cdt);
+    dbRef.child(userid).child("coreData").set(cdt);
 }
 
 function writeSeed(userid, sdt){
@@ -174,13 +186,14 @@ if(loginContainer.style.display != "none"){
                 let l = 1;
                 let c= Math.floor(Math.random() * 3);
                 let f = Math.random() * Math.PI + Math.PI;
-                let s = Math.random() * (1.1 - 0.8) + 0.8;
+                let s = Math.random() * (1.1 - 0.9) + 0.9;
                 let index = userList.length + 1;
-                // console.log(index);
+                
                 let marginX = s * 80;
-                let roomX = s * 700;
-                let min = marginX;
+                let roomX = s * 560;
+                let min = roomX * (index - 1) + marginX;
                 let max = roomX * index - marginX;
+                console.log(max, min);
                 let myX = Math.random() * (max - min) + min;
                 // console.log(marginX, index, roomX, myX);
                 writeNewUser(userId, username, [" "], [" "], [" "], myX, l, c, f,s); //如果是新用户，存进去了！
@@ -240,7 +253,7 @@ function startApp(userId, type){
     topContainer.style.display = "flex";
     document.querySelector("#p5-container").style.visibility = "visible";
     document.querySelector("body").style.background = "none";
-    socket.emit("login", [userList, userId, type, DBUserList]);
+    socket.emit("login", [userList, userId, type, DBUserList, dbKeys, myKey, ifNewUser]);
     
 }
 
@@ -248,4 +261,5 @@ function startApp(userId, type){
 // -------------------- GLOBALIZE FUNCTION -------------------- //
 window.readUserData = readUserData;
 window.writeNewUser = writeNewUser;
+window.writeCore = writeCore;
 window.signin = signin;

@@ -41,7 +41,7 @@ class Core {
     pop();
   }
 
-  update(cnvX, ifClicked, stopHover, achieveData) {
+  update(cnvX, myDBKey, stopHover) {
     this.dmouse = dist(
       this.x + this.coreX,
       this.y + this.coreY,
@@ -49,12 +49,12 @@ class Core {
       mouseY
     );
 
-    this.checkHover(stopHover, ifClicked);
+    this.checkHover(stopHover);
     
     this.coreX = map(sin(frameCount * 0.01 + this.freq), -1, 1, -60, 60);
     this.coreY = map(cos(frameCount * 0.01 + this.freq), -1, 1, -10, 0);
 
-    this.checkClick();
+    this.checkClick(myDBKey);
     // console.log(this.ifCheckDataNum);
     if (this.ifCheckDataNum) {
       this.checkDataNum();
@@ -106,7 +106,7 @@ class Core {
     pop();
   }
 
-  checkHover(stopHover, ifClicked) {
+  checkHover(stopHover) {
     if (this.dmouse <= 10 && !stopHover) {
       this.isHovering = true;
       if(mouseIsPressed){
@@ -116,32 +116,36 @@ class Core {
       this.isHovering = false;
     }
   }
-  checkClick(){
+  checkClick(myDBKey){
     if(this.ifClicked){
-      console.log(this.coreData)
       if (this.coreData[0] != " ") {
         this.readText();
-        console.log("reading")
+        // console.log("reading")
       } else if (this.ifSelf) {
-        this.writeText();
-        console.log("writing")
+        this.writeText(myDBKey);
+        // console.log("writing")
       }
     }
   }
 
-  writeText() {
+  writeText(myDBKey) {
     // Show input box
     let writeArea = document.querySelector('#writeArea')
+    let textArea = document.querySelector('#textAreaWriteCore')
     let submitButton = document.querySelector("#btn-finish")
     writeArea.style.display = "block";
-    console.log(writeArea.style.display);
+    
     submitButton.addEventListener(
       "click",
       function () {
-        if(this.coreData[0] == ""){
+        if(this.coreData[0] == " "){
           this.coreData[0] = textArea.value;
+          let cdt = this.coreData;
+          writeCore(myDBKey, cdt);
         }else{
           this.coreData.push(textArea.value);
+          let cdt = this.coreData;
+          writeCore(myDBKey, cdt);
         }
         this.ifCheckDataNum = true;
         this.isWriting = false;

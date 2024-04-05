@@ -8,6 +8,7 @@
 socket = io('ws://localhost:3500')
 // ---------------------- INITIALIZE RM & POS ---------------------- //
 let iX, roomX = 700, marginX = 80; 
+let myDBKey, otherDBKeys = [];
 
 let myName, myId, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize;
 let myCore, myPrince, mySeeds = [], myStars, myStem;
@@ -81,17 +82,19 @@ socket.on('bye',(userId)=>{
 })
 
 socket.on('checkSelf', (rst)=>{
-  myName = rst.displayName;
-  myLayer = rst.layerNum;
-  myId = rst.userId;
-  myColor = rst.color;
-  myFreq = rst.freq;
-  myX = rst.myX;
-  myCDT = rst.coreData;
-  mySDT = rst.seedData;
-  mySTD = rst.starData;
-  mySize = rst.size;
+  myName = rst[0].displayName;
+  myLayer = rst[0].layerNum;
+  myId = rst[0].userId;
+  myColor = rst[0].color;
+  myFreq = rst[0].freq;
+  myX = rst[0].myX;
+  myCDT = rst[0].coreData;
+  mySDT = rst[0].seedData;
+  mySTD = rst[0].starData;
+  mySize = rst[0].size;
+  myDBKey = rst[1];
   cnvX = 0;
+  console.log(myDBKey);
   if(myName){
     myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
     myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
@@ -118,9 +121,11 @@ socket.on('checkSelf', (rst)=>{
 
 socket.on('otherFlower', (others)=>{
   // console.log("loading other flowers!!!!!")
-  if(others.length >0){
-    for (let i = 0; i < others.length; i ++) {
-      let user = others[i];
+  otherDBKeys = others[1];
+  console.log(otherDBKeys);
+  if(others[0].length >0){
+    for (let i = 0; i < others[0].length; i ++) {
+      let user = others[0][i];
       if(user.displayName){
         cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
         let userSeed = [];
@@ -179,6 +184,11 @@ socket.on('checkOthers', (otherData)=>{
     //   princes.push(new Prince(newOtherX[newOtherName], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false));
     // }
   }
+})
+
+socket.on('newKey', ()=>{
+  otherDBKeys.push(newKey);
+  console.log(otherDBKeys);
 })
 
 socket.on('newOthers', (newOther)=>{
@@ -241,7 +251,6 @@ locateBtn.addEventListener('click', ()=>{locateSelf();});
 let canvas;
 let stars = [];
 let stopHover = false;
-let ifClicked = false;
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
@@ -307,7 +316,8 @@ function drawMyDande(){
   if(myCore){
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
-      mySeeds[i].update(cnvX, stopHover, ifClicked);
+      // console.log(myDBKey);
+      mySeeds[i].update(cnvX, myDBKey, stopHover);
       mySeeds[i].display();
       if (!mySeeds[i].ifFly) {
         mySeeds[i].lastCoreX = mySeeds[i].coreX;
@@ -319,7 +329,7 @@ function drawMyDande(){
         mySeeds.splice(i, 1);
       }
     }
-    myCore.update(cnvX);
+    myCore.update(cnvX, myDBKey, stopHover);
     myCore.display();
   }
   pop();
@@ -335,7 +345,7 @@ function drawOtherDande(){
     for(let s = 0; s < seeds.length; s++){
       let userSeeds = seeds[s];
       for(let i = 0; i < userSeeds.length; i++){
-        userSeeds[i].update(cnvX, stopHover, ifClicked);
+        userSeeds[i].update(cnvX, myDBKey, stopHover);
         userSeeds[i].display();
         if (!userSeeds[i].ifFly) {
           userSeeds[i].lastCoreX = userSeeds[i].coreX;
@@ -349,7 +359,7 @@ function drawOtherDande(){
       }
     }
     for(let i = 0; i < cores.length; i ++){
-      cores[i].update(cnvX);
+      cores[i].update(cnvX, myDBKey, stopHover);
       cores[i].display();
     } 
   }
