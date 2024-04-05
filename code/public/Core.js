@@ -41,7 +41,7 @@ class Core {
     pop();
   }
 
-  update(cnvX, stopHover, achieveData, ifClicked) {
+  update(cnvX, ifClicked, stopHover, achieveData) {
     this.dmouse = dist(
       this.x + this.coreX,
       this.y + this.coreY,
@@ -109,20 +109,22 @@ class Core {
   checkHover(stopHover, ifClicked) {
     if (this.dmouse <= 10 && !stopHover) {
       this.isHovering = true;
-      if(ifClicked){
+      if(mouseIsPressed){
         this.ifClicked = true;
       }
     } else {
       this.isHovering = false;
-      ifClicked = false;
     }
   }
   checkClick(){
     if(this.ifClicked){
-      if (this.coreData[0] != "") {
+      console.log(this.coreData)
+      if (this.coreData[0] != " ") {
         this.readText();
+        console.log("reading")
       } else if (this.ifSelf) {
         this.writeText();
+        console.log("writing")
       }
     }
   }
@@ -132,14 +134,14 @@ class Core {
     let writeArea = document.querySelector('#writeArea')
     let submitButton = document.querySelector("#btn-finish")
     writeArea.style.display = "block";
-
+    console.log(writeArea.style.display);
     submitButton.addEventListener(
       "click",
       function () {
         if(this.coreData[0] == ""){
           this.coreData[0] = textArea.value;
         }else{
-          this.coreData,push(textArea.value);
+          this.coreData.push(textArea.value);
         }
         this.ifCheckDataNum = true;
         this.isWriting = false;

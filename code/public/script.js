@@ -466,5 +466,11 @@ function locateOther(flowerX){
   } 
 }
 
+function mousePressed(){
+  if(myCore){
+
+  }
+}
+
 
 

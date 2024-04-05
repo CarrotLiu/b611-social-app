@@ -26,7 +26,6 @@ class Prince {
     this.finishBlink = false;
     this.clothX = 0;
     this.ifIdle = true;
-    this.ifTalk = false;
     this.ifWalk = false;
     this.walkDir = 1;
     this.walkCount = 0;
@@ -75,7 +74,7 @@ class Prince {
       this.idle(eyeOffsetX, eyeOffsetY, hairx, hairy, yFloat);
     } else if (this.ifWalk) {
       this.walk(hairx, hairy, yFloat);
-      console.log(`${this.name}'s xOut value is: ${this.xOut}`);
+      // console.log(`${this.name}'s xOut value is: ${this.xOut}`);
       this.clothX = 20;
     }
 
