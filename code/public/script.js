@@ -417,15 +417,20 @@ socket.on('getMove', (posDt)=>{
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
         prince.ifIdle = !posDt[2];
+        
         if(prince.ifWalk){ 
           if (prince.walkCount <= 60) { 
             prince.walkCount++;
+            console.log(prince.id);
           }
+          
+          
         }else{
           prince.walkCount = 0;
           prince.clothX = 0;
           prince.x = posDt[3];
         }
+        
       }
     }
   }
@@ -436,8 +441,10 @@ socket.on('getPos', (userX)=>{
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
+      // console.log(prince.x)
       if(prince.id == otherName){
         prince.x = userX[otherName];
+        // console.log(prince.x);
       }
     }
   }

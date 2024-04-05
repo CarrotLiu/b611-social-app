@@ -61,6 +61,16 @@ h1{
   text-align: inherit;
   font-family: inherit;
   white-space: pre-wrap;
+  
+  width: 70%;
+  max-width: 800px;
+  height: 70%;
+  max-height: 800px;
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow:
+    0 0 60px 30px rgb(244, 206, 10), 
+    0 0 100px 60px #fff;
 }
 
 
@@ -73,7 +83,7 @@ h1{
 #readArea{
   /* visibility: hidden; */
   display: none;
-
+  
 }
 
 #buttonContainer{
@@ -189,6 +199,9 @@ h1{
 #reading-btns{
 
 }
+
+
+  
 
 
 

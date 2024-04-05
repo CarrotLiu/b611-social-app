@@ -137,12 +137,8 @@ io.on('connection', socket => {
         }
         io.emit('bye', socket.userId); 
         socket.broadcast.emit('message', "A Little Prince just left" )
-
-        // console.log("leaving visitor:",allUsers)
         allUsers = allUsers.filter(user => user.userId != socket.id);
         userX = userX.filter(user => Object.keys(user)[0] != socket.id);
-        
-        
     })
 })
 

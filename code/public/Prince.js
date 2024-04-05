@@ -31,7 +31,6 @@ class Prince {
     this.walkDir = 1;
     this.walkCount = 0;
     this.scarfDir = 1;
-    this.ifSit = false;
     this.dataMax = 30;
     this.coreData = 0;
     this.maskAlpha = 255;
@@ -56,7 +55,7 @@ class Prince {
     pop();
   }
 
-  update(eyeX, eyeY) {
+  update() {
     if (this.blinkInterval <= 0) {
       this.ifBlink = true;
     }
@@ -75,6 +74,7 @@ class Prince {
       this.idle(eyeOffsetX, eyeOffsetY, hairx, hairy, yFloat);
     } else if (this.ifWalk) {
       this.walk(hairx, hairy, yFloat);
+      console.log(`${this.name}'s xOut value is: ${this.xOut}`);
       this.clothX = 20;
     }
 
