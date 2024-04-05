@@ -39,22 +39,32 @@ async function readUserData(id) {
                 userList.push(value);
                 dbKeys.push(childSnapshot.key);
                 
+                // Flag to indicate if user is found
+                let userFound = false;
+
                 for (let i = 0; i < userList.length; i++) {
                     if (userList[i].userId == id) {
                         exists = true;
                         myKey = childSnapshot.key;
-                        // console.log("inside for loop exists is:",exists)
-                        break;
+                        userFound = true; // Set the flag to true when user is found
+                        console.log(myKey);
+                        console.log(exists);
+                        break; // Break out of the inner loop
                     }
                 }
+
+                if (userFound) {
+                    return false; // Break out of the outer loop if user is found
+                }
             });
-            // console.log("outside for loop exists is:",exists)
+
             resolve(exists);
         }, (error) => {
             reject(error); 
         });
     });
 }
+
 
 
 function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
