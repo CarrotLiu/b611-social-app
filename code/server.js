@@ -122,6 +122,10 @@ io.on('connection', socket => {
             console.log(`${socket.userId} connected`, userNum);
         } 
     })
+
+    socket.on('activity', (myName)=>{
+        socket.broadcast.emit('activity', "A Little Prince is Writing...");
+    })
     
     
     //update position

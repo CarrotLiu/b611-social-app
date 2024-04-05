@@ -134,26 +134,30 @@ class Core {
     let textArea = document.querySelector('#textAreaWriteCore')
     let submitButton = document.querySelector("#btn-finish")
     writeArea.style.display = "block";
-    
-    submitButton.addEventListener(
-      "click",
-      function () {
-        if(this.coreData[0] == " "){
-          this.coreData[0] = textArea.value;
-          let cdt = this.coreData;
-          writeCore(myDBKey, cdt);
-        }else{
-          this.coreData.push(textArea.value);
-          let cdt = this.coreData;
-          writeCore(myDBKey, cdt);
-        }
-        this.ifCheckDataNum = true;
-        this.isWriting = false;
-        this.ifClicked = false;
-        writeArea.style.display = "none";
-      }.bind(this)
-    );  
+  
+    // Remove existing event listener (if any)
+    submitButton.removeEventListener("click", this.submitHandler);
+  
+    // Define submitHandler function
+    this.submitHandler = function () {
+      if (this.coreData[0] === " ") {
+        this.coreData[0] = textArea.value;
+      } else {
+        this.coreData.push(textArea.value);
+      }
+      let cdt = this.coreData;
+      writeCore(myDBKey, cdt);
+  
+      this.ifCheckDataNum = true;
+      this.isWriting = false;
+      this.ifClicked = false;
+      writeArea.style.display = "none";
+    }.bind(this);
+  
+    // Add event listener
+    submitButton.addEventListener("click", this.submitHandler);
   }
+  
 
   readText() {
     if (!this.isReading) {

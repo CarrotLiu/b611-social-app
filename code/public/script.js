@@ -225,12 +225,12 @@ socket.on("message", (msg) => {
 
 //typing activity
 msgInput.addEventListener('keypress', () => {
-  socket.emit('activity', username)
+  socket.emit('activity', myName)
 })
 
 let activityTimer;
-socket.on("activity", (name) => {
-  activity.textContent = `${username} is typing...`; 
+socket.on("activity", (msg) => {
+  activity.textContent = msg; 
   clearEventMsg();
 })
 
