@@ -98,6 +98,7 @@ socket.on('checkSelf', (rst)=>{
   if(myName){
     myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
     myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
+    myCore.checkDataNum();
     for (let r = currentLayer; r > 0; r--) {
       for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
         mySeeds.push(
@@ -124,10 +125,12 @@ socket.on('otherFlower', (others)=>{
   otherDBKeys = others[1];
   console.log(otherDBKeys);
   if(others[0].length >0){
+    console.log(others)
     for (let i = 0; i < others[0].length; i ++) {
       let user = others[0][i];
       if(user.displayName){
         cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+        cores[i].checkDataNum();
         let userSeed = [];
         for (let r = currentLayer; r > 0; r--) {
           for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {

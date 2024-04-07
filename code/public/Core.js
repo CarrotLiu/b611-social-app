@@ -119,6 +119,7 @@ class Core {
   }
   checkClick(myDBKey){
     if(this.ifClicked){
+      // console.log(this.coreData[0]);
       if (this.coreData[0] != " ") {
         this.readText(myDBKey);
         // console.log("reading")
@@ -142,11 +143,15 @@ class Core {
   
     // Define submitHandler function
     this.submitHandler = function () {
+      const timestamp = firebase.database.ServerValue.TIMESTAMP;
+      console.log(timestamp);
+
       if (this.coreData[0] === " ") {
-        this.coreData[0] = textArea.value;
         
+        this.coreData[0] = timestamp + textArea.value;
+        console.log(coreData[0]);
       } else {
-        this.coreData.push(textArea.value);
+        this.coreData.push(timestamp + textArea.value);
       }
       let cdt = this.coreData;
       writeCore(myDBKey, cdt);
@@ -164,12 +169,13 @@ class Core {
 
   readText(myDBKey) {
     if (!this.isReading) {
+      this.isReading = true;
       // console.log(this.removedReadDiv);
       let readAreaContainer = document.querySelector('#readArea');
-      let textDiv =document.querySelector('.textInputArea');
+      let textDiv =document.querySelector('#textAreaReadCore');
       let writeButton = document.querySelector("#btn-write");
       let backButton = document.querySelector("#btn-back");
-      let lockButton = document.querySelector("#btn-lock")
+      let lockButton = document.querySelector("#btn-lock");
       if(!this.ifSelf){
         lockButton.style.display="none";
         writeButton.style.display="none";
@@ -178,7 +184,8 @@ class Core {
 
       let userInputContent = document.createTextNode(this.coreData[0]);
       userInputContent.id = "userInput";
-
+      textDiv.innerHTML = "";
+      textDiv.appendChild(userInputContent);
       backButton.addEventListener(
         "click",
         function () {
@@ -211,12 +218,9 @@ class Core {
           readAreaContainer.style.display = "none";
         }.bind(this)
       );
-        if(!stopHover){
-          stopHover = true;
-        } 
-        textDiv.innerHTML = "";
-        textDiv.appendChild(userInputContent);
-      this.isReading = true;
+      if(!stopHover){
+        stopHover = true;
+      } 
     }
   }
 
@@ -247,9 +251,8 @@ class Core {
   }
 
   checkDataNum() {
-    if (this.coreData[0] != "") {
+    if (this.coreData[0] != " ") {
       this.dataNum = this.coreData.length;
-
     }
   }
 }

@@ -52,9 +52,8 @@ io.on('connection', socket => {
         let otherKeys = dbKeys.filter(key => key != myKey);
         socket.username = self.displayName;
         socket.userId = self.userId;
-        
+        console.log(otherFlowers,otherKeys);
         if(userData[2] == "user"){
-            console.log(otherFlowers)
             let allUserIds = [];
             for(let user in allUsers){
                 allUserIds.push(user.userId);
