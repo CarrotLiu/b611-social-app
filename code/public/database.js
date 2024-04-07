@@ -33,7 +33,7 @@ async function readUserData(id) {
     return new Promise((resolve, reject) => {
         dbRef.once("value", (snapshot) => {
             let exists = false;
-            let userFound = false; // Flag to indicate if user is found
+            let userFound = false; 
 
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
@@ -45,7 +45,7 @@ async function readUserData(id) {
                     if (userList[i].userId == id) {
                         exists = true;
                         myKey = childSnapshot.key;
-                        userFound = true; // Set the flag to true when user is found
+                        userFound = true; 
                         console.log(myKey);
                         console.log(exists);
                         break; // Break out of the inner loop
@@ -54,7 +54,7 @@ async function readUserData(id) {
 
                 if (userFound) {
                     // Break out of the outer loop if user is found
-                    return true; // Use 'true' instead of 'false'
+                    return true;
                 }
             });
 
@@ -219,36 +219,36 @@ if(loginContainer.style.display != "none"){
             console.log(error.message);
         }
     });
-    visitBtn.addEventListener('click', async () => {
-        try {
-            let id =  `${socket.id}`;
-            let s = Math.random(0.8, 1.1);
-            let index = userList.length;
-            let marginX = s * 80;
-            let roomX = s * 700;
-            let xpos = width / 2;
-            userList.push({
-                displayName: null,
-                userId: id,
-                coreData: [],
-                seedData: [],
-                starData: [],
-                myX: xpos,
-                layerNum: 1,
-                color: Math.floor(Math.random() * 3),
-                freq: Math.random(Math.PI, 2 * Math.PI),
-                size: s
+    // visitBtn.addEventListener('click', async () => {
+    //     try {
+    //         let id =  `${socket.id}`;
+    //         let s = Math.random(0.8, 1.1);
+    //         let index = userList.length;
+    //         let marginX = s * 80;
+    //         let roomX = s * 700;
+    //         let xpos = width / 2;
+    //         userList.push({
+    //             displayName: null,
+    //             userId: id,
+    //             coreData: [],
+    //             seedData: [],
+    //             starData: [],
+    //             myX: xpos,
+    //             layerNum: 1,
+    //             color: Math.floor(Math.random() * 3),
+    //             freq: Math.random(Math.PI, 2 * Math.PI),
+    //             size: s
         
-            }); //visitor也存进userList了！
-            //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的object data。
-            //所以userList里存了所有用户以及可能有一个visitor，但不包含其他在线的visitor。
-            //我胡汉三再忘记userList是啥就就改名卜萝胡。
-            let exist = await readUserData(null);
-            startApp(id, "visitor");
-        } catch (error) {
-            console.log(error.message);
-        }
-    })
+    //         }); //visitor也存进userList了！
+    //         //到此为止获得所有的database里的用户 + 当前登陆者（新用户/visitor）的object data。
+    //         //所以userList里存了所有用户以及可能有一个visitor，但不包含其他在线的visitor。
+    //         //我胡汉三再忘记userList是啥就就改名卜萝胡。
+    //         let exist = await readUserData(null);
+    //         startApp(id, "visitor");
+    //     } catch (error) {
+    //         console.log(error.message);
+    //     }
+    // })
 } else{
     signoutBtn.addEventListener('click', async ()=>{
         try {

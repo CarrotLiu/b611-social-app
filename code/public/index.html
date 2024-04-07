@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>B611</title>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mate:ital@0;1&family=Rubik+Scribble&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mate:ital@0;1&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js" integrity="sha512-skuhu6jj+sQnhLq1Txsack8VfnIrX8wL+MTFilYlFFT/NuLJm7eya7zOROs39Jy5cjASMEWqxLzijRVmKhsqWQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="lib/p5.js"></script>
     <script src="lib/p5.sound.js"></script>
@@ -23,25 +27,29 @@
     <main>
     <div id="p5-container"></div>                        
     <div class="buttonContainer" id="login-btns">
-        <button class="btn-basic" id="login">Login</button>
-        <button class="btn-basic" id="visit">Start Without Login</button>
+        <h1>B611</h1>
+        <button class="btn-login" id="login">Login with Google</button>
+        <!-- <button class="btn-login" id="visit">Start Without Login</button> -->
     </div>
     <p class = "activity"></p>
     <div class="textAreaContainer" id="writeArea">
         <textarea class="textInputArea" id="textAreaWriteCore" type = "text" placeholder="Please write about your day here. How do you feel? What do you think?"></textarea>
-        <div id="buttonContainer" id="writing-btns">
-            <button class="btn-basic" id="btn-finish">Finish</button>
+        <div class="buttonContainer" id="writing-btns">
+            <button class="btn-basic" id="btn-finish"></button>
         </div>
     </div>
     
     <div class="textAreaContainer" id="readArea">
-        <div class="textInputArea"></div>
-            <div id="buttonContainer" id="reading-btns">
-                <button class="btn-basic" id="btn-back">Back</button>
-                <button class="btn-basic" id="btn-revise">Revise</button>
-                <button class="btn-basic" id="btn-delete">Delete</button>
-                <button class="btn-basic" id="btn-achieve">Achieve</button>
-            </div>
+        <div class="textInputArea" id="textAreaReadCore" >
+
+        </div>
+        <div class="buttonContainer" id="reading-btns">
+            <button class="btn-basic" id="btn-back"></button>
+            <div class="btn-tooltip-back">Go Back</div>
+            <button class="btn-basic" id="btn-write"></button>
+            <button class="btn-basic" id="btn-lock"></button>
+        </div>
+            
     </div>
     <div id="topBtnContainer">
         <div id="top-left-btn-container">

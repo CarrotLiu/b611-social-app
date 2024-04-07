@@ -32,7 +32,7 @@ class Seed {
     this.hideX = 0;
     this.hideY = 0; 
 
-    this.ifFriend = false;
+    this.ifLock = true;
     this.ifSelf = true;
 
     this.isHovering = false;
@@ -66,8 +66,8 @@ class Seed {
       this.seedX += this.xSpd;
       this.seedY += this.ySpd;
     } else {
-      if (this.ifFriend || this.ifSelf) {
-        if(this.ifFriend){
+      if (this.ifLock || this.ifSelf) {
+        if(this.ifLock){
           if(this.data.length > 0){
             this.checkHover(stopHover, ifClicked);
           }else{
@@ -363,7 +363,9 @@ class Seed {
           }
         }.bind(this)
       );
+        if(this.ifSelf){
 
+        }
         let reviseButton = document.createElement("button");
         reviseButton.textContent = "Revise";
         reviseButton.id = "button-revise";
@@ -382,7 +384,6 @@ class Seed {
           }.bind(this)
         );
         let deleteButton = document.createElement("button");
-        deleteButton.textContent = "Delete";
         deleteButton.id = "button-delete";
         deleteButton.addEventListener(
           "click",

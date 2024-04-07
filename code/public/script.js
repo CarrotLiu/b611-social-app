@@ -285,6 +285,7 @@ function draw() {
   drawOtherPrince();
   pop()
   drawMyPrince();
+  drawTextBG();
 }
 function drawMyPrince(){
   if(myPrince){
@@ -315,7 +316,9 @@ function drawMyDande(){
   push();
   if(myCore){
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
+  
     for(let i = 0; i < mySeeds.length; i++){
+      if(!mySeeds[i].ifClicked){}
       // console.log(myDBKey);
       mySeeds[i].update(cnvX, myDBKey, stopHover);
       mySeeds[i].display();
@@ -476,10 +479,27 @@ function locateOther(flowerX){
   } 
 }
 
-function mousePressed(){
+function drawTextBG(){
   if(myCore){
-
+    if(myCore.isWriting || myCore.isReading){
+      push();
+      noStroke();
+      for (let i = 0; i < 80; i++) {
+        fill(colorRange[myCore.colorIndex][1][0], colorRange[myCore.colorIndex][1][1], colorRange[myCore.colorIndex][1][2], floor(map(i, 0, 60, 0, 5)));
+        circle(
+          width / 2,
+          height / 2,
+          floor(i * 3 + 750)
+        );
+      }
+      for (let i = 0; i < 35; i++) {
+        fill(255, 220 - i * 6);
+        circle(width / 2, height / 2, 616 + i * 5);
+      }
+      pop();
+    }
   }
+
 }
 
 

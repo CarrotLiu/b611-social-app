@@ -4,7 +4,7 @@ html, body {
   text-align: center;
   background-color:#001C30;
   font-size: 18px;
-  font-family: 'IM Fell DW Pica', serif;
+  font-family: "Mate", serif;
   color: white;
   overflow:hidden;
   
@@ -21,6 +21,20 @@ canvas {
 h1{
   color: white;
   text-align: center;
+  font-family:"Rubik Scribble", system-ui;
+  letter-spacing: 20px;
+  font-size: 110px; 
+  -webkit-animation: glow 3s ease-in-out infinite alternate;
+  -moz-animation: glow 3s ease-in-out infinite alternate;
+  animation: glow 3s ease-in-out infinite alternate;
+}
+@-webkit-keyframes glow {
+  from {
+    text-shadow: 0 0 3px #ffffff9f, 0 0 5px #ffffff9f, 0 0 8px #fcf1929d, 0 0 12px #fcf1929d, 0 0 14px #fcf1929d, 0 0 16px #fcf1929d, 0 0 18px #fcf1929d;
+  }
+  to {
+    text-shadow: 0 0 3px #ffffff9f, 0 0 5px #ffffff9f, 0 0 8px #f8e53dbd, 0 0 15px #f8e53dbd, 0 0 17px #f8e53dbd, 0 0 20px #f8e53dbd, 0 0 22px #f8e53dbd;
+  }
 }
 
 .activity{
@@ -44,15 +58,16 @@ h1{
   height: 60%;
   max-height: 70vh; */
   /* color:#001C30; */
-  width: 750px;
+
   /* max-width: 800px; */
-  height: 750px;
   /* max-height: 800px; */
+  /* width: 750px;
+  height: 750px;
   border-radius: 50%;
   background-color: #fff;
   box-shadow:
     0 0 60px 35px #fff,
-    0 0 135px 80px rgb(244, 206, 10);
+    0 0 135px 80px rgb(244, 206, 10); */
 }
 textarea::-webkit-scrollbar {
   width: 0px;
@@ -72,7 +87,7 @@ border-radius: 10px;
 
 .textInputArea {
   box-sizing: border-box;
-  margin-top: 100px;
+  margin-top: 60px;
   width: 500px; 
   height: 500px;
   padding: 5%;
@@ -89,7 +104,11 @@ border-radius: 10px;
   font-family: inherit;
   white-space: pre-wrap;
   resize: none;
+}
 
+#textAreaReadCore{
+  left: 50%;
+  color:#001C30;
 }
 
 
@@ -102,7 +121,7 @@ border-radius: 10px;
 #readArea{
   /* visibility: hidden; */
   display: none;
-  
+  color:#001C30;
 }
 
 #buttonContainer{
@@ -112,24 +131,47 @@ border-radius: 10px;
 }
 
 .btn-basic{
-  box-sizing: border-box;
-  font-family: 'IM Fell DW Pica', serif;
-  font-size: 20px;
-  width: 110px;
-  padding: 2%;
-  /* position: relative; */
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 50px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(11.3px);
-  border: 1px solid rgba(255, 255, 255, 0.85);
+  position: relative;
+  background: none;
+  border: none;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 60px;
+  height: 60px;
+  margin-left: 15px;
+  margin-right: 15px;
+  
 }
 
-.btn-basic:hover {
+.btn-login{
+  color:#fff;
+  box-sizing: border-box;
+  font-family: "Mate", serif;
+  letter-spacing: 2px;
+  font-size: 20px;
+  width: 360px;
+  padding: 16px;
+  background: none;
+  border-radius: 50px;
+  backdrop-filter: blur(11.3px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0px 0px 1.5px 1.5px  rgba(255, 255, 255, 0.5);
+
+}
+.btn-login:hover {
+  background:rgba(255, 255, 255, 0.2);
+  box-shadow: 0px 0px 35px 0 #fff, 15px 15px 30px 0 #1d0dca17;
+  color:#fff;
+  cursor: pointer;
+}
+
+/* .btn-basic:hover {
   background:rgba(255, 255, 255, 0.3);
   box-shadow: 0px 0px 35px 0 #fff, 15px 15px 30px 0 #1d0dca17;
   color:#fff;
-}
+} */
 
 #topBtnContainer{
   display: none;
@@ -171,6 +213,64 @@ border-radius: 10px;
   margin-right: 15px;
 }
 
+#btn-finish{
+  background-image: url('assets/finish.svg');
+}
+
+#btn-finish:hover{
+  background-image: url('assets/finish-hover.svg');
+  cursor:pointer;
+}
+
+#btn-back{
+  background-image: url('assets/back.svg');
+}
+
+.btn-tooltip-back{
+  display: none; /* Hide the tooltip by default */
+  position: absolute;
+  bottom: calc(100% + 5px); /* Position the tooltip above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff; /* Tooltip background color */
+  color: #001C30; /* Tooltip text color */
+  padding: 10px;
+  border: none;
+  font-family: "Mate", serif;
+  white-space: nowrap; /* Prevent line breaks in tooltip text */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow to the tooltip */
+}
+.btn-basic:hover + .btn-tooltip {
+  display: block; /* Show the tooltip when hovering over the button */
+}
+
+#btn-back:hover{
+  background-image: url('assets/back-hover.svg');
+  cursor:pointer;
+}
+
+#btn-back:hover::after { 
+  display: block; /* Show the tooltip when hovering over the button */ 
+} 
+
+#btn-write{
+  background-image: url('assets/write.svg');
+}
+
+#btn-write:hover{
+  background-image: url('assets/write-hover.svg');
+  cursor:pointer;
+}
+
+#btn-lock{
+  background-image: url('assets/lock-open.svg');
+}
+
+#btn-lock:hover{
+  background-image: url('assets/lock-open-hover.svg');
+  cursor:pointer;
+}
+
 #btn-signout{
   background-image: url('assets/door-close.svg');
 }
@@ -208,8 +308,11 @@ border-radius: 10px;
 
 
 #login-btns{
-  margin-top: 100px;
-
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 5px;
 }
 
 #writing-btns{

@@ -19,6 +19,7 @@ class Core {
     );
     
     this.ifSelf = self;
+    this.ifLock = false;
 
     this.isHovering = false;
     this.ifClicked = false;
@@ -48,14 +49,14 @@ class Core {
       mouseX - cnvX,
       mouseY
     );
-
-    this.checkHover(stopHover);
-    
+    if(!this.ifLock || this.ifSelf){
+      this.checkHover(stopHover);
+    }
     this.coreX = map(sin(frameCount * 0.01 + this.freq), -1, 1, -60, 60);
     this.coreY = map(cos(frameCount * 0.01 + this.freq), -1, 1, -10, 0);
 
     this.checkClick(myDBKey);
-    // console.log(this.ifCheckDataNum);
+    
     if (this.ifCheckDataNum) {
       this.checkDataNum();
       this.ifCheckDataNum = false;
@@ -66,14 +67,14 @@ class Core {
     noStroke();
     if (this.isHovering) {
       for (let i = 0; i < 80; i++) {
-        fill(250, 30, 20, floor(map(i, 0, 99, 0, 5)));
+        fill(230, 55, 35, floor(map(i, 0, 99, 0, 5)));
         circle(
           this.coreX,
           this.coreY,
           floor(i * 0.5 + map(this.layerNum, 1, 8, 30, 45))
         );
       }
-      fill(250, 30, 20);
+      fill(250,  55, 35);
     } else {
       // let fluct2 = sin(PI / 2 + frameCount * 0.01);
       // this.assignColor(fluct2);
@@ -82,14 +83,14 @@ class Core {
         i < 10 + constrain(map(this.dataNum, 0, this.dataMax, 0, 70), 0, 70);
         i++
       ) {
-        fill(244, 206, 20, floor(map(i, 0, 99, 0, 5)));
+        fill(colorPrince[this.colorIndex][1][0], colorPrince[this.colorIndex][1][1], colorPrince[this.colorIndex][1][2], floor(map(i, 0, 99, 0, 5)));
         circle(
           this.coreX,
           this.coreY,
           floor(i * 0.5 + map(this.layerNum, 1, 8, 30, 45))
         );
       }
-      fill(244, 206, 20);
+      fill(colorPrince[this.colorIndex][1][0], colorPrince[this.colorIndex][1][1], colorPrince[this.colorIndex][1][2]);
     }
     circle(this.coreX, this.coreY, map(this.layerNum, 1, 8, 30, 45));
 
@@ -119,7 +120,7 @@ class Core {
   checkClick(myDBKey){
     if(this.ifClicked){
       if (this.coreData[0] != " ") {
-        this.readText();
+        this.readText(myDBKey);
         // console.log("reading")
       } else if (this.ifSelf) {
         this.writeText(myDBKey);
@@ -130,6 +131,7 @@ class Core {
 
   writeText(myDBKey) {
     // Show input box
+    this.isWriting = true;
     let writeArea = document.querySelector('#writeArea')
     let textArea = document.querySelector('#textAreaWriteCore')
     let submitButton = document.querySelector("#btn-finish")
@@ -148,7 +150,7 @@ class Core {
       }
       let cdt = this.coreData;
       writeCore(myDBKey, cdt);
-  
+      
       this.ifCheckDataNum = true;
       this.isWriting = false;
       this.ifClicked = false;
@@ -160,24 +162,23 @@ class Core {
   }
   
 
-  readText() {
+  readText(myDBKey) {
     if (!this.isReading) {
       // console.log(this.removedReadDiv);
       let readAreaContainer = document.querySelector('#readArea');
-      let reviseButton = document.querySelector("#btn-revise");
+      let textDiv =document.querySelector('.textInputArea');
+      let writeButton = document.querySelector("#btn-write");
       let backButton = document.querySelector("#btn-back");
-      let deleteButton = document.querySelector("#btn-delete")
-
-      if(this.self == false){
-        deleteButton.style.display="none"
-        reviseButton.style.display="none"
+      let lockButton = document.querySelector("#btn-lock")
+      if(!this.ifSelf){
+        lockButton.style.display="none";
+        writeButton.style.display="none";
       }
       readAreaContainer.style.display = "block";
 
       let userInputContent = document.createTextNode(this.coreData[0]);
       userInputContent.id = "userInput";
-      let buttonContainer = document.createElement("div");
-      buttonContainer.id = "buttonContainer";
+
       backButton.addEventListener(
         "click",
         function () {
@@ -187,36 +188,34 @@ class Core {
           readAreaContainer.style.display = "none";
         }.bind(this)
       );
-
-      reviseButton.addEventListener(
+      writeButton.addEventListener(
         "click",
         function () {
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
           readAreaContainer.style.display = "none";
-          this.writeText();
+          this.writeText(myDBKey);
         }.bind(this)
       );
-      deleteButton.addEventListener(
+      lockButton.addEventListener(
         "click",
         function () {
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
+          this.ifLock = true;
           this.coreData.splice(0, 1);
           this.dataNum --;
+          button.style.backgroundImage = "url('lock-close.svg')";
           readAreaContainer.style.display = "none";
         }.bind(this)
       );
-
         if(!stopHover){
           stopHover = true;
         } 
-        readAreaContainer.innerHTML = "";
-        readAreaContainer.appendChild(userInputContent);
-        
-      
+        textDiv.innerHTML = "";
+        textDiv.appendChild(userInputContent);
       this.isReading = true;
     }
   }
