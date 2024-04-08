@@ -511,7 +511,7 @@ function getTimestamp() {
   const year = now.getFullYear();
   const hour = now.getHours();
   const minute = now.getMinutes();
-  const timestampString = `${day} . ${month} . ${year}  ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+  const timestampString = `${year}.${month}.${day}  ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}\n`;
   return timestampString;
 }
 

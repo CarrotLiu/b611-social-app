@@ -147,7 +147,7 @@ class Core {
       console.log(timestamp);
       if (this.coreData[0] === " ") {
         this.coreData[0] = timestamp + textArea.value;
-        console.log(coreData[0]);
+        console.log(this.coreData[0]);
       } else {
         this.coreData.push(timestamp + textArea.value);
       }
