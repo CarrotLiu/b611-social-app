@@ -143,11 +143,9 @@ class Core {
   
     // Define submitHandler function
     this.submitHandler = function () {
-      const timestamp = firebase.database.ServerValue.TIMESTAMP;
+      const timestamp = getTimestamp();
       console.log(timestamp);
-
       if (this.coreData[0] === " ") {
-        
         this.coreData[0] = timestamp + textArea.value;
         console.log(coreData[0]);
       } else {
