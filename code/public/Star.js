@@ -15,10 +15,8 @@ class Star{
         this.drawStar();
     }
     drawStar(){
-        
         push();
         noStroke();
-        
         translate(this.x, this.y);
         fill(255, this.alpha);
         circle(0, 0, this.size);

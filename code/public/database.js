@@ -34,13 +34,14 @@ async function readUserData(id) {
         dbRef.once("value", (snapshot) => {
             let exists = false;
             let userFound = false; 
-
             snapshot.forEach((childSnapshot) => {
                 let value = childSnapshot.val();
                 DBUserList.push(value);
                 userList.push(value);
                 dbKeys.push(childSnapshot.key);
-
+            });
+            snapshot.forEach((childSnapshot) => {
+                let value = childSnapshot.val();
                 for (let i = 0; i < userList.length; i++) {
                     if (userList[i].userId == id) {
                         exists = true;
@@ -64,9 +65,6 @@ async function readUserData(id) {
         });
     });
 }
-
-
-
 
 function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
     console.log("write new user");
@@ -149,8 +147,6 @@ function clearDBReference(refName) {
         console.log("! DB Remove failed: " + error.message);
     });
 }
-
-
 
 // ---------------------- SIGN IN/OUT ---------------------- //
 const loginBtn = document.querySelector("#login");
@@ -268,7 +264,6 @@ function startApp(userId, type){
     socket.emit("login", [userList, userId, type, DBUserList, dbKeys, myKey, ifNewUser]);
     
 }
-
 
 // -------------------- GLOBALIZE FUNCTION -------------------- //
 window.readUserData = readUserData;
