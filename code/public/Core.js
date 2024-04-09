@@ -147,7 +147,6 @@ class Core {
       // console.log(timestamp);
       if (this.coreData[0] === " ") {
         this.coreData[0] = timestamp + textArea.value;
-        // console.log(this.coreData[0]);
       } else {
         this.coreData.push("\n\n" + timestamp + textArea.value);
       }
@@ -173,24 +172,27 @@ class Core {
       let textDiv =document.querySelector('#textAreaReadCore');
       let writeButton = document.querySelector("#btn-write");
       let backButton = document.querySelector("#btn-back");
-      let lockButton = document.querySelector("#btn-lock");
+      let lockButton;
       console.log(this.ifLock);
-      if(this.ifLock){
-        console.log(this.ifLock);
-        lockButton.setAttribute("id", "btn-open");
-      }else{
-        lockButton.setAttribute("id", "btn-lock");
+      if(document.querySelector("#btn-lock")){
+        lockButton = document.querySelector("#btn-lock");
+      }else if(document.querySelector("#btn-open")){
+        lockButton = document.querySelector("#btn-open");
       }
       
       if(!this.ifSelf){
         lockButton.style.display="none";
         writeButton.style.display="none";
       }
-      if(this.ifLock){
-        lockButton.style.backgroundImage = "url('lock-close.svg')";
+      if(!this.ifLock){
+        // console.log(this.ifLock);
+        lockButton.setAttribute("id", "btn-open");
+        console.log(lockButton);
       }else{
-        lockButton.style.backgroundImage = "url('lock-open.svg')";
+        lockButton.setAttribute("id", "btn-lock");
+        console.log(lockButton);
       }
+      
       textDiv.innerHTML = "";
       let userInputContent = "";
       readAreaContainer.style.display = "block";
@@ -222,14 +224,12 @@ class Core {
       lockButton.addEventListener(
         "click",
         function () {
+          
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
           this.ifLock = !this.ifLock;
-          this.coreData.splice(0, 1);
-          this.dataNum --;
-          
-          
+          console.log(this.ifLock);
           readAreaContainer.style.display = "none";
         }.bind(this)
       );
