@@ -137,19 +137,19 @@ class Core {
     let textArea = document.querySelector('#textAreaWriteCore')
     let submitButton = document.querySelector("#btn-finish")
     writeArea.style.display = "block";
-  
+    textArea.value = "";
     // Remove existing event listener (if any)
     submitButton.removeEventListener("click", this.submitHandler);
-  
+    
     // Define submitHandler function
     this.submitHandler = function () {
       const timestamp = getTimestamp();
-      console.log(timestamp);
+      // console.log(timestamp);
       if (this.coreData[0] === " ") {
         this.coreData[0] = timestamp + textArea.value;
-        console.log(this.coreData[0]);
+        // console.log(this.coreData[0]);
       } else {
-        this.coreData.push(timestamp + textArea.value);
+        this.coreData.push("\n\n" + timestamp + textArea.value);
       }
       let cdt = this.coreData;
       writeCore(myDBKey, cdt);
@@ -174,16 +174,32 @@ class Core {
       let writeButton = document.querySelector("#btn-write");
       let backButton = document.querySelector("#btn-back");
       let lockButton = document.querySelector("#btn-lock");
+      console.log(this.ifLock);
+      if(this.ifLock){
+        console.log(this.ifLock);
+        lockButton.setAttribute("id", "btn-open");
+      }else{
+        lockButton.setAttribute("id", "btn-lock");
+      }
+      
       if(!this.ifSelf){
         lockButton.style.display="none";
         writeButton.style.display="none";
       }
-      readAreaContainer.style.display = "block";
-
-      let userInputContent = document.createTextNode(this.coreData[0]);
-      userInputContent.id = "userInput";
+      if(this.ifLock){
+        lockButton.style.backgroundImage = "url('lock-close.svg')";
+      }else{
+        lockButton.style.backgroundImage = "url('lock-open.svg')";
+      }
       textDiv.innerHTML = "";
-      textDiv.appendChild(userInputContent);
+      let userInputContent = "";
+      readAreaContainer.style.display = "block";
+      for(let i = 0; i < this.coreData.length; i++){
+        userInputContent = document.createTextNode(this.coreData[i]);
+        textDiv.appendChild(userInputContent);
+      }
+      
+      // userInputContent.id = "userInput";
       backButton.addEventListener(
         "click",
         function () {
@@ -209,10 +225,11 @@ class Core {
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
-          this.ifLock = true;
+          this.ifLock = !this.ifLock;
           this.coreData.splice(0, 1);
           this.dataNum --;
-          button.style.backgroundImage = "url('lock-close.svg')";
+          
+          
           readAreaContainer.style.display = "none";
         }.bind(this)
       );

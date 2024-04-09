@@ -7,8 +7,8 @@ html, body {
   font-family: "Mate", serif;
   color: white;
   overflow:hidden;
-  
 }
+
 canvas {
   
 }
@@ -28,12 +28,13 @@ h1{
   -moz-animation: glow 3s ease-in-out infinite alternate;
   animation: glow 3s ease-in-out infinite alternate;
 }
+
 @-webkit-keyframes glow {
   from {
-    text-shadow: 0 0 3px #ffffff9f, 0 0 5px #ffffff9f, 0 0 8px #fcf1929d, 0 0 12px #fcf1929d, 0 0 14px #fcf1929d, 0 0 16px #fcf1929d, 0 0 18px #fcf1929d;
+    text-shadow: 0 0 2px #ffffff9f, 0 0 3px #ffffff9f, 0 0 5px #fcf1929d, 0 0 8px #fcf1929d, 0 0 10px #fcf1929d, 0 0 12px #fcf1929d, 0 0 15px #fcf1929d;
   }
   to {
-    text-shadow: 0 0 3px #ffffff9f, 0 0 5px #ffffff9f, 0 0 8px #f8e53dbd, 0 0 15px #f8e53dbd, 0 0 17px #f8e53dbd, 0 0 20px #f8e53dbd, 0 0 22px #f8e53dbd;
+    text-shadow: 0 0 2px #ffffff9f, 0 0 3px #ffffff9f, 0 0 5px #f8e53dbd, 0 0 8px #f8e53dbd, 0 0 12px #f8e53dbd, 0 0 16px #f8e53dbd, 0 0 18px #f8e53dbd;
   }
 }
 
@@ -129,6 +130,9 @@ border-radius: 10px;
   font-size: 22px;
 }
 
+button:focus { outline: none; }
+
+
 #buttonContainer{
   background-color: transparent;
   padding: 6px;
@@ -166,8 +170,9 @@ border-radius: 10px;
 }
 .btn-login:hover {
   background:rgba(255, 255, 255, 0.2);
-  box-shadow: 0px 0px 35px 0 #fff, 15px 15px 30px 0 #1d0dca17;
+  box-shadow: 0px 0px 35px 0 #fff170bd, 15px 15px 30px 0 #1d0dca17;
   color:#fff;
+  border: 2px solid rgba(255, 255, 255, 0.85);
   cursor: pointer;
 }
 
@@ -201,6 +206,7 @@ border-radius: 10px;
   align-items: left;
   left:0px;
   width: 12%;
+  min-width: 90px;
   margin: 0px;
   padding:0px;
 }
@@ -230,24 +236,6 @@ border-radius: 10px;
   background-image: url('assets/back.svg');
 }
 
-.btn-tooltip-back{
-  display: none; /* Hide the tooltip by default */
-  position: absolute;
-  bottom: calc(100% + 5px); /* Position the tooltip above the button */
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #fff; /* Tooltip background color */
-  color: #001C30; /* Tooltip text color */
-  padding: 10px;
-  border: none;
-  font-family: "Mate", serif;
-  white-space: nowrap; /* Prevent line breaks in tooltip text */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow to the tooltip */
-}
-.btn-basic:hover + .btn-tooltip {
-  display: block; /* Show the tooltip when hovering over the button */
-}
-
 #btn-back:hover{
   background-image: url('assets/back-hover.svg');
   cursor:pointer;
@@ -267,10 +255,19 @@ border-radius: 10px;
 }
 
 #btn-lock{
-  background-image: url('assets/lock-open.svg');
+  background-image: url('assets/lock-close.svg');
 }
 
 #btn-lock:hover{
+  background-image: url('assets/lock-close-hover.svg');
+  cursor:pointer;
+}
+
+#btn-open{
+  background-image: url('assets/lock-open.svg');
+}
+
+#btn-open:hover{
   background-image: url('assets/lock-open-hover.svg');
   cursor:pointer;
 }

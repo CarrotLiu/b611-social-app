@@ -52,13 +52,15 @@ async function readUserData(id) {
                         break; // Break out of the inner loop
                     }
                 }
-
                 if (userFound) {
                     // Break out of the outer loop if user is found
                     return true;
                 }
             });
-
+            if(!userFound){
+                DBUserList.push(value);
+                userList.push(value);
+            }
             resolve(exists);
         }, (error) => {
             reject(error);

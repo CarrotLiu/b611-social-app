@@ -174,7 +174,6 @@ socket.on('checkOthers', (otherData)=>{
     if (!ifExists) {
       princes.push(new Prince(newOtherX[newOtherId], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false, newOtherId));
     }
-
     // if(princes.length > 0){
     //   for(let j = 0; j < princes.length; j++){
     //     if(princes[j].name != newOtherName){
@@ -272,7 +271,6 @@ function draw() {
     stars[i].update();
     stars[i].display();
   }
-  
   if(myPrince && !located){
     cnvX = -(myX - window.innerWidth / 2);
     myPrince.x = myX + cnvX + 200;
@@ -319,7 +317,6 @@ function drawMyDande(){
   push();
   if(myCore){
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
-  
     for(let i = 0; i < mySeeds.length; i++){
       if(!mySeeds[i].ifClicked){}
       // console.log(myDBKey);
@@ -386,6 +383,7 @@ function drawStem(x, y, transX, transY, colorIndex) {
   pop();
 }
 
+// -------------------- POSITION UPDATE -------------------- //
 function princeWalk(){
   if (keyIsPressed && (keyCode == 39 || keyCode == 37)) {
     if(keyCode == 39){
@@ -395,14 +393,13 @@ function princeWalk(){
     }
     //ArrowRight / ArrowLeft
     myPrince.ifIdle = false;
-    myPrince.ifWalk = true; // => this.ifWalk
+    myPrince.ifWalk = true; 
     cnvX += myPrince.cnvX;
     if (myPrince.walkCount <= 60) { 
       myPrince.walkCount++;
     }
     // console.log("xout:",myPrince.xOut);
       socket.emit('updatePos',[myId, myPrince.walkDir, myPrince.ifWalk, myPrince.xOut]);
-    
   } else {
     myPrince.ifWalk = false;
     myPrince.ifIdle = true;
@@ -420,7 +417,6 @@ function keyReleased(){
     // console.log("x", myPrince.x);
     // console.log("xOut",myPrince.xOut);
     socket.emit('updatePos',[myId, myPrince.walkDir, false, myPrince.xOut]);
-    
   }
 }
 
@@ -434,20 +430,17 @@ socket.on('getMove', function (posDt){
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
         prince.ifIdle = !posDt[2];
-        
         if(prince.ifWalk){ 
           if (prince.walkCount <= 60) { 
             prince.walkCount++;
           }
           console.log(prince.ifWalk);
-          console.log(prince)
-          
+          console.log(prince) 
         }else{
           prince.walkCount = 0;
           prince.clothX = 0;
           prince.x = posDt[3];
         }
-        
       }
     }
   }
@@ -511,8 +504,9 @@ function getTimestamp() {
   const year = now.getFullYear();
   const hour = now.getHours();
   const minute = now.getMinutes();
-  const timestampString = `${year}.${month}.${day}  ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}\n`;
+  const timestampString = `\n${year}.${month}.${day}  ${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}\n`;
   return timestampString;
 }
 
+// -------------------- GLOBALIZE FUNCTION -------------------- //
 window.getTimestamp = getTimestamp;
