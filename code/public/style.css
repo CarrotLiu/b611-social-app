@@ -291,6 +291,15 @@ button:focus { outline: none; }
   cursor:pointer;
 }
 
+#btn-blow{
+  background-image: url('assets/blow.svg');
+}
+
+#btn-blow:hover{
+  background-image: url('assets/blow-hover.svg');
+  cursor:pointer;
+}
+
 #btn-star{
   background-image: url('assets/star-off.svg');
 }
