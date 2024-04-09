@@ -133,9 +133,9 @@ class Core {
   writeText(myDBKey) {
     // Show input box
     this.isWriting = true;
-    let writeArea = document.querySelector('#writeArea')
-    let textArea = document.querySelector('#textAreaWriteCore')
-    let submitButton = document.querySelector("#btn-finish")
+    let writeArea = document.querySelector('#writeArea');
+    let textArea = document.querySelector('#textAreaWriteCore');
+    let submitButton = document.querySelector("#btn-finish");
     writeArea.style.display = "block";
     textArea.value = "";
     // Remove existing event listener (if any)
@@ -168,16 +168,19 @@ class Core {
       this.isReading = true;
       // console.log(this.removedReadDiv);
       let readAreaContainer = document.querySelector('#readArea');
-      let textDiv =document.querySelector('#textAreaReadCore');
+      let innerContainer = document.querySelector('#textAreaReadCore');
+      let textDiv =document.querySelector('#coreContent');
       let writeButton = document.querySelector("#btn-write");
       let backButton = document.querySelector("#btn-back");
       let lockButton;
-      console.log(this.ifLock);
       if(document.querySelector("#btn-lock")){
         lockButton = document.querySelector("#btn-lock");
       }else if(document.querySelector("#btn-open")){
         lockButton = document.querySelector("#btn-open");
       }
+
+      writeButton = removeAllEventListeners(writeButton);
+      backButton = removeAllEventListeners(backButton);
       lockButton = removeAllEventListeners(lockButton);
       // let existingListener = getEventListeners(lockButton);
       // console.log(existingListener);
@@ -195,6 +198,8 @@ class Core {
         lockButton.setAttribute("id", "btn-lock");
         console.log(lockButton);
       }
+
+      textDiv.addEventListener('scroll', handleScroll(textDiv));
       
       textDiv.innerHTML = "";
       let userInputContent = "";

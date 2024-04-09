@@ -514,7 +514,13 @@ function removeAllEventListeners(element) {
   return clonedElement;
 }
 
+function handleScroll(textDiv) {
+  var scrollPosition = window.scrollY;
+  textDiv.style.top = (50 + scrollPosition) + 'px';
+}
+
 
 // -------------------- GLOBALIZE FUNCTION -------------------- //
 window.getTimestamp = getTimestamp;
 window.removeAllEventListeners = removeAllEventListeners
+window.handleScroll = handleScroll;
