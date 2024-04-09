@@ -508,5 +508,13 @@ function getTimestamp() {
   return timestampString;
 }
 
+function removeAllEventListeners(element) {
+  const clonedElement = element.cloneNode(true);
+  element.parentNode.replaceChild(clonedElement, element);
+  return clonedElement;
+}
+
+
 // -------------------- GLOBALIZE FUNCTION -------------------- //
 window.getTimestamp = getTimestamp;
+window.removeAllEventListeners = removeAllEventListeners

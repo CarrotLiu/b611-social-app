@@ -129,7 +129,7 @@ class Core {
       }
     }
   }
-
+  
   writeText(myDBKey) {
     // Show input box
     this.isWriting = true;
@@ -162,7 +162,6 @@ class Core {
     // Add event listener
     submitButton.addEventListener("click", this.submitHandler);
   }
-  
 
   readText(myDBKey) {
     if (!this.isReading) {
@@ -179,11 +178,15 @@ class Core {
       }else if(document.querySelector("#btn-open")){
         lockButton = document.querySelector("#btn-open");
       }
+      lockButton = removeAllEventListeners(lockButton);
+      // let existingListener = getEventListeners(lockButton);
+      // console.log(existingListener);
       
       if(!this.ifSelf){
         lockButton.style.display="none";
         writeButton.style.display="none";
       }
+      
       if(!this.ifLock){
         // console.log(this.ifLock);
         lockButton.setAttribute("id", "btn-open");
@@ -200,7 +203,20 @@ class Core {
         userInputContent = document.createTextNode(this.coreData[i]);
         textDiv.appendChild(userInputContent);
       }
-      
+
+      lockButton.addEventListener(
+        "click", 
+        function () {
+          stopHover = false;
+          this.isReading = false;
+          this.ifClicked = false;
+          let reverse = !this.ifLock;
+          this.ifLock = reverse;
+          console.log(this.ifLock);
+          readAreaContainer.style.display = "none";
+        }.bind(this)
+      );
+
       // userInputContent.id = "userInput";
       backButton.addEventListener(
         "click",
@@ -221,18 +237,18 @@ class Core {
           this.writeText(myDBKey);
         }.bind(this)
       );
-      lockButton.addEventListener(
-        "click",
-        function () {
-          
-          stopHover = false;
-          this.isReading = false;
-          this.ifClicked = false;
-          this.ifLock = !this.ifLock;
-          console.log(this.ifLock);
-          readAreaContainer.style.display = "none";
-        }.bind(this)
-      );
+      // lockButton.addEventListener(
+      //   "click",
+      //   function() {
+      //     stopHover = false;
+      //     this.isReading = false;
+      //     this.ifClicked = false;
+      //     let reverse = !this.ifLock;
+      //     this.ifLock = reverse;
+      //     console.log(this.ifLock);
+      //     readAreaContainer.style.display = "none";
+      //   }.bind(this)
+      // );
       if(!stopHover){
         stopHover = true;
       } 
