@@ -87,8 +87,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         layerNum: l,
         color: c,
         freq: f,
-        size: s
-
+        size: s,
+        ifLock: false
     });
     
     DBUserList.push({
@@ -101,8 +101,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         layerNum: l,
         color: c,
         freq: f,
-        size: s
-
+        size: s,
+        ifLock: false
     });
     dbRef.child(newUserId).set({
         displayName: username,
@@ -117,7 +117,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         layerNum: l,
         color: c,
         freq: f,
-        size: s
+        size: s,
+        ifLock: false
     });
     write_done = true;
 }
@@ -136,6 +137,11 @@ function writeSeed(userid, sdt){
 function writeStar(userid, std){
     console.log("update star data");
     dbRef.child(userid).child("starData").set(std);
+}
+
+function writeLock(userid, ifLock){
+    console.log("update lock data");
+    dbRef.child(userid).child("ifLock").set(ifLock);
 }
   
 function clearDBReference(refName) {
@@ -212,7 +218,6 @@ if(loginContainer.style.display != "none"){
             if (write_done) {
                 startApp(userId, "user");
             }
-     
         } catch (error) {
             console.log(error.message);
         }
@@ -274,3 +279,4 @@ window.writeCore = writeCore;
 window.writeSeed = writeSeed;
 window.writeStar = writeStar;
 window.signin = signin;
+window.writeLock = writeLock;

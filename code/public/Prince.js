@@ -475,8 +475,10 @@ class Prince {
       this.x += this.walkDir * this.spdX;
       this.cnvX = 0;
     }
+    
     this.xOut += this.walkDir * this.spdX;
     this.y += yFloat * 0.1;
+    console.log(this.x, this.xOut)
     
   }
 }

@@ -10,7 +10,7 @@ socket = io('ws://localhost:3500')
 let iX, roomX = 700, marginX = 80; 
 let myDBKey, otherDBKeys = [];
 
-let myName, myId, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize;
+let myName, myId, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize, myLock;
 let myCore, myPrince, mySeeds = [], myStars, myStem;
 let myX, myY = window.innerHeight / 2;
 let currentLayer = 1;
@@ -92,12 +92,14 @@ socket.on('checkSelf', (rst)=>{
   mySDT = rst[0].seedData;
   mySTD = rst[0].starData;
   mySize = rst[0].size;
+  myLock = rst[0].ifLock;
   myDBKey = rst[1];
+  
   cnvX = 0;
   console.log(myDBKey);
   if(myName){
     myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
-    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true);
+    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true, myLock, myId);
     myCore.checkDataNum();
     for (let r = currentLayer; r > 0; r--) {
       for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -129,7 +131,7 @@ socket.on('otherFlower', (others)=>{
     for (let i = 0; i < others[0].length; i ++) {
       let user = others[0][i];
       if(user.displayName){
-        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false));
+        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId));
         cores[i].checkDataNum();
         let userSeed = [];
         for (let r = currentLayer; r > 0; r--) {
@@ -421,12 +423,12 @@ function keyReleased(){
 }
 
 socket.on('getMove', function (posDt){
-  let otherName = posDt[0];
+  let otherId = posDt[0];
   // console.log(posDt);
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
-      if(prince.id == otherName){
+      if(prince.id == otherId){
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
         prince.ifIdle = !posDt[2];
@@ -434,12 +436,12 @@ socket.on('getMove', function (posDt){
           if (prince.walkCount <= 60) { 
             prince.walkCount++;
           }
-          console.log(prince.ifWalk);
+          console.log(posDt[3]);
           console.log(prince) 
         }else{
           prince.walkCount = 0;
           prince.clothX = 0;
-          prince.x = posDt[3];
+          prince.x = posDt[3]; // xOut
         }
       }
     }
@@ -447,18 +449,30 @@ socket.on('getMove', function (posDt){
 }.bind(this))
 
 socket.on('getPos', function (userX) {
-  let otherName = Object.keys(userX)[0];
+  let otherId = Object.keys(userX)[0];
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
       // console.log(prince.x)
-      if(prince.id == otherName){
-        prince.x = userX[otherName];
+      if(prince.id == otherId){
+        prince.x = userX[otherId];
         // console.log(prince.x);
       }
     }
   }
 }.bind(this))
+
+socket.on('getLock', function (lockDt){
+  let otherId = lockDt[0];
+  if(princes.length >0){
+    for(let i = 0; i < princes.length; i++){
+      let prince = princes[i];
+      if(prince.id == otherId){
+        prince.ifLock = lockDt[1];
+      }
+    }
+  }
+})
 
 function locateSelf(){
   if(myPrince){

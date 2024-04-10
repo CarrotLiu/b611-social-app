@@ -1,6 +1,7 @@
 class Core {
-  constructor(x, y, layerNum, ci, freq, size, name, cdt, self) {
+  constructor(x, y, layerNum, ci, freq, size, name, cdt, self, ifLock, userId) {
     this.name = name;
+    this.id = userId;
     this.x = x;
     this.y = y;
     this.coreX = 0;
@@ -19,7 +20,7 @@ class Core {
     );
     
     this.ifSelf = self;
-    this.ifLock = false;
+    this.ifLock = ifLock;
 
     this.isHovering = false;
     this.ifClicked = false;
@@ -101,7 +102,6 @@ class Core {
       } else {
         fill(255, alphaMask);
       }
-
       circle(this.coreX, this.coreY, map(this.layerNum, 1, 8, 30, 45));
     }
     pop();
@@ -182,8 +182,7 @@ class Core {
       writeButton = removeAllEventListeners(writeButton);
       backButton = removeAllEventListeners(backButton);
       lockButton = removeAllEventListeners(lockButton);
-      // let existingListener = getEventListeners(lockButton);
-      // console.log(existingListener);
+      textDiv = removeAllEventListeners(textDiv);
       
       if(!this.ifSelf){
         lockButton.style.display="none";
@@ -193,10 +192,10 @@ class Core {
       if(!this.ifLock){
         // console.log(this.ifLock);
         lockButton.setAttribute("id", "btn-open");
-        console.log(lockButton);
+        // console.log(lockButton);
       }else{
         lockButton.setAttribute("id", "btn-lock");
-        console.log(lockButton);
+        // console.log(lockButton);
       }
 
       textDiv.addEventListener('scroll', handleScroll(textDiv));
@@ -215,9 +214,10 @@ class Core {
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
-          let reverse = !this.ifLock;
-          this.ifLock = reverse;
-          console.log(this.ifLock);
+          this.ifLock = !this.ifLock;
+          // console.log(this.ifLock);
+          writeLock(myDBKey, this.ifLock);
+          socket.emit("updateLock", [this.id, this.ifLock]);
           readAreaContainer.style.display = "none";
         }.bind(this)
       );

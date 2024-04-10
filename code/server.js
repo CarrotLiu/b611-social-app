@@ -107,10 +107,12 @@ io.on('connection', socket => {
             socket.emit('message', `Welcome to B611!`)
         }
         userNum = allUsers.length;
+        console.log(others);
         others = allUsers.filter(data => data.userId != self.userId);
         socket.emit('checkSelf', [self, myKey]);
         socket.emit('otherFlower', [otherFlowers, otherKeys]);
         socket.emit('checkOthers', [others, userX]);
+        
         if(ifNew){
             socket.broadcast.emit('newKey', myKey);
         }
@@ -136,6 +138,11 @@ io.on('connection', socket => {
         }
         // console.log(userX);
         socket.broadcast.emit('getMove', posDt);
+    })
+
+    //update lock
+    socket.on('updateLock', (lockDt)=>{
+        socket.broadcast.emit('getLock', lockDt);
     })
 
     //user disconnect => delete prince
