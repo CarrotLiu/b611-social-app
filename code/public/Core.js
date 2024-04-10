@@ -37,10 +37,16 @@ class Core {
     
   }
 
-  display() {
+  display(cnv) {
     push();
     translate(this.x, this.y);
     this.drawCore();
+    pop();
+    push();
+    translate(-cnv, 0);
+    if(this.isReading || this.isWriting){
+      this.textBG();
+    }
     pop();
   }
 
@@ -137,35 +143,37 @@ class Core {
   
   writeText(myDBKey) {
     // Show input box
-    this.isWriting = true;
-    let writeArea = document.querySelector('#writeArea');
-    let textArea = document.querySelector('#textAreaWriteCore');
-    let submitButton = document.querySelector("#btn-finish");
-    writeArea.style.display = "block";
-    textArea.value = "";
-    // Remove existing event listener (if any)
-    submitButton.removeEventListener("click", this.submitHandler);
-    
-    // Define submitHandler function
-    this.submitHandler = function () {
-      const timestamp = getTimestamp();
-      // console.log(timestamp);
-      if (this.coreData[0] === " ") {
-        this.coreData[0] = timestamp + textArea.value;
-      } else {
-        this.coreData.push("\n\n" + timestamp + textArea.value);
-      }
-      let cdt = this.coreData;
-      writeCore(myDBKey, cdt);
+    if(!this.isWriting){
+      this.isWriting = true;
+      let writeArea = document.querySelector('#writeArea');
+      let textArea = document.querySelector('#textAreaWriteCore');
+      let submitButton = document.querySelector("#btn-finish");
+      writeArea.style.display = "block";
+      textArea.value = "";
+      // Remove existing event listener (if any)
+      submitButton.removeEventListener("click", this.submitHandler);
       
-      this.ifCheckDataNum = true;
-      this.isWriting = false;
-      this.ifClicked = false;
-      writeArea.style.display = "none";
-    }.bind(this);
-  
-    // Add event listener
-    submitButton.addEventListener("click", this.submitHandler);
+      // Define submitHandler function
+      this.submitHandler = function () {
+        const timestamp = getTimestamp();
+        // console.log(timestamp);
+        if (this.coreData[0] === " ") {
+          this.coreData[0] = timestamp + textArea.value;
+        } else {
+          this.coreData.push("\n\n" + timestamp + textArea.value);
+        }
+        let cdt = this.coreData;
+        writeCore(this.dbKey, cdt);
+        
+        this.ifCheckDataNum = true;
+        this.isWriting = false;
+        this.ifClicked = false;
+        writeArea.style.display = "none";
+      }.bind(this);
+    
+      // Add event listener
+      submitButton.addEventListener("click", this.submitHandler);
+    }
   }
 
   readText(myDBKey) {
@@ -267,7 +275,23 @@ class Core {
       } 
     }
   }
-
+  textBG(){
+    push();
+    noStroke();
+    for (let i = 0; i < 80; i++) {
+      fill(colorRange[this.colorIndex][1][0], colorRange[this.colorIndex][1][1], colorRange[this.colorIndex][1][2], floor(map(i, 0, 60, 0, 5)));
+      circle(
+        width / 2,
+        height / 2,
+        floor(i * 3 + 750)
+      );
+    }
+    for (let i = 0; i < 35; i++) {
+      fill(255, 220 - i * 6);
+      circle(width / 2, height / 2, 616 + i * 5);
+    }
+    pop();
+  }
   assignColor(fluct) {
     fill(
       map(

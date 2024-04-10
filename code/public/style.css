@@ -124,7 +124,10 @@ border-radius: 10px;
 #readArea{
   /* visibility: hidden; */
   display: none;
-  color:#001C30;
+}
+
+#commentArea{
+  display: none;
 }
 
 #textAreaReadCore{
@@ -230,6 +233,15 @@ button:focus { outline: none; }
 }
 
 #btn-finish:hover{
+  background-image: url('assets/finish-hover.svg');
+  cursor:pointer;
+}
+
+#btn-comment{
+  background-image: url('assets/finish.svg');
+}
+
+#btn-comment:hover{
   background-image: url('assets/finish-hover.svg');
   cursor:pointer;
 }

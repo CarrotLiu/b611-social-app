@@ -102,6 +102,7 @@ socket.on('checkSelf', (rst)=>{
     myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
     myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true, myLock, myId, myDBKey);
     myCore.checkDataNum();
+    let index = 0;
     for (let r = currentLayer; r > 0; r--) {
       for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
         mySeeds.push(
@@ -115,9 +116,13 @@ socket.on('checkSelf', (rst)=>{
             myColor,
             myFreq,
             myId,
-            myDBKey
+            myDBKey,
+            mySDT[index],
+            index,
+            true
           )
         );
+        index++;
       }
     }
     console.log(mySeeds);
@@ -148,6 +153,7 @@ socket.on('otherFlower', (others)=>{
         cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId, user.dbKey));
         cores[i].checkDataNum();
         let userSeed = [];
+        let index = 0;
         for (let r = currentLayer; r > 0; r--) {
           for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
             userSeed.push(new Seed(
@@ -160,8 +166,12 @@ socket.on('otherFlower', (others)=>{
               user.color,
               user.freq,
               user.userId,
-              user.dbKey
+              user.dbKey,
+              user.seedData[index],
+              index,
+              false
             ));
+            index++;
           }
         }
         seeds.push(userSeed);
@@ -312,7 +322,6 @@ function draw() {
   drawOtherPrince();
   pop()
   drawMyPrince();
-  drawTextBG();
 }
 function drawMyPrince(){
   if(myPrince){
@@ -347,8 +356,8 @@ function drawMyDande(){
     for(let i = 0; i < mySeeds.length; i++){
       if(!mySeeds[i].ifClicked){}
       // console.log(myDBKey);
-      mySeeds[i].update(cnvX, myDBKey, stopHover);
-      mySeeds[i].display();
+      mySeeds[i].update(cnvX, stopHover, mySDT);
+      mySeeds[i].display(cnvX);
       if (!mySeeds[i].ifFly) {
         mySeeds[i].lastCoreX = mySeeds[i].coreX;
         mySeeds[i].lastCoreY = mySeeds[i].coreY;
@@ -360,7 +369,7 @@ function drawMyDande(){
       }
     }
     myCore.update(cnvX, myDBKey, stopHover);
-    myCore.display();
+    myCore.display(cnvX);
   }
   pop();
 }
@@ -376,8 +385,8 @@ function drawOtherDande(){
     for(let s = 0; s < seeds.length; s++){
       let userSeeds = seeds[s];
       for(let i = 0; i < userSeeds.length; i++){
-        userSeeds[i].update(cnvX, myDBKey, stopHover);
-        userSeeds[i].display();
+        userSeeds[i].update(cnvX, stopHover, otherSDT[s]);
+        userSeeds[i].display(cnvX);
         if (!userSeeds[i].ifFly) {
           userSeeds[i].lastCoreX = userSeeds[i].coreX;
           userSeeds[i].lastCoreY = userSeeds[i].coreY;
@@ -392,7 +401,7 @@ function drawOtherDande(){
     
     for(let i = 0; i < cores.length; i ++){
       cores[i].update(cnvX, myDBKey, stopHover);
-      cores[i].display();
+      cores[i].display(cnvX);
     } 
   }
   pop();
@@ -415,6 +424,8 @@ function drawStem(x, y, transX, transY, colorIndex) {
 function regrowMe() {
   if (mySeeds.length == 0) {
     currentLayer = 1;
+    mySDT = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "];
+    let index = 0;
     for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + currentLayer * 3)) {
       mySeeds.push(
         new Seed(
@@ -427,9 +438,13 @@ function regrowMe() {
           myColor,
           myFreq,
           myId,
-          myDBKey
+          myDBKey,
+          mySDT[index],
+          index,
+          true
         )
       );
+      index++;
     }
     console.log(mySeeds);
   }
@@ -439,6 +454,8 @@ function regrowOther(){
   for(let s = 0; s < seeds.length; s++){
     let userSeed = seeds[s];
     if(userSeed.length == 0){
+      let index = 0;
+      otherSDT[s] = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]; 
       for (let r = currentLayer; r > 0; r--) {
         for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
           userSeed.push(new Seed(
@@ -451,14 +468,17 @@ function regrowOther(){
             otherColor[s],
             otherFreq[s],
             otherId[s],
-            otherDBKeys[s]
+            otherDBKeys[s],
+            otherSDT[s][index],
+            index,
+            false
           ));
+          index++;
         }
       }
       seeds[s]=userSeed;
     }
   }
-        
 }
 
 // -------------------- POSITION UPDATE -------------------- //
@@ -566,6 +586,29 @@ socket.on('getCoreData', function (coreDt){
   }
 });
 
+socket.on('getSeedData', function (seedDt){
+  let otherId = seedDt[0];
+  if(myDBKey == otherId){
+    mySDT = seedDt[1];
+    for(let i = 0; i < mySeeds.length; s++){
+      mySeeds[i].data=mySDT[i];
+    }
+  }
+  if(seeds.length > 0){
+    for(let s = 0; s < seeds.length; s++){
+      let userSeeds = seeds[s];
+      if(userSeeds[0].dbKey == otherId){
+        otherSDT[s] = seedDt[1];
+        let seedDT = otherSDT[s];
+        for(let i = 0; i < userSeeds.length; i++){
+          let seed = userSeeds[i];
+          userSeeds[i].data=seedDT[i];
+        }
+      }
+    }
+  }
+});
+
 socket.on('getFly', function (myId){
   for(let s = 0; s < seeds.length; s++){
     let userSeeds = seeds[s];
@@ -593,48 +636,7 @@ function locateOther(flowerX){
   } 
 }
 
-function drawTextBG(){
-  if(myCore){
-    if(myCore.isWriting || myCore.isReading){
-      push();
-      noStroke();
-      for (let i = 0; i < 80; i++) {
-        fill(colorRange[myCore.colorIndex][1][0], colorRange[myCore.colorIndex][1][1], colorRange[myCore.colorIndex][1][2], floor(map(i, 0, 60, 0, 5)));
-        circle(
-          width / 2,
-          height / 2,
-          floor(i * 3 + 750)
-        );
-      }
-      for (let i = 0; i < 35; i++) {
-        fill(255, 220 - i * 6);
-        circle(width / 2, height / 2, 616 + i * 5);
-      }
-      pop();
-    }
-  }
-  if(otherFlowersLoaded){
-    for(let i = 0; i < cores.length; i ++){
-      if(cores[i].isWriting || cores[i].isReading){
-        push();
-      noStroke();
-      for (let j = 0; j < 80; j++) {
-        fill(colorRange[cores[i].colorIndex][1][0], colorRange[cores[i].colorIndex][1][1], colorRange[cores[i].colorIndex][1][2], floor(map(j, 0, 60, 0, 5)));
-        circle(
-          width / 2,
-          height / 2,
-          floor(j * 3 + 750)
-        );
-      }
-      for (let j = 0; j < 35; j++) {
-        fill(255, 220 - j * 6);
-        circle(width / 2, height / 2, 616 + j * 5);
-      }
-      pop();
-      }
-    }
-  }
-}
+
 
 function getTimestamp() {
   const now = new Date();

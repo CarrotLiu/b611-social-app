@@ -1,7 +1,8 @@
 class Seed {
-  constructor(x, y, layer, sdPos, dirx, diry, ci, freq, id, dbKey) {
+  constructor(x, y, layer, sdPos, dirx, diry, ci, freq, id, dbKey, data, index, ifSelf) {
     this.id = id;
     this.dbKey = dbKey;
+    this.index = index;
     this.x = x;
     this.y = y;
     this.coreX = 0;
@@ -33,17 +34,15 @@ class Seed {
     );
     this.hideX = 0;
     this.hideY = 0; 
-
-    this.ifLock = true;
-    this.ifSelf = true;
+    this.ifSelf = ifSelf;
 
     this.isHovering = false;
     this.ifClicked = false;
     this.isWriting = false;
     this.isReading = false;
-    this.data = [];
-    this.achievedData = [];
-    this.removedWriteDiv = null;
+    
+    this.data = data;
+
     this.removedReadDiv = null;
 
     this.ifFly = false;
@@ -51,15 +50,15 @@ class Seed {
     this.colorIndex = ci;
   }
 
-  update(cnvX, stopHover,ifClicked) {
+  update(cnvX, stopHover, sdt) {
+    // console.log(this.data);
     //get mouse pos
     this.dmouse = dist(
-      this.x + this.seedX + this.coreX ,
+      this.x + this.seedX + this.coreX,
       this.y + this.seedY + this.coreY,
       mouseX - cnvX,
       mouseY
     );
-    
     //fly
     this.checkFly();
     if (this.ifFly) {
@@ -67,19 +66,14 @@ class Seed {
       this.seedX += this.xSpd;
       this.seedY += this.ySpd;
     } else {
-      if (this.ifLock || this.ifSelf) {
-        if(this.ifLock){
-          if(this.data.length > 0){
-            this.checkHover(stopHover, ifClicked);
-          }else{
-            this.checkHide();
-          }
+      if(!this.ifSelf){
+        if(this.data != " "){
+          this.checkHide();
         }else{
-          this.checkHover(stopHover, ifClicked);
+          this.checkHover(stopHover);
         }
-        
-      } else {
-        this.checkHide();
+      }else{
+        this.checkHover(stopHover);
       }
       this.coreX = map(sin(frameCount * 0.01 + this.freq), -1, 1, -60, 60);
       this.coreY = map(cos(frameCount * 0.01 + this.freq), -1, 1, -10, 0);
@@ -92,14 +86,20 @@ class Seed {
           (40 + this.layerNum * 20) +
         this.hideY;
     }
-    this.checkClick(ifClicked);
+    this.checkClick(sdt);
   }
 
-  display() {
+  display(cnv) {
     push();
     translate(this.x, this.y);
     this.drawSeedStem();
     this.drawSeed();
+    pop();
+    push()
+    translate(-cnv, 0);
+    if(this.isReading || this.isWriting){
+      this.textBG();
+    }
     pop();
   }
 
@@ -123,8 +123,7 @@ class Seed {
       pop();
     } else {
       push();
-
-      if (this.data.length != 0) {
+      if (this.data != " ") {
         push();
         this.assignColor(fluct1);
         noStroke();
@@ -167,7 +166,6 @@ class Seed {
 
       pop();
     }
-
     pop();
   }
 
@@ -177,14 +175,12 @@ class Seed {
     } else {
       this.angle = -PI / 2 + atan(this.seedY / this.seedX);
     }
-
     push();
     if (this.ifFly) {
       translate(this.lastCoreX + this.seedX, this.lastCoreY + this.seedY);
     } else {
       translate(this.coreX + this.seedX, this.coreY + this.seedY);
     }
-
     stroke(255, 100);
     strokeWeight(map(sin(this.seedPos + frameCount * 0.05), -1, 1, 0.01, 2));
     rotate(this.angle + this.flyAngle);
@@ -256,86 +252,54 @@ class Seed {
     this.hideY = map(this.dmouse, 0, 20, 10, 0);
   }
 
-  checkHover(stopHover, ifClicked) {
+  checkHover(stopHover) {
+    // console.log(this.dmouse)
     if (this.dmouse <= 10 && !stopHover) {
+
       this.isHovering = true;
-      if(ifClicked){
+      
+      if(mouseIsPressed){
         this.ifClicked = true;
       }
     } else {
       this.isHovering = false;
-      ifClicked = false;
     }
   }
-  checkClick(){
+  checkClick(sdt){
     if(this.ifClicked){
-      if (this.data.length != 0) {
+      if (this.ifSelf || this.data != " ") {
         this.readText();
-      } else if (this.ifSelf) {
-        this.writeText();
-      }  
+      } else if (!this.ifSelf) {
+        this.writeText(sdt);
+      } 
     }
   }
 
-
-  writeText() {
-    if (!this.isWriting) {
-      let writeAreaContainer = document.createElement("div");
-      writeAreaContainer.id = "writeAreaContainer";
-      let textArea = document.createElement("textarea");
-      textArea.id = "textInputArea";
-      let br = document.createElement("br");
-      if (this.data.length != 0) {
-        textArea.value = this.data[0];
-      } else {
-        textArea.placeholder =
-          "Write about the characteristics you hope to possess";
-      }
-      textArea.style.width = "500px";
-      textArea.style.height = "300px";
-      // Create a submit button
-      let submitButton = document.createElement("button");
-      submitButton.id = "button-submit";
-      submitButton.textContent = "Submit";
-      submitButton.addEventListener(
-        "click",
-        function () {
-          // console.log("textArea.value", textArea.value)
-          stopHover = false;
-          
-          let userInput = textArea.value; //.replace(/\r?\n/g, "\n");
-          this.data[0] = userInput;
-
-          this.isWriting = false;
-          this.ifClicked = false;
-
-          let divToRemove = document.getElementById("writeAreaContainer");
-          if (divToRemove) {
-            this.removedWriteDiv = divToRemove;
-            divToRemove.parentNode.removeChild(divToRemove);
-          }
-        }.bind(this)
-      );
-
-      if (this.removedWriteDiv) {
-        this.removedWriteDiv.innerHTML = "";
-        this.removedWriteDiv.appendChild(textArea);
-        this.removedWriteDiv.appendChild(br);
-        this.removedWriteDiv.appendChild(submitButton);
-        document.body.appendChild(this.removedWriteDiv);
-        this.removedWriteDiv = null;
-      } else {
-        if(!stopHover){
-          stopHover = true;
-        } 
-        writeAreaContainer.innerHTML = "";
-        writeAreaContainer.appendChild(textArea);
-        writeAreaContainer.appendChild(br);
-        writeAreaContainer.appendChild(submitButton);
-        document.body.appendChild(writeAreaContainer);
-      }
-
+  writeText(sdt) {
+    if(!this.isWriting){
       this.isWriting = true;
+      console.log(this.data);
+      let commentArea = document.querySelector('#commentArea');
+      let textArea = document.querySelector('#textAreaWriteSeed');
+      let submitButton = document.querySelector("#btn-comment");
+      commentArea.style.display = "block";
+      textArea.value = "";
+      // Remove existing event listener (if any)
+      submitButton.removeEventListener("click", this.submitHandler);
+      
+      // Define submitHandler function
+      this.submitHandler = function () {
+        const timestamp = getTimestamp();
+        // console.log(timestamp);
+        this.data = timestamp + textArea.value;
+        sdt[this.index] = this.data;
+        writeSeed(this.dbKey, sdt);
+        this.isWriting = false;
+        this.ifClicked = false;
+        commentArea.style.display = "none";
+      }.bind(this);
+      // Add event listener
+      submitButton.addEventListener("click", this.submitHandler);
     }
   }
 
@@ -364,95 +328,25 @@ class Seed {
           }
         }.bind(this)
       );
-        if(this.ifSelf){
-
-        }
-        let reviseButton = document.createElement("button");
-        reviseButton.textContent = "Revise";
-        reviseButton.id = "button-revise";
-        reviseButton.addEventListener(
-          "click",
-          function () {
-            stopHover = false;
-            this.isReading = false;
-            this.ifClicked = false;
-            let divToRemove = document.getElementById("readAreaContainer");
-            if (divToRemove) {
-              this.removedReadDiv = divToRemove;
-              divToRemove.parentNode.removeChild(divToRemove);
-            }
-            this.writeText();
-          }.bind(this)
-        );
-        let deleteButton = document.createElement("button");
-        deleteButton.id = "button-delete";
-        deleteButton.addEventListener(
-          "click",
-          function () {
-            stopHover = false;
-            this.isReading = false;
-            this.ifClicked = false;
-            this.data.splice(0, 1);
-            let divToRemove = document.getElementById("readAreaContainer");
-            if (divToRemove) {
-              this.removedReadDiv = divToRemove;
-              divToRemove.parentNode.removeChild(divToRemove);
-            }
-          }.bind(this)
-        );
-        let achieveButton = document.createElement("button");
-        achieveButton.textContent = "Achieved";
-        achieveButton.id = "button-achieve";
-        achieveButton.addEventListener(
-          "click",
-          function () {
-            stopHover = false;
-            
-            this.isReading = false;
-            this.ifClicked = false;
-            this.achievedData[0] = "\n" + this.data[0];
-            this.data.splice(0, 1);
-            let divToRemove = document.getElementById("readAreaContainer");
-            if (divToRemove) {
-              
-              this.removedReadDiv = divToRemove;
-              divToRemove.parentNode.removeChild(divToRemove);
-            }
-          }.bind(this)
-        );
-      
-      
-      if (this.removedReadDiv) {
-        
-        this.removedReadDiv.innerHTML = "";
-        this.removedReadDiv.appendChild(userInputContent);
-        buttonContainer.appendChild(backButton);
-        if(this.ifSelf){
-          buttonContainer.appendChild(reviseButton);
-          buttonContainer.appendChild(deleteButton);
-          buttonContainer.appendChild(achieveButton);
-        }
-       
-        this.removedReadDiv.appendChild(buttonContainer);
-        document.body.appendChild(this.removedReadDiv);
-        this.removedReadDiv = null;
-      } else {
-        if(!stopHover){
-          stopHover = true;
-        } 
-        readAreaContainer.innerHTML = "";
-        document.body.appendChild(readAreaContainer);
-        readAreaContainer.appendChild(userInputContent);
-        buttonContainer.appendChild(backButton);
-        if(this.ifSelf){
-          buttonContainer.appendChild(reviseButton);
-          buttonContainer.appendChild(deleteButton);
-          buttonContainer.appendChild(achieveButton);
-        }
-        readAreaContainer.appendChild(buttonContainer);
-      }
       this.isReading = true;
     }
+  }
+  textBG(){
+    push();
+    noStroke();
+    for (let i = 0; i < 80; i++) {
+      fill(colorRange[this.colorIndex][1][0], colorRange[this.colorIndex][1][1], colorRange[this.colorIndex][1][2], floor(map(i, 0, 60, 0, 5)));
+      circle(
+        width / 2,
+        height / 2,
+        floor(i * 3 + 750)
+      );
+    }
+    for (let i = 0; i < 35; i++) {
+      fill(255, 220 - i * 6);
+      circle(width / 2, height / 2, 616 + i * 5);
+    }
+    pop();
   }
 
   checkFly() {

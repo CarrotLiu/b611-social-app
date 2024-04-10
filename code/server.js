@@ -149,6 +149,10 @@ io.on('connection', socket => {
         socket.broadcast.emit('getCoreData', coreDt);
     })
 
+    socket.on('newSeedData', (seedDt)=>{
+        socket.broadcast.emit('getSeedData', seedDt);
+    })
+
     socket.on('updateFly', (myId)=>{
         socket.broadcast.emit('getFly', myId);
     })

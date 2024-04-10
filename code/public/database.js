@@ -128,7 +128,7 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
 
 function writeCore(userid, cdt){
     console.log("update core data");
-    console.log(cdt);
+    // console.log(cdt);
     dbRef.child(userid).child("coreData").set(cdt);
     socket.emit('newCoreData', [myKey, cdt]);
 }
@@ -136,6 +136,7 @@ function writeCore(userid, cdt){
 function writeSeed(userid, sdt){
     console.log("update seed data");
     dbRef.child(userid).child("seedData").set(sdt);
+    socket.emit('newSeedData', [myKey, sdt]);
 }
 
 function writeStar(userid, std){
@@ -215,7 +216,7 @@ if(loginContainer.style.display != "none"){
                 console.log(max, min);
                 let myX = Math.random() * (max - min) + min;
                 // console.log(marginX, index, roomX, myX);
-                writeNewUser(userId, username, [" "], [" "], [" "], myX, l, c, f,s); //如果是新用户，存进去了！
+                writeNewUser(userId, username, [" "], [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "], [" "], myX, l, c, f,s); //如果是新用户，存进去了！
             }else{  
                 write_done = true;
             }
