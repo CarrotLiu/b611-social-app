@@ -149,6 +149,10 @@ io.on('connection', socket => {
         socket.broadcast.emit('getCoreData', coreDt);
     })
 
+    socket.on('updateFly', (myId)=>{
+        socket.broadcast.emit('getFly', myId);
+    })
+
     //user disconnect => delete prince
     socket.on('disconnect', ()=>{
         io.emit('bye', socket.userId); 

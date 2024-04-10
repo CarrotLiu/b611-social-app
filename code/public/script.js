@@ -22,6 +22,7 @@ let otherFlowersLoaded = false;
 let otherPrincesLoaded = false;
 
 let princes = [], cores = [], seeds = [], stems=[];
+let otherX = [], otherLayer = [], otherColor = [], otherFreq = [], otherCDT=[], otherSDT = [], otherSTD = [], otherSize = [], otherLock = [], otherId = [], otherName=[];
 
 let cnvX = 0;
 
@@ -112,11 +113,14 @@ socket.on('checkSelf', (rst)=>{
             random(0, 0.003),
             random(0.001, 0.002),
             myColor,
-            myFreq
+            myFreq,
+            myId,
+            myDBKey
           )
         );
       }
     }
+    console.log(mySeeds);
   }else{
     myPrince = new Prince(myX - 200, myY + 100, myFreq, myId, colorPrince[myColor], true, myId);
   }
@@ -124,13 +128,23 @@ socket.on('checkSelf', (rst)=>{
 
 socket.on('otherFlower', (others)=>{
   // console.log("loading other flowers!!!!!")
-  otherDBKeys = others[1];
-  console.log(otherDBKeys);
   if(others[0].length >0){
-    console.log(others);
+    // console.log(others);
     for (let i = 0; i < others[0].length; i ++) {
       let user = others[0][i];
       if(user.displayName){
+        otherX.push(user.myX);
+        otherLayer.push(user.layerNum);
+        otherColor.push(user.color);
+        otherFreq.push(user.freq);
+        otherSize.push(user.size);
+        otherName.push(user.displayName);
+        otherCDT.push(user.coreData);
+        otherSDT.push(user.seedData);
+        otherSTD.push(user.starData);
+        otherLock.push(user.ifLock);
+        otherId.push(user.userId);
+        otherDBKeys.push(user.dbKey);
         cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId, user.dbKey));
         cores[i].checkDataNum();
         let userSeed = [];
@@ -144,7 +158,9 @@ socket.on('otherFlower', (others)=>{
               random(0, 0.003),
               random(0.001, 0.002),
               user.color,
-              user.freq
+              user.freq,
+              user.userId,
+              user.dbKey
             ));
           }
         }
@@ -216,7 +232,7 @@ socket.on('newOthers', (newOther)=>{
 const activity = document.querySelector('.activity');
 const msgInput = document.querySelector('textarea');
 const locateBtn = document.querySelector("#btn-locate");
-const starBtn = document.querySelector("#btn-star");
+const blowBtn = document.querySelector("#btn-blow");
 const helpBtn = document.querySelector("#btn-bulb");
 const logBtn = document.querySelector("#btn-signout");
 
@@ -251,6 +267,14 @@ function clearEventMsg(){
 }
 
 locateBtn.addEventListener('click', ()=>{locateSelf();});
+blowBtn.addEventListener('click', ()=>{
+  if(mySeeds.length > 0){
+    for(let i = 0; i < mySeeds.length; i++){
+      mySeeds[i].ifFly=true;
+    }
+  }
+  socket.emit('updateFly', myId);
+});
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
 let stars = [];
@@ -318,6 +342,7 @@ function drawOtherPrince(){
 function drawMyDande(){
   push();
   if(myCore){
+    regrowMe();
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
       if(!mySeeds[i].ifClicked){}
@@ -344,6 +369,7 @@ function drawOtherDande(){
   push();
   if(otherFlowersLoaded){
     // console.log(cores);
+    regrowOther();
     for(let i = 0; i < cores.length; i ++){
       drawStem(map(sin(frameCount * 0.01 + cores[i].freq), -1, 1, -60, 60),map(cos(cores[i].freq), -1, 1, -10, 0),cores[i].x,cores[i].y,cores[i].colorIndex);
     }
@@ -384,6 +410,55 @@ function drawStem(x, y, transX, transY, colorIndex) {
   noFill();
   bezier(x, y, 0, 150, 0, 500, 0, 500);
   pop();
+}
+
+function regrowMe() {
+  if (mySeeds.length == 0) {
+    currentLayer = 1;
+    for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + currentLayer * 3)) {
+      mySeeds.push(
+        new Seed(
+          myX,                    
+          myY,
+          myLayer,
+          i,
+          random(0, 0.003),
+          random(0.001, 0.002),
+          myColor,
+          myFreq,
+          myId,
+          myDBKey
+        )
+      );
+    }
+    console.log(mySeeds);
+  }
+}
+
+function regrowOther(){
+  for(let s = 0; s < seeds.length; s++){
+    let userSeed = seeds[s];
+    if(userSeed.length == 0){
+      for (let r = currentLayer; r > 0; r--) {
+        for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
+          userSeed.push(new Seed(
+            otherX[s],                    
+            window.innerHeight / 2,
+            otherLayer[s],
+            i,
+            random(0, 0.003),
+            random(0.001, 0.002),
+            otherColor[s],
+            otherFreq[s],
+            otherId[s],
+            otherDBKeys[s]
+          ));
+        }
+      }
+      seeds[s]=userSeed;
+    }
+  }
+        
 }
 
 // -------------------- POSITION UPDATE -------------------- //
@@ -490,6 +565,19 @@ socket.on('getCoreData', function (coreDt){
     }
   }
 });
+
+socket.on('getFly', function (myId){
+  for(let s = 0; s < seeds.length; s++){
+    let userSeeds = seeds[s];
+    for(let i = 0; i < userSeeds.length; i++){
+      let currentSd = userSeeds[i];
+      if (currentSd.id == myId) {
+        currentSd.ifFly = true;
+      }      
+    }
+  }
+})
+
 function locateSelf(){
   if(myPrince){
     cnvX = -(myX - window.innerWidth / 2);

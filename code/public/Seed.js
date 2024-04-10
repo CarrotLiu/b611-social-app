@@ -1,5 +1,7 @@
 class Seed {
-  constructor(x, y, layer, sdPos, dirx, diry, ci, freq) {
+  constructor(x, y, layer, sdPos, dirx, diry, ci, freq, id, dbKey) {
+    this.id = id;
+    this.dbKey = dbKey;
     this.x = x;
     this.y = y;
     this.coreX = 0;
@@ -57,7 +59,6 @@ class Seed {
       mouseX - cnvX,
       mouseY
     );
-
     
     //fly
     this.checkFly();
