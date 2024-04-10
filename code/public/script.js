@@ -93,13 +93,13 @@ socket.on('checkSelf', (rst)=>{
   mySTD = rst[0].starData;
   mySize = rst[0].size;
   myLock = rst[0].ifLock;
-  myDBKey = rst[1];
+  myDBKey = rst[0].dbKey;
   
   cnvX = 0;
   console.log(myDBKey);
   if(myName){
     myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
-    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true, myLock, myId);
+    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true, myLock, myId, myDBKey);
     myCore.checkDataNum();
     for (let r = currentLayer; r > 0; r--) {
       for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
@@ -127,11 +127,11 @@ socket.on('otherFlower', (others)=>{
   otherDBKeys = others[1];
   console.log(otherDBKeys);
   if(others[0].length >0){
-    console.log(others)
+    console.log(others);
     for (let i = 0; i < others[0].length; i ++) {
       let user = others[0][i];
       if(user.displayName){
-        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId));
+        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId, user.dbKey));
         cores[i].checkDataNum();
         let userSeed = [];
         for (let r = currentLayer; r > 0; r--) {
@@ -363,6 +363,7 @@ function drawOtherDande(){
         }
       }
     }
+    
     for(let i = 0; i < cores.length; i ++){
       cores[i].update(cnvX, myDBKey, stopHover);
       cores[i].display();
@@ -429,8 +430,10 @@ socket.on('getMove', function (posDt){
     for(let i = 0; i < princes.length; i++){
       let prince = princes[i];
       if(prince.id == otherId){
+        
         prince.walkDir = posDt[1];
         prince.ifWalk = posDt[2];
+        console.log(posDt[2], prince.ifWalk);
         prince.ifIdle = !posDt[2];
         if(prince.ifWalk){ 
           if (prince.walkCount <= 60) { 
@@ -443,6 +446,7 @@ socket.on('getMove', function (posDt){
           prince.clothX = 0;
           prince.x = posDt[3]; // xOut
         }
+        break;
       }
     }
   }
@@ -464,16 +468,28 @@ socket.on('getPos', function (userX) {
 
 socket.on('getLock', function (lockDt){
   let otherId = lockDt[0];
-  if(princes.length >0){
-    for(let i = 0; i < princes.length; i++){
-      let prince = princes[i];
-      if(prince.id == otherId){
-        prince.ifLock = lockDt[1];
+  if(cores.length >0){
+    for(let i = 0; i < cores.length; i++){
+      let core = cores[i];
+      if(core.id == otherId){
+        cores[i].ifLock = lockDt[1];
       }
     }
   }
 })
 
+socket.on('getCoreData', function (coreDt){
+  console.log(coreDt);
+  let otherId = coreDt[0];
+  if(cores.length >0){
+    for(let i = 0; i < cores.length; i++){
+      let core = cores[i];
+      if(core.id == otherId){
+        core.coreData = coreDt[1];
+      }
+    }
+  }
+});
 function locateSelf(){
   if(myPrince){
     cnvX = -(myX - window.innerWidth / 2);
@@ -507,6 +523,27 @@ function drawTextBG(){
         circle(width / 2, height / 2, 616 + i * 5);
       }
       pop();
+    }
+  }
+  if(otherFlowersLoaded){
+    for(let i = 0; i < cores.length; i ++){
+      if(cores[i].isWriting || cores[i].isReading){
+        push();
+      noStroke();
+      for (let j = 0; j < 80; j++) {
+        fill(colorRange[cores[i].colorIndex][1][0], colorRange[cores[i].colorIndex][1][1], colorRange[cores[i].colorIndex][1][2], floor(map(j, 0, 60, 0, 5)));
+        circle(
+          width / 2,
+          height / 2,
+          floor(j * 3 + 750)
+        );
+      }
+      for (let j = 0; j < 35; j++) {
+        fill(255, 220 - j * 6);
+        circle(width / 2, height / 2, 616 + j * 5);
+      }
+      pop();
+      }
     }
   }
 }

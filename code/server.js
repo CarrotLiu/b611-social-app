@@ -145,18 +145,24 @@ io.on('connection', socket => {
         socket.broadcast.emit('getLock', lockDt);
     })
 
+    socket.on('newCoreData', (coreDt)=>{
+        socket.broadcast.emit('getCoreData', coreDt);
+    })
+
     //user disconnect => delete prince
     socket.on('disconnect', ()=>{
-        if(socket.username){
-            console.log(`${socket.username} just left`)
-        }else{
-            console.log(`${socket.id} just left`)
-        }
         io.emit('bye', socket.userId); 
         socket.broadcast.emit('message', "A Little Prince just left" )
         allUsers = allUsers.filter(user => user.userId != socket.id);
         userX = userX.filter(user => Object.keys(user)[0] != socket.id);
+        userNum = allUsers.length;
+        if(socket.username){
+            console.log(`${socket.username} just left`, userNum);
+        }else{
+            console.log(`${socket.id} just left`, userNum);
+        }
     })
+    
 })
 
 

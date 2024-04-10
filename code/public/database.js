@@ -88,7 +88,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         color: c,
         freq: f,
         size: s,
-        ifLock: false
+        ifLock: false,
+        dbKey: newUserId
     });
     
     DBUserList.push({
@@ -102,7 +103,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         color: c,
         freq: f,
         size: s,
-        ifLock: false
+        ifLock: false,
+        dbKey: newUserId
     });
     dbRef.child(newUserId).set({
         displayName: username,
@@ -118,7 +120,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         color: c,
         freq: f,
         size: s,
-        ifLock: false
+        ifLock: false,
+        dbKey: newUserId
     });
     write_done = true;
 }
@@ -127,6 +130,7 @@ function writeCore(userid, cdt){
     console.log("update core data");
     console.log(cdt);
     dbRef.child(userid).child("coreData").set(cdt);
+    socket.emit('newCoreData', [myKey, cdt]);
 }
 
 function writeSeed(userid, sdt){

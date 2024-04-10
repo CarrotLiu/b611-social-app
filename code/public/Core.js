@@ -1,7 +1,8 @@
 class Core {
-  constructor(x, y, layerNum, ci, freq, size, name, cdt, self, ifLock, userId) {
+  constructor(x, y, layerNum, ci, freq, size, name, cdt, self, ifLock, userId, dbKey) {
     this.name = name;
     this.id = userId;
+    this.dbKey = dbKey;
     this.x = x;
     this.y = y;
     this.coreX = 0;
@@ -120,12 +121,16 @@ class Core {
   checkClick(myDBKey){
     if(this.ifClicked){
       // console.log(this.coreData[0]);
-      if (this.coreData[0] != " ") {
-        this.readText(myDBKey);
-        // console.log("reading")
-      } else if (this.ifSelf) {
-        this.writeText(myDBKey);
-        // console.log("writing")
+      if(this.ifSelf){
+        if (this.coreData[0] != " ") {
+          this.readText(this.dbKey);
+        }else{
+          this.writeText(this.dbKey);
+        }
+      }else{
+        if(!this.ifLock){
+          this.readText(this.dbKey);
+        }
       }
     }
   }
@@ -187,6 +192,9 @@ class Core {
       if(!this.ifSelf){
         lockButton.style.display="none";
         writeButton.style.display="none";
+      }else{
+        lockButton.style.display="inline-block";
+        writeButton.style.display="inline-block";
       }
       
       if(!this.ifLock){
