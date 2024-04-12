@@ -16,6 +16,8 @@ let myX, myY = window.innerHeight / 2;
 let currentLayer = 1;
 let maxLayerNum = 2;
 
+let otherWalk = [];
+
 let ifRoomSet = false;
 let located = false;
 let otherFlowersLoaded = false;
@@ -74,8 +76,10 @@ let colorPrince = [
 let data_loaded = false;
 
 socket.on('bye',(userId)=>{
+  socket.emit('activity', "A Little Prince just left.");
   for(let i = 0; i < princes.length; i++){
     if(princes[i].id == userId){
+      otherWalk.splice(i, 1);
       princes.splice(i, 1);
       i--;
     }
@@ -182,16 +186,14 @@ socket.on('otherFlower', (others)=>{
 })
 
 socket.on('checkOthers', (otherData)=>{
-  console.log("userData",otherData[0]);
-  console.log("userX",otherData[1]);
+  console.log("others' userData:",otherData[0]);
+  console.log("others' userX:",otherData[1]);
   for(let i = 0; i < otherData[0].length; i++){
     let newOtherDT = otherData[0][i];
     let newOtherName = newOtherDT.displayName;
     let newOtherId = newOtherDT.userId;
-    
     let newOtherX = otherData[1].filter(user => Object.keys(user)[0] == newOtherId)[0];
-    console.log(newOtherX[newOtherId])
-    console.log(princes);
+    console.log("all others' id:",newOtherX[newOtherId]);
     let ifExists = false;
     for (let j = 0; j < princes.length; j++) {
       if (princes[j].id == newOtherId) {
@@ -201,18 +203,9 @@ socket.on('checkOthers', (otherData)=>{
     }
     if (!ifExists) {
       princes.push(new Prince(newOtherX[newOtherId], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false, newOtherId));
+      otherWalk.push(false);
     }
-    // if(princes.length > 0){
-    //   for(let j = 0; j < princes.length; j++){
-    //     if(princes[j].name != newOtherName){
-    //       console.log(newOtherX)
-    //       princes.push(new Prince(newOtherX[newOtherName], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false));
-    //       console.log(princes);
-    //     }
-    //   }
-    // }else{
-    //   princes.push(new Prince(newOtherX[newOtherName], window.innerHeight / 2 + 100, newOtherDT.freq, newOtherName, colorPrince[newOtherDT.color], false));
-    // }
+    console.log("other princes loaded:", princes);
   }
 })
 
@@ -234,6 +227,7 @@ socket.on('newOthers', (newOther)=>{
   }
   if(!ifExist){
     princes.push(new Prince(newOther.myX + 200, window.innerHeight / 2 + 100, newOther.freq, newOtherName, colorPrince[newOther.color], false, newOtherId));
+    otherWalk.push(false);
     console.log(princes);
   }
 })
@@ -264,9 +258,6 @@ socket.on("activity", (msg) => {
   clearEventMsg();
 })
 
-socket.on('bye', (msg)=>{
-  socket.emit('activity', msg);
-})
   
 //time function for clearing messages
 function clearEventMsg(){
@@ -343,7 +334,20 @@ function drawOtherPrince(){
     for(let i = 0; i < princes.length;i++){
       push();
       princes[i].update();
+
+      //用魔法打败魔法！backup未解之bug！yeah！
+      if(otherWalk[i]){
+        if (princes[i].walkCount <= 60) { 
+          princes[i].walkCount++;
+        }
+        princes[i].walk();
+        princes[i].clothX = 20;
+      }else{
+        princes[i].walkCount = 0;
+        princes[i].clothX = 0;
+      }
       princes[i].display();
+
       pop();
     }
   }
@@ -354,7 +358,7 @@ function drawMyDande(){
     regrowMe();
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
-      if(!mySeeds[i].ifClicked){}
+      // if(!mySeeds[i].ifClicked){}
       // console.log(myDBKey);
       mySeeds[i].update(cnvX, stopHover, mySDT);
       mySeeds[i].display(cnvX);
@@ -523,29 +527,33 @@ socket.on('getMove', function (posDt){
   // console.log(posDt);
   if(princes.length >0){
     for(let i = 0; i < princes.length; i++){
-      let prince = princes[i];
-      if(prince.id == otherId){
-        
-        prince.walkDir = posDt[1];
-        prince.ifWalk = posDt[2];
-        console.log(posDt[2], prince.ifWalk);
-        prince.ifIdle = !posDt[2];
-        if(prince.ifWalk){ 
-          if (prince.walkCount <= 60) { 
-            prince.walkCount++;
-          }
-          console.log(posDt[3]);
-          console.log(prince) 
+      // let prince = princes[i];
+      if(princes[i].id == otherId){
+        princes[i].walkDir = posDt[1];
+        princes[i].ifIdle = !posDt[2];
+        otherWalk[i] = posDt[2];
+        // princes[i].ifWalk = posDt[2];
+        console.log("ifWalk sent via socket:",posDt[2], "prince[i].ifWalk:",princes[i].ifWalk);
+        if(posDt[2]){ 
+          // princes[i].startWalk(princes[i].ifWalk);
+          // if (princes[i].walkCount <= 60) { 
+          //   princes[i].walkCount++;
+          // }
+          // this.clothX = 20;
+          // princes[i].walk();
+          // console.log("xout:",posDt[3]);
+          // console.log(princes[i]) ;
+          // console.log("prince[i].ifWalk:",princes[i].ifWalk);
         }else{
-          prince.walkCount = 0;
-          prince.clothX = 0;
-          prince.x = posDt[3]; // xOut
+          // princes[i].walkCount = 0;
+          // princes[i].clothX = 0;
+          princes[i].x = posDt[3]; // xOut
         }
         break;
       }
     }
   }
-}.bind(this))
+})
 
 socket.on('getPos', function (userX) {
   let otherId = Object.keys(userX)[0];
@@ -554,12 +562,13 @@ socket.on('getPos', function (userX) {
       let prince = princes[i];
       // console.log(prince.x)
       if(prince.id == otherId){
+        otherWalk[i] = false;
         prince.x = userX[otherId];
         // console.log(prince.x);
       }
     }
   }
-}.bind(this))
+})
 
 socket.on('getLock', function (lockDt){
   let otherId = lockDt[0];
@@ -635,8 +644,6 @@ function locateOther(flowerX){
     myPrince.x = flowerX + cnvX - 200;
   } 
 }
-
-
 
 function getTimestamp() {
   const now = new Date();

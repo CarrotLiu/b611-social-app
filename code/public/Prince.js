@@ -13,6 +13,7 @@ class Prince {
     this.accY = 0;
     this.hairX = 0;
     this.hairY = -90;
+    this.yFloat = sin(frameCount * 0.008 + freq) * 0.3;
     this.eyeX = 0;
     this.eyeY = 0;
     this.eyeHX = 0;
@@ -58,11 +59,11 @@ class Prince {
     if (this.blinkInterval <= 0) {
       this.ifBlink = true;
     }
-    let hairx = map(sin(frameCount * 0.01 + this.freq), -1, 1, -20, 20);
-    let hairy = map(cos(frameCount * 0.01 + this.freq), -1, 1, -100, -90);
+    this.hairX = map(sin(frameCount * 0.01 + this.freq), -1, 1, -20, 20);
+    this.hairY = map(cos(frameCount * 0.01 + this.freq), -1, 1, -100, -90);
     let eyeOffsetX = map(mouseX, 0, width, -20, 20);
     let eyeOffsetY = map(mouseY, 0, height, -26, 10);
-    let yFloat = sin(frameCount * 0.008 + this.freq) * 0.3;
+    this.yFloat = sin(frameCount * 0.008 + this.freq) * 0.3;
     this.eyeHX = 0;
     this.eyeHY = 0;
     this.eyeVX = 16;
@@ -71,9 +72,9 @@ class Prince {
     push();
     if (this.ifIdle) {
       // console.log(this);
-      this.idle(eyeOffsetX, eyeOffsetY, hairx, hairy, yFloat);
+      this.idle(eyeOffsetX, eyeOffsetY);
     } else if (this.ifWalk) {
-      this.walk(hairx, hairy, yFloat);
+      this.walk();
       // console.log(`${this.name}'s xOut value is: ${this.xOut}`);
       this.clothX = 20;
     }
@@ -441,17 +442,22 @@ class Prince {
     return scarfFluctY;
   }
 
-  idle(eyeOffsetX, eyeOffsetY, hairx, hairy, yFloat) {
+  idle(eyeOffsetX, eyeOffsetY) {
     // this.eyeX = eyeOffsetX;
     // this.eyeY = eyeOffsetY;
     this.eyeX = 0;
     this.eyeY = 0;
-    this.hairX = hairx;
-    this.hairY = hairy;
-    this.y += yFloat;
+    this.y += this.yFloat;
   }
 
-  walk(hairx, hairy, yFloat) {
+  startWalk(ifWalkReceived){
+    if(ifWalkReceived){
+      this.ifWalk = ifWalkReceived;
+      console.log("should be walking!!",this.ifWalk);
+    }
+  }
+
+  walk() {
     if (this.walkDir == 1) {
       //ArrowRight
       this.scarfDir = -1;
@@ -466,9 +472,6 @@ class Prince {
       this.eyeX = lerp(this.eyeX, -52, map(this.walkCount, 0, 60, 0, 1));
       this.eyeY = -5;
     }
-
-    this.hairX = hairx;
-    this.hairY = hairy;
     if((dist(this.x, 0, windowWidth, 0) < 100 && this.walkDir == 1)||(dist(this.x, 0, 0, 0) < 100 && this.walkDir == -1)){
       this.cnvX = -this.walkDir * this.spdX;;
     }else{
@@ -477,8 +480,7 @@ class Prince {
     }
     
     this.xOut += this.walkDir * this.spdX;
-    this.y += yFloat * 0.1;
-    console.log(this.x, this.xOut)
-    
+    this.y += this.yFloat * 0.1;
+    // console.log(this.x, this.xOut)
   }
 }
