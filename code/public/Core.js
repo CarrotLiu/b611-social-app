@@ -159,12 +159,12 @@ class Core {
       textArea.value = "";
       uploadButton.removeEventListener("click", this.uploadHandler);
       submitButton.removeEventListener("click", this.submitHandler);
-
+      let userId = this.dbKey;
       this.uploadHandler = async function () {
         let file = fileInput.files[0];
         try{
           
-          this.coreImage = await writeImage(file, this.dbKey);
+          this.coreImage = await writeImage(file, userId);
         } catch(error){
           console.log(error);
         }
