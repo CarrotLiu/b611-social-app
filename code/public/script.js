@@ -305,6 +305,7 @@ function draw() {
     myPrince.x = myX + cnvX + 200;
     located = true;
   }
+  
   //translate 所有其他东西
   drawMyPrince();
   push()
@@ -314,7 +315,9 @@ function draw() {
   drawMyDande();
   //others dandelion
   drawOtherDande();
+  
   pop()
+  checkStopHover();
   
 }
 function drawMyPrince(){
@@ -654,10 +657,17 @@ function checkStopHover(){
   let readSeed = document.querySelector("#readCommentArea").style.display;
   let writeSeed = document.querySelector("#commentArea").style.display;
   if(writeSeed == "block" || readSeed == "block" || writeCore == "block" || readCore == "block"){
-    stophover = true;
-  }else{
+    stopHover = true;
+    push()
+    noStroke();
+    fill(255);
+    circle(width / 2, height / 2, 660);
+    pop();
+  }
+  if(writeSeed == "none" && readSeed == "none" && writeCore == "none" && readCore == "none"){
     stopHover = false;
   }
+
 }
 
 function getTimestamp() {
