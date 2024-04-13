@@ -15,6 +15,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
     <script defer src="database.js"></script>
     <script defer src="Core.js"></script>
     <script defer src="Seed.js"></script>
@@ -34,6 +35,11 @@
     <p class = "activity"></p>
     <div class="textAreaContainer" id="writeArea">
         <textarea class="textInputArea" id="textAreaWriteCore" type = "text" placeholder="Please write about your day here. How do you feel? What do you think?"></textarea>
+        <div class="imageInputArea" id="imageAreaWriteCore">
+            <input type="file" id="imageInput" accept="image/*">
+            <br>
+            <button class="btn-basic" id="btn-uploadimg"></button>
+        </div>
         <div class="buttonContainer" id="writing-btns">
             <button class="btn-basic" id="btn-finish"></button>
         </div>
@@ -41,7 +47,7 @@
 
     <div class="textAreaContainer" id="commentArea">
         <textarea class="textInputArea" id="textAreaWriteSeed" type = "text" placeholder="Please respect others and make polite comments."></textarea>
-        <div class="buttonContainer" id="writing-btns">
+        <div class="buttonContainer" id="writing-btns-seed">
             <button class="btn-basic" id="btn-comment"></button>
         </div>
     </div>
@@ -59,6 +65,19 @@
         </div>
             
     </div>
+
+    <div class="textAreaContainer" id="readCommentArea">
+        <div class="textInputArea" id="textAreaReadSeed" >
+            <div class="readContent" id="seedContent">
+
+            </div>
+        </div>
+        <div class="buttonContainer" id="seed-reading-btns">
+            <button class="btn-basic" id="btn-back-seed"></button>
+        </div>   
+    </div>
+
+    
     <div id="topBtnContainer">
         <div id="top-left-btn-container">
             <button class="btn-top" id="btn-signout">

@@ -15,6 +15,7 @@ firebase.initializeApp(firebaseConfig);
 
 //init database
 const db = firebase.database();
+const storage = firebase.storage();
 const dbRef = db.ref("userData");
 
 //init authentication
@@ -89,7 +90,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         freq: f,
         size: s,
         ifLock: false,
-        dbKey: newUserId
+        dbKey: newUserId,
+        images: [" "]
     });
     
     DBUserList.push({
@@ -104,7 +106,8 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         freq: f,
         size: s,
         ifLock: false,
-        dbKey: newUserId
+        dbKey: newUserId,
+        images: [" "]
     });
     dbRef.child(newUserId).set({
         displayName: username,
@@ -121,33 +124,104 @@ function writeNewUser(id, username, cdt, sdt, std, pos, l, c, f, s) {
         freq: f,
         size: s,
         ifLock: false,
-        dbKey: newUserId
+        dbKey: newUserId,
+        images: [" "]
     });
     write_done = true;
 }
 
 function writeCore(userid, cdt){
-    console.log("update core data");
-    // console.log(cdt);
-    dbRef.child(userid).child("coreData").set(cdt);
     socket.emit('newCoreData', [myKey, cdt]);
+    dbRef.child(userid).child("coreData").set(cdt).then(function(){
+        console.log("update core data");
+    }).catch(function(error){
+        console.log('Error updating core data:', error);
+    })
 }
 
 function writeSeed(userid, sdt){
-    console.log("update seed data");
-    dbRef.child(userid).child("seedData").set(sdt);
     socket.emit('newSeedData', [myKey, sdt]);
+    dbRef.child(userid).child("seedData").set(sdt).then(function(){
+        console.log("update seed data");
+    }).catch(function(error){
+        console.log('Error updating seed data:', error);
+    })
+    
 }
 
 function writeStar(userid, std){
-    console.log("update star data");
-    dbRef.child(userid).child("starData").set(std);
+    dbRef.child(userid).child("starData").set(std).then(function(){
+        console.log("update star data");
+    }).catch(function(error){
+        console.log('Error updating star data:', error);
+    })
 }
 
 function writeLock(userid, ifLock){
-    console.log("update lock data");
-    dbRef.child(userid).child("ifLock").set(ifLock);
+    dbRef.child(userid).child("ifLock").set(ifLock).then(function(){
+        console.log("update lock data");
+    }).catch(function(error){
+        console.log('Error updating lock data:', error);
+    })
 }
+
+async function writeImage(file, userId) {
+    console.log(userId);
+    let imageRef = dbRef.child(userId).child("images");
+    let currentImages = [];
+
+    imageRef.once('value', (snapshot) => {
+        currentImages = snapshot.val() || [" "];
+        console.log("Image array before writing image:", currentImages);
+    }).then(() => {
+        if (file) {
+            let storageRef = storage.ref('images/' + userId + '/' + file.name);
+            let uploadTask = storageRef.put(file);
+
+            uploadTask.on('state_changed', (snapshot) => {
+                // Handle upload progress if needed
+            }, (error) => {
+                console.error('Error uploading image:', error);
+                reject(error); // Reject the promise on upload error
+            }, () => {
+                uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+                    console.log("Download URL:", downloadURL);
+                    if (currentImages.length == 1 && currentImages[0] == " ") {
+                        currentImages[0] = downloadURL;
+                    } else {
+                        currentImages.push(downloadURL);
+                    }
+                    imagesRef.set(currentImages).then(() => {
+                        console.log('Image URL saved to database');
+                        console.log("Image array after writing image:", currentImages);
+                        resolve(currentImages);
+                    }).catch((error) => {
+                        console.error('Error saving image URL to database:', error);
+                        reject(error); // Reject the promise on database error
+                    });
+                }).catch((error) => {
+                    console.error('Error getting download URL:', error);
+                    reject(error); // Reject the promise on download URL error
+                });
+            });
+        } else {
+            currentImages.push(" ");
+            imagesRef.set(currentImages).then(() => {
+                console.log('Image URL saved to database');
+                console.log("Image array after writing image:", currentImages);
+                resolve(currentImages);
+            }).catch((error) => {
+                console.error('Error saving image URL to database:', error);
+                reject(error); // Reject the promise on database error
+            });
+        }
+    }).catch((error) => {
+        console.log('Error reading current image data:', error);
+        reject(error); // Reject the promise on database read error
+    });
+
+}
+
   
 function clearDBReference(refName) {
     let ref = database.ref(refName);
@@ -160,6 +234,8 @@ function clearDBReference(refName) {
         console.log("! DB Remove failed: " + error.message);
     });
 }
+
+
 
 // ---------------------- SIGN IN/OUT ---------------------- //
 const loginBtn = document.querySelector("#login");
@@ -285,3 +361,4 @@ window.writeSeed = writeSeed;
 window.writeStar = writeStar;
 window.signin = signin;
 window.writeLock = writeLock;
+window.writeImage = writeImage;

@@ -10,7 +10,7 @@ socket = io('ws://localhost:3500')
 let iX, roomX = 700, marginX = 80; 
 let myDBKey, otherDBKeys = [];
 
-let myName, myId, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize, myLock;
+let myName, myId, myLayer, myColor, myFreq, myCDT, mySDT, mySTD, mySize, myLock, myImg;
 let myCore, myPrince, mySeeds = [], myStars, myStem;
 let myX, myY = window.innerHeight / 2;
 let currentLayer = 1;
@@ -24,7 +24,7 @@ let otherFlowersLoaded = false;
 let otherPrincesLoaded = false;
 
 let princes = [], cores = [], seeds = [], stems=[];
-let otherX = [], otherLayer = [], otherColor = [], otherFreq = [], otherCDT=[], otherSDT = [], otherSTD = [], otherSize = [], otherLock = [], otherId = [], otherName=[];
+let otherX = [], otherLayer = [], otherColor = [], otherFreq = [], otherCDT=[], otherSDT = [], otherSTD = [], otherSize = [], otherLock = [], otherId = [], otherName=[], otherImgs = [];
 
 let cnvX = 0;
 
@@ -99,12 +99,13 @@ socket.on('checkSelf', (rst)=>{
   mySize = rst[0].size;
   myLock = rst[0].ifLock;
   myDBKey = rst[0].dbKey;
-  
+  myImg = rst[0].images;
+
   cnvX = 0;
-  console.log(myDBKey);
+  console.log("myDBKey:",myDBKey);
   if(myName){
     myPrince = new Prince(myX + 200, myY + 100, myFreq, myName, colorPrince[myColor], true, myId);
-    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true, myLock, myId, myDBKey);
+    myCore = new Core(myX, myY, myLayer, myColor, myFreq, mySize, myName, myCDT, true, myLock, myId, myDBKey, myImg);
     myCore.checkDataNum();
     let index = 0;
     for (let r = currentLayer; r > 0; r--) {
@@ -129,7 +130,7 @@ socket.on('checkSelf', (rst)=>{
         index++;
       }
     }
-    console.log(mySeeds);
+    // console.log(mySeeds);
   }else{
     myPrince = new Prince(myX - 200, myY + 100, myFreq, myId, colorPrince[myColor], true, myId);
   }
@@ -154,7 +155,8 @@ socket.on('otherFlower', (others)=>{
         otherLock.push(user.ifLock);
         otherId.push(user.userId);
         otherDBKeys.push(user.dbKey);
-        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId, user.dbKey));
+        otherImgs.push(user.images);
+        cores.push(new Core(user.myX, window.innerHeight / 2, user.layerNum, user.color, user.freq, user.size, user.displayName, user.coreData, false, user.ifLock, user.userId, user.dbKey, user.images));
         cores[i].checkDataNum();
         let userSeed = [];
         let index = 0;
@@ -304,15 +306,16 @@ function draw() {
     located = true;
   }
   //translate 所有其他东西
+  drawMyPrince();
   push()
   translate(cnvX, 0);
+  drawOtherPrince();
   //self dandelion
   drawMyDande();
   //others dandelion
   drawOtherDande();
-  drawOtherPrince();
   pop()
-  drawMyPrince();
+  
 }
 function drawMyPrince(){
   if(myPrince){
@@ -643,6 +646,18 @@ function locateOther(flowerX){
     cnvX = -(flowerX - window.innerWidth / 2);
     myPrince.x = flowerX + cnvX - 200;
   } 
+}
+
+function checkStopHover(){
+  let readCore = document.querySelector("#readArea").style.display;
+  let writeCore = document.querySelector("#writeArea").style.display;
+  let readSeed = document.querySelector("#readCommentArea").style.display;
+  let writeSeed = document.querySelector("#commentArea").style.display;
+  if(writeSeed == "block" || readSeed == "block" || writeCore == "block" || readCore == "block"){
+    stophover = true;
+  }else{
+    stopHover = false;
+  }
 }
 
 function getTimestamp() {

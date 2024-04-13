@@ -1,5 +1,5 @@
 class Core {
-  constructor(x, y, layerNum, ci, freq, size, name, cdt, self, ifLock, userId, dbKey) {
+  constructor(x, y, layerNum, ci, freq, size, name, cdt, self, ifLock, userId, dbKey, cimg) {
     this.name = name;
     this.id = userId;
     this.dbKey = dbKey;
@@ -11,6 +11,7 @@ class Core {
     this.size = size;
     this.layerNum = layerNum;
     this.coreData = cdt;
+    this.coreImage = cimg;
     this.colorIndex = ci;
 
     this.dmouse = dist(
@@ -131,6 +132,7 @@ class Core {
         if (this.coreData[0] != " ") {
           this.readText(this.dbKey);
         }else{
+          
           this.writeText(this.dbKey);
         }
       }else{
@@ -144,16 +146,29 @@ class Core {
   writeText(myDBKey) {
     // Show input box
     if(!this.isWriting){
+      console.log(this.dbKey);
       this.isWriting = true;
       let writeArea = document.querySelector('#writeArea');
       let textArea = document.querySelector('#textAreaWriteCore');
       let submitButton = document.querySelector("#btn-finish");
+      let uploadButton = document.querySelector("#btn-uploadimg");
+      let fileInput = document.querySelector("#imageInput");
+      let fileSubmitBtn = document.querySelector("#imageInput");
+      
       writeArea.style.display = "block";
       textArea.value = "";
-      // Remove existing event listener (if any)
+      uploadButton.removeEventListener("click", this.uploadHandler);
       submitButton.removeEventListener("click", this.submitHandler);
-      
-      // Define submitHandler function
+
+      this.uploadHandler = async function () {
+        let file = fileInput.files[0];
+        try{
+          
+          this.coreImage = await writeImage(file, this.dbKey);
+        } catch(error){
+          console.log(error);
+        }
+      }
       this.submitHandler = function () {
         const timestamp = getTimestamp();
         // console.log(timestamp);
@@ -170,8 +185,9 @@ class Core {
         this.ifClicked = false;
         writeArea.style.display = "none";
       }.bind(this);
-    
+      
       // Add event listener
+      uploadButton.addEventListener("click", this.uploadHandler);
       submitButton.addEventListener("click", this.submitHandler);
     }
   }
@@ -215,13 +231,18 @@ class Core {
       }
 
       textDiv.addEventListener('scroll', handleScroll(textDiv));
-      
       textDiv.innerHTML = "";
       let userInputContent = "";
+      let userInputImage = document.createElement("img");
+
       readAreaContainer.style.display = "block";
       for(let i = 0; i < this.coreData.length; i++){
         userInputContent = document.createTextNode(this.coreData[i]);
         textDiv.appendChild(userInputContent);
+        if(this.coreImage[i] != " "){
+          userInputImage.src=this.coreImage[i];
+          textDiv.appendChild(userInputImage);
+        }
       }
 
       lockButton.addEventListener(

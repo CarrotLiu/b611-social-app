@@ -95,7 +95,7 @@ class Seed {
     this.drawSeedStem();
     this.drawSeed();
     pop();
-    push()
+    push(); 
     translate(-cnv, 0);
     if(this.isReading || this.isWriting){
       this.textBG();
