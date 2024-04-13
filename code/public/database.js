@@ -191,10 +191,10 @@ async function writeImage(file, userId) {
                     } else {
                         currentImages.push(downloadURL);
                     }
-                    imagesRef.set(currentImages).then(() => {
+                    dbRef.child(userId).child("images").set(currentImages).then(() => {
                         console.log('Image URL saved to database');
                         console.log("Image array after writing image:", currentImages);
-                        resolve(currentImages);
+                        return currentImages;
                     }).catch((error) => {
                         console.error('Error saving image URL to database:', error);
                         reject(error); // Reject the promise on database error
@@ -206,10 +206,10 @@ async function writeImage(file, userId) {
             });
         } else {
             currentImages.push(" ");
-            imagesRef.set(currentImages).then(() => {
+            dbRef.child(userId).child("images").set(currentImages).then(() => {
                 console.log('Image URL saved to database');
                 console.log("Image array after writing image:", currentImages);
-                resolve(currentImages);
+                return currentImages;
             }).catch((error) => {
                 console.error('Error saving image URL to database:', error);
                 reject(error); // Reject the promise on database error

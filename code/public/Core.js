@@ -146,7 +146,6 @@ class Core {
   writeText(myDBKey) {
     // Show input box
     if(!this.isWriting){
-      console.log(this.dbKey);
       this.isWriting = true;
       let writeArea = document.querySelector('#writeArea');
       let textArea = document.querySelector('#textAreaWriteCore');
@@ -160,10 +159,9 @@ class Core {
       uploadButton.removeEventListener("click", this.uploadHandler);
       submitButton.removeEventListener("click", this.submitHandler);
       let userId = this.dbKey;
-      this.uploadHandler = async function () {
+      this.uploadHandler = async function (){
         let file = fileInput.files[0];
         try{
-          
           this.coreImage = await writeImage(file, userId);
         } catch(error){
           console.log(error);
@@ -241,6 +239,7 @@ class Core {
         textDiv.appendChild(userInputContent);
         if(this.coreImage[i] != " "){
           userInputImage.src=this.coreImage[i];
+          textDiv.appendChild(document.createElement("br"));
           textDiv.appendChild(userInputImage);
         }
       }
