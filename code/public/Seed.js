@@ -282,11 +282,21 @@ class Seed {
       let commentArea = document.querySelector('#commentArea');
       let textArea = document.querySelector('#textAreaWriteSeed');
       let submitButton = document.querySelector("#btn-comment");
+      let backButton = document.querySelector("#btn-back-writeSeed");
       commentArea.style.display = "block";
       textArea.value = "";
       // Remove existing event listener (if any)
       submitButton.removeEventListener("click", this.submitHandler);
-      
+      backButton = removeAllEventListeners(backButton);
+      backButton.addEventListener(
+        "click",
+        function () {
+          stopHover = false;
+          this.isReading = false;
+          this.ifClicked = false;
+          readAreaContainer.style.display = "none";
+        }.bind(this)
+      );
       // Define submitHandler function
       this.submitHandler = function () {
         const timestamp = getTimestamp();
@@ -305,32 +315,33 @@ class Seed {
 
   readText() {
     if (!this.isReading) {
-      let readAreaContainer = document.createElement("div");
-      readAreaContainer.id = "readAreaContainer";
-      let userInputContent = document.createTextNode(this.data[0]);
-      // console.log("userInputContent", userInputContent)
-      userInputContent.id = "userInput";
-      let buttonContainer = document.createElement("div");
-      buttonContainer.id = "buttonContainer";
-      let backButton = document.createElement("button");
-      backButton.textContent = "Back";
-      backButton.id = "button-back";
+      this.isReading = true;
+      let readAreaContainer = document.querySelector('#readCommentArea');
+      let innerContainer = document.querySelector('#textAreaReadSeed');
+      let textDiv =document.querySelector('#seedContent');
+      let backButton = document.querySelector("#btn-back-seed");
+      textDiv.addEventListener('scroll', handleScroll(textDiv));
+      textDiv.innerHTML = "";
+      let userInputContent = "";
+      if(this.data != " "){
+        userInputContent = this.data;
+        let textNode = document.createTextNode(userInputContent);
+        textDiv.appendChild(textNode);
+      }
+      readAreaContainer.style.display = "block";
+      backButton = removeAllEventListeners(backButton);
       backButton.addEventListener(
         "click",
         function () {
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
-          let divToRemove = document.getElementById("readAreaContainer");
-          if (divToRemove) {
-            this.removedReadDiv = divToRemove;
-            divToRemove.parentNode.removeChild(divToRemove);
-          }
+          readAreaContainer.style.display = "none";
         }.bind(this)
       );
-      this.isReading = true;
     }
   }
+
   textBG(){
     push();
     noStroke();

@@ -153,11 +153,13 @@ class Core {
       let uploadButton = document.querySelector("#btn-uploadimg");
       let fileInput = document.querySelector("#imageInput");
       let fileSubmitBtn = document.querySelector("#imageInput");
+      let backButton = document.querySelector("#btn-back-writeCore");
       
       writeArea.style.display = "block";
       textArea.value = "";
       uploadButton.removeEventListener("click", this.uploadHandler);
       submitButton.removeEventListener("click", this.submitHandler);
+      backButton = removeAllEventListeners(backButton);
       let userId = this.dbKey;
       this.uploadHandler = async function (){
         let file = fileInput.files[0];
@@ -183,6 +185,16 @@ class Core {
         this.ifClicked = false;
         writeArea.style.display = "none";
       }.bind(this);
+      
+      backButton.addEventListener(
+        "click",
+        function () {
+          stopHover = false;
+          this.isReading = false;
+          this.ifClicked = false;
+          readAreaContainer.style.display = "none";
+        }.bind(this)
+      );
       
       // Add event listener
       uploadButton.addEventListener("click", this.uploadHandler);
@@ -278,18 +290,6 @@ class Core {
           this.writeText(myDBKey);
         }.bind(this)
       );
-      // lockButton.addEventListener(
-      //   "click",
-      //   function() {
-      //     stopHover = false;
-      //     this.isReading = false;
-      //     this.ifClicked = false;
-      //     let reverse = !this.ifLock;
-      //     this.ifLock = reverse;
-      //     console.log(this.ifLock);
-      //     readAreaContainer.style.display = "none";
-      //   }.bind(this)
-      // );
       if(!stopHover){
         stopHover = true;
       } 
