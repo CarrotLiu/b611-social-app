@@ -75,17 +75,6 @@ let colorPrince = [
 ]
 let data_loaded = false;
 
-socket.on('bye',(userId)=>{
-  socket.emit('activity', "A Little Prince just left.");
-  for(let i = 0; i < princes.length; i++){
-    if(princes[i].id == userId){
-      otherWalk.splice(i, 1);
-      princes.splice(i, 1);
-      i--;
-    }
-  }
-})
-
 socket.on('checkSelf', (rst)=>{
   myName = rst[0].displayName;
   myLayer = rst[0].layerNum;
@@ -251,13 +240,26 @@ socket.on("message", (msg) => {
 
 //typing activity
 msgInput.addEventListener('keypress', () => {
-  socket.emit('activity', myName)
+  if(keyCode !=13 && keyCode != 37 && keyCode != 39 && keyCode != 38 && keyCode !=40){
+    socket.emit('activity', "A Little Prince is writing...")
+  }
 })
 
 let activityTimer;
 socket.on("activity", (msg) => {
   activity.textContent = msg; 
   clearEventMsg();
+})
+
+socket.on('bye',(userId)=>{
+  socket.emit('activity', "A Little Prince just left.");
+  for(let i = 0; i < princes.length; i++){
+    if(princes[i].id == userId){
+      otherWalk.splice(i, 1);
+      princes.splice(i, 1);
+      i--;
+    }
+  }
 })
 
   
@@ -277,6 +279,9 @@ blowBtn.addEventListener('click', ()=>{
     }
   }
   socket.emit('updateFly', myId);
+});
+logBtn.addEventListener('click', ()=>{
+  location.reload();
 });
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
@@ -435,6 +440,7 @@ function regrowMe() {
   if (mySeeds.length == 0) {
     currentLayer = 1;
     mySDT = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "];
+    writeSeed(myDBKey, mySDT)
     let index = 0;
     for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + currentLayer * 3)) {
       mySeeds.push(
@@ -466,6 +472,7 @@ function regrowOther(){
     if(userSeed.length == 0){
       let index = 0;
       otherSDT[s] = [" ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]; 
+      writeSeed(otherDBKeys[s], otherSDT[s]);
       for (let r = currentLayer; r > 0; r--) {
         for (let i = 0; i < 2 * PI; i += (2 * PI) / (11 + r * 3)) {
           userSeed.push(new Seed(
@@ -491,7 +498,7 @@ function regrowOther(){
   }
 }
 
-// -------------------- POSITION UPDATE -------------------- //
+// -------------------- REALTIME UPDATE -------------------- //
 function princeWalk(){
   if (keyIsPressed && (keyCode == 39 || keyCode == 37)) {
     if(keyCode == 39){
@@ -603,11 +610,14 @@ socket.on('getCoreData', function (coreDt){
 
 socket.on('getSeedData', function (seedDt){
   let otherId = seedDt[0];
+  console.log(otherId);
+  console.log(myDBKey);
   if(myDBKey == otherId){
     mySDT = seedDt[1];
-    for(let i = 0; i < mySeeds.length; s++){
+    for(let i = 0; i < mySeeds.length; i++){
       mySeeds[i].data=mySDT[i];
     }
+    console.log(mySDT)
   }
   if(seeds.length > 0){
     for(let s = 0; s < seeds.length; s++){
@@ -652,10 +662,11 @@ function locateOther(flowerX){
 }
 
 function checkStopHover(){
-  let readCore = document.querySelector("#readArea").style.display;
-  let writeCore = document.querySelector("#writeArea").style.display;
-  let readSeed = document.querySelector("#readCommentArea").style.display;
-  let writeSeed = document.querySelector("#commentArea").style.display;
+  let readCore = window.getComputedStyle(document.querySelector("#readArea")).display;
+  let writeCore = window.getComputedStyle(document.querySelector("#writeArea")).display;
+  let readSeed = window.getComputedStyle(document.querySelector("#readCommentArea")).display;
+  let writeSeed = window.getComputedStyle(document.querySelector("#commentArea")).display;
+  
   if(writeSeed == "block" || readSeed == "block" || writeCore == "block" || readCore == "block"){
     stopHover = true;
     push()
@@ -663,12 +674,12 @@ function checkStopHover(){
     fill(255);
     circle(width / 2, height / 2, 660);
     pop();
-  }
-  if(writeSeed == "none" && readSeed == "none" && writeCore == "none" && readCore == "none"){
+  } else {
     stopHover = false;
   }
-
+  console.log("stopHover:", stopHover);
 }
+
 
 function getTimestamp() {
   const now = new Date();

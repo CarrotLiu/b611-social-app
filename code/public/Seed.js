@@ -294,7 +294,7 @@ class Seed {
           stopHover = false;
           this.isReading = false;
           this.ifClicked = false;
-          readAreaContainer.style.display = "none";
+          commentArea.style.display = "none";
         }.bind(this)
       );
       // Define submitHandler function

@@ -124,8 +124,8 @@ io.on('connection', socket => {
         } 
     })
 
-    socket.on('activity', (myName)=>{
-        socket.broadcast.emit('activity', "A Little Prince is Writing...");
+    socket.on('activity', (msg)=>{
+        socket.broadcast.emit('activity', msg);
     })
     
     

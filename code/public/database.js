@@ -35,14 +35,15 @@ async function readUserData(id) {
         dbRef.once("value", (snapshot) => {
             let exists = false;
             let userFound = false; 
+            let value;
             snapshot.forEach((childSnapshot) => {
-                let value = childSnapshot.val();
+                value = childSnapshot.val();
                 DBUserList.push(value);
                 userList.push(value);
                 dbKeys.push(childSnapshot.key);
             });
             snapshot.forEach((childSnapshot) => {
-                let value = childSnapshot.val();
+                value = childSnapshot.val();
                 for (let i = 0; i < userList.length; i++) {
                     if (userList[i].userId == id) {
                         exists = true;
@@ -275,18 +276,35 @@ if(loginContainer.style.display != "none"){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
+            console.log("avatar:", photoURL);
+            let signoutBtn = document.querySelector("#btn-signout");
+            signoutBtn.style.backgroundImage = `url('${photoURL}')`;
+            signoutBtn.style.borderRadius ="50%";
+            signoutBtn.style.boxShadow = "0px 0px 10px 0px rgba(255, 255, 255, 0.75)";
+            signoutBtn.addEventListener('mouseenter', function() {
+                signoutBtn.style.borderRadius = "0%";
+                signoutBtn.style.boxShadow ="none";
+                signoutBtn.style.backgroundImage = "url('assets/door-open.svg')"; 
+            });
+            signoutBtn.addEventListener('mouseleave', function() {
+                signoutBtn.style.backgroundImage = `url('${photoURL}')`; 
+                signoutBtn.style.borderRadius ="50%";
+            signoutBtn.style.boxShadow = "0px 0px 10px 0px rgba(255, 255, 255, 0.75)";
+            });
             const exists = await readUserData(userId);  //userList现在是database里所有的user！！！如果是新用户/visitor，就还没存进去！！！
             // console.log("now exists is:", exists)
+
             if (!exists) {
                 console.log("new user!");
                 let l = 1;
                 let c= Math.floor(Math.random() * 3);
                 let f = Math.random() * Math.PI + Math.PI;
                 let s = Math.random() * (1.1 - 0.9) + 0.9;
+                
                 let index = userList.length + 1;
                 
                 let marginX = s * 80;
-                let roomX = s * 560;
+                let roomX = window.innerWidth + s * 10;
                 let min = roomX * (index - 1) + marginX;
                 let max = roomX * index - marginX;
                 console.log(max, min);

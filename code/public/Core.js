@@ -154,7 +154,7 @@ class Core {
       let fileInput = document.querySelector("#imageInput");
       let fileSubmitBtn = document.querySelector("#imageInput");
       let backButton = document.querySelector("#btn-back-writeCore");
-      
+
       writeArea.style.display = "block";
       textArea.value = "";
       uploadButton.removeEventListener("click", this.uploadHandler);
@@ -190,9 +190,9 @@ class Core {
         "click",
         function () {
           stopHover = false;
-          this.isReading = false;
+          this.isWriting = false;
           this.ifClicked = false;
-          readAreaContainer.style.display = "none";
+          writeArea.style.display = "none";
         }.bind(this)
       );
       
