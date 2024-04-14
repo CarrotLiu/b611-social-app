@@ -390,7 +390,22 @@ button:focus { outline: none; }
   background-image: url('assets/back-hover.svg');
 }
 
+#btn-mute{
+  background-image: url('assets/unmute.svg');
+}
+#btn-mute:hover{
+  background-image: url('assets/mute.svg');
+  transition:0.5s;
+}
 
+#btn-unmute{
+  background-image: url('assets/mute.svg');
+}
+
+#btn-unmute:hover{
+  background-image: url('assets/unmute.svg');
+  transition:0.5s;
+}
 
 
 input[type="file"]::file-selector-button {

@@ -75,6 +75,13 @@ let colorPrince = [
 ]
 let data_loaded = false;
 
+let playlist = [];
+let voices;
+function preload() {
+  playlist[0] = loadSound("assets/LagFyrirOmmu.weba");
+  voices = loadSound("assets/humanvoices.mp3");
+}
+
 socket.on('checkSelf', (rst)=>{
   myName = rst[0].displayName;
   myLayer = rst[0].layerNum;
@@ -230,6 +237,37 @@ const locateBtn = document.querySelector("#btn-locate");
 const blowBtn = document.querySelector("#btn-blow");
 const helpBtn = document.querySelector("#btn-bulb");
 const logBtn = document.querySelector("#btn-signout");
+let soundBtn;
+let mute = false;
+if(document.querySelector("#btn-mute")){
+  soundBtn = document.querySelector("#btn-mute");
+  mute = false;
+}else if(document.querySelector("#btn-unmute")){
+  soundBtn = document.querySelector("#btn-unmute");
+  mute = true;
+}
+soundBtn.addEventListener('click', ()=>{
+  if(mute){
+    soundBtn.setAttribute("id", "btn-mute");
+    mute = false;
+  }else{
+    soundBtn.setAttribute("id", "btn-unmute");
+    mute = true;
+  }
+})
+
+locateBtn.addEventListener('click', ()=>{locateSelf();});
+blowBtn.addEventListener('click', ()=>{
+  if(mySeeds.length > 0){
+    for(let i = 0; i < mySeeds.length; i++){
+      mySeeds[i].ifFly=true;
+    }
+  }
+  socket.emit('updateFly', myId);
+});
+logBtn.addEventListener('click', ()=>{
+  location.reload();
+});
 
 //connection activity
 socket.on("message", (msg) => {
@@ -271,22 +309,12 @@ function clearEventMsg(){
     }, 5000)
 }
 
-locateBtn.addEventListener('click', ()=>{locateSelf();});
-blowBtn.addEventListener('click', ()=>{
-  if(mySeeds.length > 0){
-    for(let i = 0; i < mySeeds.length; i++){
-      mySeeds[i].ifFly=true;
-    }
-  }
-  socket.emit('updateFly', myId);
-});
-logBtn.addEventListener('click', ()=>{
-  location.reload();
-});
+
 // -------------------- P5JS SKETCH -------------------- //
 let canvas;
 let stars = [];
 let stopHover = false;
+
 
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight);
@@ -296,10 +324,22 @@ function setup() {
   for (let i = 0; i < 150; i++) {
     stars.push(new Star(random(0, width), random(0, height)));
   }
+  if(!mute){
+    playlist[0].play();
+  }
+  
 }
 
 // Main draw function
 function draw() {
+  if (!mute) {
+    if(!playlist[0].isPlaying()){
+      playlist[0].loop();
+    }
+    
+  }else{
+    playlist[0].stop();
+  }
   background("#001C30");
   for (let i = 0; i < stars.length; i++) {
     stars[i].update();
@@ -366,6 +406,7 @@ function drawOtherPrince(){
 function drawMyDande(){
   push();
   if(myCore){
+
     regrowMe();
     drawStem(map(sin(frameCount * 0.01 + myFreq), -1, 1, -60, 60),map(cos(myFreq), -1, 1, -10, 0),myX,myY,myColor);
     for(let i = 0; i < mySeeds.length; i++){
@@ -378,7 +419,11 @@ function drawMyDande(){
         mySeeds[i].lastCoreY = mySeeds[i].coreY;
         mySeeds[i].lastSeedX = mySeeds[i].seedX;
         mySeeds[i].lastSeedY = mySeeds[i].seedY;
-      }      
+      }else{
+        if(!voices.isPlaying()){
+          voices.play();
+        }
+      }
       if (mySeeds[i].flyDone) {
         mySeeds.splice(i, 1);
       }
@@ -407,6 +452,11 @@ function drawOtherDande(){
           userSeeds[i].lastCoreY = userSeeds[i].coreY;
           userSeeds[i].lastSeedX = userSeeds[i].seedX;
           userSeeds[i].lastSeedY = userSeeds[i].seedY;
+        }else{
+          
+          if(!voices.isPlaying()){
+            voices.play();
+          }
         }      
         if (userSeeds[i].flyDone) {
           userSeeds.splice(i, 1);
@@ -677,7 +727,7 @@ function checkStopHover(){
   } else {
     stopHover = false;
   }
-  console.log("stopHover:", stopHover);
+  // console.log("stopHover:", stopHover);
 }
 
 

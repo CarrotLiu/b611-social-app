@@ -304,7 +304,7 @@ if(loginContainer.style.display != "none"){
                 let index = userList.length + 1;
                 
                 let marginX = s * 80;
-                let roomX = window.innerWidth + s * 10;
+                let roomX = 1300 + s * 10;
                 let min = roomX * (index - 1) + marginX;
                 let max = roomX * index - marginX;
                 console.log(max, min);

@@ -1,0 +1,24 @@
+<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_485_332)">
+<g filter="url(#filter0_f_485_332)">
+<path d="M30.417 43.75L16.167 33.3333H7.50033C6.94779 33.3333 6.41789 33.1138 6.02719 32.7231C5.63649 32.3324 5.41699 31.8025 5.41699 31.25V18.75C5.41699 18.1975 5.63649 17.6676 6.02719 17.2769C6.41789 16.8862 6.94779 16.6667 7.50033 16.6667H16.167L30.417 6.25V43.75Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 12L44 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M39 37L44 42" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M39 25L46 25" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</g>
+<path d="M30.417 43.75L16.167 33.3333H7.50033C6.94779 33.3333 6.41789 33.1138 6.02719 32.7231C5.63649 32.3324 5.41699 31.8025 5.41699 31.25V18.75C5.41699 18.1975 5.63649 17.6676 6.02719 17.2769C6.41789 16.8862 6.94779 16.6667 7.50033 16.6667H16.167L30.417 6.25V43.75Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M39 12L44 7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M39 37L44 42" stroke="white" stroke-width="2" stroke-linecap="round"/>
+<path d="M39 25L46 25" stroke="white" stroke-width="2" stroke-linecap="round"/>
+</g>
+<defs>
+<filter id="filter0_f_485_332" x="0.416992" y="1.25" width="50.583" height="47.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="2" result="effect1_foregroundBlur_485_332"/>
+</filter>
+<clipPath id="clip0_485_332">
+<rect width="50" height="50" fill="white"/>
+</clipPath>
+</defs>
+</svg>
