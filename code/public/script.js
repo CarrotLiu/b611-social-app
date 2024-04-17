@@ -79,19 +79,21 @@ let voices;
 var imgPreviewCnv;
 
 async function previewImage(url){
+  let modifiedImg = document.querySelector("#img-preview-sketch");
+  modifiedImg.style.display = "block";
   sketch = function(p){
     p.princesAvatar = [];
     p.princesAvatarIdx=[];
     p.imgPath = url;
     p.preload = function(){
-      princesAvatar[0] = loadImage("assets/prince1.svg");
-      princesAvatar[1] = loadImage("assets/prince2.svg");
-      princesAvatar[2] = loadImage("assets/prince3.svg");
+      p.princesAvatar[0] = loadImage("assets/prince1.svg");
+      p.princesAvatar[1] = loadImage("assets/prince2.svg");
+      p.princesAvatar[2] = loadImage("assets/prince3.svg");
     }
     p.setup = function(){
-      p.preview = p.createCanvas(640, 480);
+      p.preview = p.createCanvas(windowWidth, windowHeight);
       p.preview.parent("img-preview-sketch");
-      p.preview.position(windowWidth / 2, 100);
+      p.preview.position(0, 0);
       p.setupFaceDetection();
     }
     p.draw = function() {
@@ -107,17 +109,19 @@ async function previewImage(url){
       p.scaleFactor = 1.2;
       p.detector = new objectdetect.detector(p.w, p.h, p.scaleFactor, p.classifier);
       p.img = loadImage(p.imgPath, function(img) {
-        detectFaces(img);
+        p.detectFaces(img);
       });
     }
     p.detectFaces = function(img) {
-      p.faces = detector.detect(img.canvas);
-      p.faces = p.faces.filter(face => face[4] > 5); 
+      p.faces = p.detector.detect(img.canvas);
+      p.faces = p.faces.filter(face => face[4] > 3); 
+      console.log(p.faces);
       for(let i = 0; i < p.faces.length; i++){
         p.princesAvatarIdx[i] = floor(random(0, p.faces.length - 1));
       }
     }
     p.displayFaceDetection = function() {
+      p.img.resize(0, height);
       p.image(p.img, 0, 0);
       p.stroke(255);
       p.noFill();
@@ -131,18 +135,18 @@ async function previewImage(url){
         p.translate(fx - fwidth /10, fy + fheight / 10);
         p.imageMode(CENTER);
         p.scale(fwidth / 75);
-        p.image(p.princes[princesIdx[i]], 0, 0);
+        p.image(p.princesAvatar[p.princesAvatarIdx[i]], 0, 0);
         p.pop();
       }
     }
   }
   imgPreviewCnv = new p5(sketch);
-  let modifiedImg = document.querySelector("#img-preview-sketch");
-  return new Promise((resolve, reject) => {
-    modifiedImg.toBlob(function(blob) {
-      resolve(blob);
-    }, 'image/jpeg');
-  });
+  
+  // return new Promise((resolve, reject) => {
+  //   modifiedImg.toBlob(function(blob) {
+  //     resolve(blob);
+  //   }, 'image/jpeg');
+  // });
   
 }
 

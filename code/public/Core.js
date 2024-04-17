@@ -164,9 +164,10 @@ class Core {
       this.uploadHandler = async function (){
         let file = fileInput.files[0];
         try{
-          console.log(file);
-          // let imageUrl = URL.createObjectURL(file);
-          // let modifiedImageBlob = await previewImage(imageUrl);
+          
+          let imageUrl = URL.createObjectURL(file);
+          // console.log(imageUrl);
+          let modifiedImageBlob = await previewImage(imageUrl);
           // this.coreImage = await writeImage(modifiedImageBlob, userId);
           // let imageUrl = URL.createObjectURL(file);
           // await previewImage(imageUrl);
