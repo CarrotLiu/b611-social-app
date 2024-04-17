@@ -150,9 +150,7 @@ class Core {
       let writeArea = document.querySelector('#writeArea');
       let textArea = document.querySelector('#textAreaWriteCore');
       let submitButton = document.querySelector("#btn-finish");
-      let uploadButton = document.querySelector("#btn-uploadimg");
       let fileInput = document.querySelector("#imageInput");
-      let fileSubmitBtn = document.querySelector("#btn-uploadimg");
       let backButton = document.querySelector("#btn-back-writeCore");
 
       writeArea.style.display = "block";

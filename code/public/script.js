@@ -79,11 +79,24 @@ let voices;
 var imgPreviewCnv;
 
 async function previewImage(url){
+  let uploadButton = document.querySelector("#btn-uploadimg");
+  let slider = document.querySelector("#blurRange");
+  
   let modifiedImg = document.querySelector("#img-preview-sketch");
   modifiedImg.style.display = "block";
-  sketch = function(p){
+  sketch = function(p, slider){
     p.faceapi;
     p.detections;
+    
+    p.slider = slider;
+    p.blurValue = p.slider.value;
+    p.slider.addEventListener('input', function() {
+      console.log(p.slider.value);
+      p.blurValue = p.slider.value; 
+    });
+    // console.log(p.slider);
+    // console.log(p.blurValue);
+    
     p.detection_options = {
       withLandmarks: true,
       withDescriptors: false,
@@ -101,9 +114,9 @@ async function previewImage(url){
       p.princesAvatar[2] = loadImage("assets/prince3.svg");
     }
     p.setup = function(){
-      p.preview = p.createCanvas(window.innerWidth / 2, 800);
+      p.preview = p.createCanvas(800, 600);
       p.preview.parent("img-preview-sketch");
-      p.preview.position(0, 0);
+      p.preview.position(50, (window.innerHeight - 600)/ 2);
       p.img = loadImage(url, function(){
         p.imageLoaded = true;
         if(p.imageLoaded){
@@ -121,15 +134,27 @@ async function previewImage(url){
       });
     }
     p.draw = function(){
-      p.background(255);
+      p.background(255, 0);
       if(p.detectionDone){
+        
         p.image(p.img,0,0 );
+        p.filter(p.BLUR, parseInt(p.blurValue, 10), false);
+        // console.log(p.blurValue)
         for(let i = 0; i < p.detections.length; i++){
           let detection = p.detections[i];
           if (detection) {
             p.displayImg(detection, i);
           }
         } 
+      }else{
+        p.push();
+        p.noStroke();
+        p.fill(255);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.textFont("Mate");
+        p.textSize(30);
+        p.text("Loading...", 260, p.height / 2);
+        p.pop();
       }
     }
 
@@ -153,8 +178,6 @@ async function previewImage(url){
       // console.log(p.img,canvasWidth, canvasHeight)
       let alignedRect = detection.alignedRect;
       let {_x, _y, _width, _height} = alignedRect._box;
-      // rect(_x, _y, _width, _height);
-      console.log(_x, _y, _width, _height);
       p.push();
       p.imageMode(CENTER);
       p.translate(_x, _y);
@@ -163,7 +186,7 @@ async function previewImage(url){
       p.pop();
     }
   }
-  imgPreviewCnv = new p5(sketch);
+  imgPreviewCnv = new p5((p) => sketch(p, slider)); 
   
   // return new Promise((resolve, reject) => {
   //   modifiedImg.toBlob(function(blob) {

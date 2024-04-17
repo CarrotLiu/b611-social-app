@@ -30,7 +30,8 @@
 </head>
 <body>  
     <main>
-    <div id="p5-container"></div>                        
+    <div id="p5-container"></div>     
+                      
     <div class="buttonContainer" id="login-btns">
         <h1>B611</h1>
         <button class="btn-login" id="login">Login with Google</button>
@@ -41,9 +42,7 @@
         <textarea class="textInputArea" id="textAreaWriteCore" type = "text" placeholder="Please write about your day here. How do you feel? What do you think?"></textarea>
         <div class="imageInputArea" id="imageAreaWriteCore">
             <input type="file" id="imageInput" accept="image/*">
-            <br>
-            <br>
-            <button class="btn-basic" id="btn-uploadimg"></button>
+            
         </div>
         <div class="buttonContainer" id="writing-btns">
             <button class="btn-basic" id="btn-finish"></button>
@@ -103,8 +102,15 @@
             </button>
         </div>
     </div>
-    <div id="img-preview-sketch"></div>
-</main>  
+    <div id="img-preview-sketch">
+        <input type="range" min="0" max="16" value="1" class="slider" id="blurRange">
+        <br>
+        <br>
+        <button class="btn-basic" id="btn-uploadimg"></button>
+        <button class="btn-basic" id="btn_back_img"></button>
+    </div> 
+    
+    </main>  
 </body>
 </html>
 
