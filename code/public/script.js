@@ -82,62 +82,85 @@ async function previewImage(url){
   let modifiedImg = document.querySelector("#img-preview-sketch");
   modifiedImg.style.display = "block";
   sketch = function(p){
+    p.faceapi;
+    p.detections;
+    p.detection_options = {
+      withLandmarks: true,
+      withDescriptors: false,
+    }
     p.princesAvatar = [];
     p.princesAvatarIdx=[];
-    p.imgPath = url;
+    p.img;
+    p.imgLoaded = false;
+    p.detectionDone = false;
+    p.compensateX = 0;
+    p.compensateY = 0;
     p.preload = function(){
       p.princesAvatar[0] = loadImage("assets/prince1.svg");
       p.princesAvatar[1] = loadImage("assets/prince2.svg");
       p.princesAvatar[2] = loadImage("assets/prince3.svg");
     }
     p.setup = function(){
-      p.preview = p.createCanvas(windowWidth, windowHeight);
+      p.preview = p.createCanvas(window.innerWidth / 2, 800);
       p.preview.parent("img-preview-sketch");
       p.preview.position(0, 0);
-      p.setupFaceDetection();
-    }
-    p.draw = function() {
-      p.background(0);
-      p.displayFaceDetection();
-    }
-    p.w = 640, p.h = 480;
-    p.detector;
-    p.classifier = objectdetect.frontalface;
-    p.img;
-    p.faces = [];
-    p.setupFaceDetection = function(){
-      p.scaleFactor = 1.2;
-      p.detector = new objectdetect.detector(p.w, p.h, p.scaleFactor, p.classifier);
-      p.img = loadImage(p.imgPath, function(img) {
-        p.detectFaces(img);
+      p.img = loadImage(url, function(){
+        p.imageLoaded = true;
+        if(p.imageLoaded){
+          if(p.img.width > p.img.height){
+            p.compensateY = (p.width - p.img.width) / 20;
+            p.img.resize(p.width, 0);
+            
+          }else{
+            p.compensateX = (p.height - p.img.height) / 20;
+            p.img.resize(0, p.height);
+            
+          }
+          p.faceapi = ml5.faceApi(p.detection_options, p.modelReady);
+        }
       });
     }
-    p.detectFaces = function(img) {
-      p.faces = p.detector.detect(img.canvas);
-      p.faces = p.faces.filter(face => face[4] > 3); 
-      console.log(p.faces);
-      for(let i = 0; i < p.faces.length; i++){
-        p.princesAvatarIdx[i] = floor(random(0, p.faces.length - 1));
+    p.draw = function(){
+      p.background(255);
+      if(p.detectionDone){
+        p.image(p.img,0,0 );
+        for(let i = 0; i < p.detections.length; i++){
+          let detection = p.detections[i];
+          if (detection) {
+            p.displayImg(detection, i);
+          }
+        } 
       }
     }
-    p.displayFaceDetection = function() {
-      p.img.resize(0, height);
-      p.image(p.img, 0, 0);
-      p.stroke(255);
-      p.noFill();
-      for (let i = 0; i < p.faces.length; i++) {
-        let face = p.faces[i];
-        let fx = face[0];
-        let fy = face[1];
-        let fwidth = face[2];
-        let fheight = face[3];
-        p.push();
-        p.translate(fx - fwidth /10, fy + fheight / 10);
-        p.imageMode(CENTER);
-        p.scale(fwidth / 75);
-        p.image(p.princesAvatar[p.princesAvatarIdx[i]], 0, 0);
-        p.pop();
+
+    p.modelReady = function(){
+      console.log(p.faceapi)
+      p.faceapi.detect(p.img, p.gotResults)
+    }
+    p.gotResults = function(err, result){
+      if (err) {
+        console.log(err)
+        return
       }
+      p.detections = result;
+      for(let i = 0; i < p.detections.length; i++){
+        p.princesAvatarIdx[i] = p.floor(p.random(0,p.detections.length - 1));
+      }
+      p.detectionDone = true;
+    }
+    p.displayImg = function(detection, i){
+
+      // console.log(p.img,canvasWidth, canvasHeight)
+      let alignedRect = detection.alignedRect;
+      let {_x, _y, _width, _height} = alignedRect._box;
+      // rect(_x, _y, _width, _height);
+      console.log(_x, _y, _width, _height);
+      p.push();
+      p.imageMode(CENTER);
+      p.translate(_x, _y);
+      p.scale(_width / 75);
+      p.image(p.princesAvatar[p.princesAvatarIdx[i]], 0, 0);
+      p.pop();
     }
   }
   imgPreviewCnv = new p5(sketch);

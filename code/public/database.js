@@ -276,7 +276,7 @@ if(loginContainer.style.display != "none"){
     loginBtn.addEventListener('click', async () => {
         try {
             const { username, userId, photoURL } = await signin();
-            console.log("avatar:", photoURL);
+            // console.log("avatar:", photoURL);
             let signoutBtn = document.querySelector("#btn-signout");
             signoutBtn.style.backgroundImage = `url('${photoURL}')`;
             signoutBtn.style.borderRadius ="50%";
