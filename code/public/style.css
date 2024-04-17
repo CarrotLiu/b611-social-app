@@ -9,13 +9,15 @@ html, body {
   overflow:hidden;
 }
 
-canvas {
-  
-}
 
 #p5-container{
   visibility: hidden;
   height: 100%;
+}
+
+#img-preview-sketch{
+  display: none;
+  position:absolute;
 }
 
 h1{
@@ -357,7 +359,6 @@ button:focus { outline: none; }
 
 #btn-uploadimg{
   background-image: url('assets/upload.svg');
-  
 }
 
 #btn-uploadimg:hover{

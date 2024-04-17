@@ -74,9 +74,78 @@ let colorPrince = [
   ]
 ]
 let data_loaded = false;
-
 let playlist = [];
 let voices;
+var imgPreviewCnv;
+
+async function previewImage(url){
+  sketch = function(p){
+    p.princesAvatar = [];
+    p.princesAvatarIdx=[];
+    p.imgPath = url;
+    p.preload = function(){
+      princesAvatar[0] = loadImage("assets/prince1.svg");
+      princesAvatar[1] = loadImage("assets/prince2.svg");
+      princesAvatar[2] = loadImage("assets/prince3.svg");
+    }
+    p.setup = function(){
+      p.preview = p.createCanvas(640, 480);
+      p.preview.parent("img-preview-sketch");
+      p.preview.position(windowWidth / 2, 100);
+      p.setupFaceDetection();
+    }
+    p.draw = function() {
+      p.background(0);
+      p.displayFaceDetection();
+    }
+    p.w = 640, p.h = 480;
+    p.detector;
+    p.classifier = objectdetect.frontalface;
+    p.img;
+    p.faces = [];
+    p.setupFaceDetection = function(){
+      p.scaleFactor = 1.2;
+      p.detector = new objectdetect.detector(p.w, p.h, p.scaleFactor, p.classifier);
+      p.img = loadImage(p.imgPath, function(img) {
+        detectFaces(img);
+      });
+    }
+    p.detectFaces = function(img) {
+      p.faces = detector.detect(img.canvas);
+      p.faces = p.faces.filter(face => face[4] > 5); 
+      for(let i = 0; i < p.faces.length; i++){
+        p.princesAvatarIdx[i] = floor(random(0, p.faces.length - 1));
+      }
+    }
+    p.displayFaceDetection = function() {
+      p.image(p.img, 0, 0);
+      p.stroke(255);
+      p.noFill();
+      for (let i = 0; i < p.faces.length; i++) {
+        let face = p.faces[i];
+        let fx = face[0];
+        let fy = face[1];
+        let fwidth = face[2];
+        let fheight = face[3];
+        p.push();
+        p.translate(fx - fwidth /10, fy + fheight / 10);
+        p.imageMode(CENTER);
+        p.scale(fwidth / 75);
+        p.image(p.princes[princesIdx[i]], 0, 0);
+        p.pop();
+      }
+    }
+  }
+  imgPreviewCnv = new p5(sketch);
+  let modifiedImg = document.querySelector("#img-preview-sketch");
+  return new Promise((resolve, reject) => {
+    modifiedImg.toBlob(function(blob) {
+      resolve(blob);
+    }, 'image/jpeg');
+  });
+  
+}
+
 function preload() {
   playlist[0] = loadSound("assets/LagFyrirOmmu.weba");
   voices = loadSound("assets/humanvoices.mp3");

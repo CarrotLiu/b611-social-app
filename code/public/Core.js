@@ -152,23 +152,35 @@ class Core {
       let submitButton = document.querySelector("#btn-finish");
       let uploadButton = document.querySelector("#btn-uploadimg");
       let fileInput = document.querySelector("#imageInput");
-      let fileSubmitBtn = document.querySelector("#imageInput");
+      let fileSubmitBtn = document.querySelector("#btn-uploadimg");
       let backButton = document.querySelector("#btn-back-writeCore");
 
       writeArea.style.display = "block";
       textArea.value = "";
-      uploadButton.removeEventListener("click", this.uploadHandler);
+      
       submitButton.removeEventListener("click", this.submitHandler);
       backButton = removeAllEventListeners(backButton);
       let userId = this.dbKey;
       this.uploadHandler = async function (){
         let file = fileInput.files[0];
         try{
-          this.coreImage = await writeImage(file, userId);
+          console.log(file);
+          // let imageUrl = URL.createObjectURL(file);
+          // let modifiedImageBlob = await previewImage(imageUrl);
+          // this.coreImage = await writeImage(modifiedImageBlob, userId);
+          // let imageUrl = URL.createObjectURL(file);
+          // await previewImage(imageUrl);
+          // this.coreImage = await writeImage(file, userId);
         } catch(error){
           console.log(error);
         }
       }
+      fileInput.removeEventListener("change", this.uploadHandler, false);
+      fileInput.addEventListener("change", this.uploadHandler, false);
+      // uploadButton.removeEventListener("click", this.uploadHandler);
+      // uploadButton.addEventListener("click", this.uploadHandler);
+      
+      
       this.submitHandler = function () {
         const timestamp = getTimestamp();
         // console.log(timestamp);
@@ -196,8 +208,6 @@ class Core {
         }.bind(this)
       );
       
-      // Add event listener
-      uploadButton.addEventListener("click", this.uploadHandler);
       submitButton.addEventListener("click", this.submitHandler);
     }
   }
