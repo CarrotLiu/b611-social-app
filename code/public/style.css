@@ -9,20 +9,13 @@ html, body {
   overflow:hidden;
 }
 
+canvas {
+  
+}
 
 #p5-container{
   visibility: hidden;
   height: 100%;
-}
-
-#img-preview-sketch{
-  display: none;
-  position:absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height:100%;
-  background-color: #001C30;
 }
 
 h1{
@@ -363,10 +356,8 @@ button:focus { outline: none; }
 }
 
 #btn-uploadimg{
-  position:absolute;
-  top: 60%;
-  right: 305px;
   background-image: url('assets/upload.svg');
+  
 }
 
 #btn-uploadimg:hover{
@@ -416,57 +407,6 @@ button:focus { outline: none; }
   transition:0.5s;
 }
 
-#btn_back_img{
-  position:absolute;
-  top:50px;
-  right: 50px;
-  background-image: url('assets/back-img.svg');
-  transition:0.3s;
-}
-#btn_back_img:hover{
-  background-image: url('assets/back-img-hover.svg');
-}
-
-
-#blurRange{
-  width: 300px;
-  border-radius: 5px;
-  -webkit-appearance: none;
-  height: 20px;
-  background: #ffffff;
-  outline: none;
-  opacity: 0.7;
-  -webkit-transition: .2s;
-  transition: opacity .2s;
-  box-shadow: 0 0 10px 0 #ffffff;
-  position: absolute;
-  right: 200px;
-  top: 50%;
-  transform: translateY(-50%);
-}
-#blurRange:hover {
-  opacity: 1;
-}
-
-#blurRange::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 20px;
-  height: 20px;
-  background: #fadb11;
-  border-radius: 10px;
-  box-shadow: 0 0 10px 0 #fadb11;
-  cursor: pointer;
-}
-
-#blurRange::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  background: #fadb11;
-  border-radius: 10px;
-  box-shadow: 0 0 10px 0 #fadb11;
-  cursor: pointer;
-}
 
 input[type="file"]::file-selector-button {
   border: 2px solid #001C30;
@@ -537,6 +477,5 @@ border-radius: 10px;
 
 
   
-
 
 
