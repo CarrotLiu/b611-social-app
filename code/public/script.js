@@ -363,6 +363,20 @@ function draw() {
   
   pop()
   checkStopHover();
+  }
+  
+  //translate 所有其他东西
+  drawMyPrince();
+  push()
+  translate(cnvX, 0);
+  drawOtherPrince();
+  //self dandelion
+  drawMyDande();
+  //others dandelion
+  drawOtherDande();
+  
+  pop()
+  checkStopHover();
   
 }
 function drawMyPrince(){
