@@ -31,8 +31,8 @@ let userNum = allUsers.length;
 //if in production mode: route to github path. else, route to local path
 const io = new Server(expressServer, {
     cors: {
-        origin: process.env.NODE_ENV === "production" ? "https://carrotliu.github.io" : 
-        ["http://localhost:5501", "http://127.0.0.1:5501"]
+        origin: process.env.NODE_ENV === "production" ? "https://carrotliu.github.io" : "http://127.0.0.1:3500"
+        // ["http://localhost:5501", "http://127.0.0.1:5501", "http://127.0.0.1:3500", "http:localhost:3500"]
     }
 })
 
