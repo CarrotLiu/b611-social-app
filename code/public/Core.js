@@ -156,19 +156,19 @@ class Core {
       writeArea.style.display = "block";
       textArea.value = "";
       
-      submitButton.removeEventListener("click", this.submitHandler);
+      submitButton.removeEventListener("click", this.submitHandler, false);
       backButton = removeAllEventListeners(backButton);
       let userId = this.dbKey;
       this.uploadHandler = async function (){
         let file = fileInput.files[0];
         try{
-          
           let imageUrl = URL.createObjectURL(file);
           // console.log(imageUrl);
           let modifiedImageBlob = await previewImage(imageUrl);
-          // this.coreImage = await writeImage(modifiedImageBlob, userId);
-          // let imageUrl = URL.createObjectURL(file);
-          // await previewImage(imageUrl);
+          fileInput.files[0]=modifiedImageBlob;
+          file = fileInput.files[0];
+          console.log(file);
+          this.coreImage = await writeImage(modifiedImageBlob, userId);
           // this.coreImage = await writeImage(file, userId);
         } catch(error){
           console.log(error);
@@ -180,8 +180,11 @@ class Core {
       // uploadButton.addEventListener("click", this.uploadHandler);
       
       
-      this.submitHandler = function () {
+      this.submitHandler = async function () {
         const timestamp = getTimestamp();
+        if(!fileInput.files[0]){
+          this.coreImage = await writeImage(null, userId);
+        }
         // console.log(timestamp);
         if (this.coreData[0] === " ") {
           this.coreData[0] = timestamp + textArea.value;
@@ -253,6 +256,8 @@ class Core {
       textDiv.innerHTML = "";
       let userInputContent = "";
       let userInputImage = document.createElement("img");
+      userInputImage.style.width = "80%";
+      userInputImage.style.border = "none";
 
       readAreaContainer.style.display = "block";
       for(let i = 0; i < this.coreData.length; i++){

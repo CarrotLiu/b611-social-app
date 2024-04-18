@@ -80,22 +80,29 @@ var imgPreviewCnv;
 
 async function previewImage(url){
   let uploadButton = document.querySelector("#btn-uploadimg");
-  let slider = document.querySelector("#blurRange");
-  
+let slider = document.querySelector("#blurRange");
+let backBtn = document.querySelector("#btn_back_img"); 
+// console.log(backBtn);
   let modifiedImg = document.querySelector("#img-preview-sketch");
   modifiedImg.style.display = "block";
+
+  
+  backBtn.addEventListener('click', function() {
+    modifiedImg.style.display = "none";
+  });
+
   sketch = function(p, slider){
     p.faceapi;
     p.detections;
     
     p.slider = slider;
     p.blurValue = p.slider.value;
-    p.slider.addEventListener('input', function() {
-      console.log(p.slider.value);
+    p.slider.removeEventListener('input', function() {
       p.blurValue = p.slider.value; 
     });
-    // console.log(p.slider);
-    // console.log(p.blurValue);
+    p.slider.addEventListener('input', function() {
+      p.blurValue = p.slider.value; 
+    });
     
     p.detection_options = {
       withLandmarks: true,
@@ -115,6 +122,7 @@ async function previewImage(url){
     }
     p.setup = function(){
       p.preview = p.createCanvas(800, 600);
+
       p.preview.parent("img-preview-sketch");
       p.preview.position(50, (window.innerHeight - 600)/ 2);
       p.img = loadImage(url, function(){
@@ -123,11 +131,9 @@ async function previewImage(url){
           if(p.img.width > p.img.height){
             p.compensateY = (p.width - p.img.width) / 20;
             p.img.resize(p.width, 0);
-            
           }else{
             p.compensateX = (p.height - p.img.height) / 20;
             p.img.resize(0, p.height);
-            
           }
           p.faceapi = ml5.faceApi(p.detection_options, p.modelReady);
         }
@@ -187,12 +193,19 @@ async function previewImage(url){
     }
   }
   imgPreviewCnv = new p5((p) => sketch(p, slider)); 
-  
-  // return new Promise((resolve, reject) => {
-  //   modifiedImg.toBlob(function(blob) {
-  //     resolve(blob);
-  //   }, 'image/jpeg');
-  // });
+    
+
+    uploadButton.addEventListener('click', async function() {
+      return new Promise((resolve, reject) => {
+        imgPreviewCnv.canvas.toBlob(function(blob) {
+          let cnv = blob;
+          console.log(cnv)
+          modifiedImg.style.display = "none";
+          imgPreviewCnv.remove(); // or imgPreviewCnv.canvas.remove() if you want to remove only the canvas
+          resolve(cnv);
+        }, 'image/jpeg');
+      });
+    });
   
 }
 
